@@ -1,23 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 
+type Executive = {
+  id: number
+  dni: string
+  name: string
+  last_name: string
+  company_id: number
+  assistant_id: number
+  company: {
+    razon_social: string
+  }
+  assistant: {
+    name: string
+    last_name: string
+  }
+}
+
 export default function ExecutiveDetailsPage() {
-  const [executive, setExecutive] = useState<any>(null)
+  const [executive, setExecutive] = useState<Executive | null>(null)
   const params = useParams()
-  const router = useRouter()
 
-  useEffect(() => {
-    if (params.id) {
-      fetchExecutive()
-    }
-  }, [params.id])
-
-  async function fetchExecutive() {
+  const fetchExecutive = useCallback(async () => {
+    if (typeof params.id !== 'string') return
     const { data, error } = await supabase
       .from('executive')
       .select(`
@@ -33,7 +43,11 @@ export default function ExecutiveDetailsPage() {
     } else {
       setExecutive(data)
     }
-  }
+  }, [params.id])
+
+  useEffect(() => {
+    fetchExecutive()
+  }, [fetchExecutive])
 
   if (!executive) return <div>Loading...</div>
 

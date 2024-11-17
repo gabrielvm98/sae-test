@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
@@ -17,13 +17,8 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
   const [seats, setSeats] = useState('1')
   const router = useRouter()
 
-  useEffect(() => {
-    if (companyId) {
-      fetchCompany()
-    }
-  }, [companyId])
-
-  async function fetchCompany() {
+  const fetchCompany = useCallback(async () => {
+    if (!companyId) return
     const { data, error } = await supabase
       .from('company')
       .select('*')
@@ -38,7 +33,13 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
       setNombreComercial(data.nombre_comercial)
       setSeats(data.seats.toString())
     }
-  }
+  }, [companyId])
+
+  useEffect(() => {
+    if (companyId) {
+      fetchCompany()
+    }
+  }, [companyId, fetchCompany])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
@@ -24,14 +24,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
   const [companies, setCompanies] = useState<Company[]>([])
   const router = useRouter()
 
-  useEffect(() => {
-    fetchCompanies()
-    if (assistantId) {
-      fetchAssistant()
-    }
-  }, [assistantId])
-
-  async function fetchCompanies() {
+  const fetchCompanies = useCallback(async () => {
     const { data, error } = await supabase
       .from('company')
       .select('id, razon_social')
@@ -41,9 +34,10 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
     } else {
       setCompanies(data || [])
     }
-  }
+  }, [])
 
-  async function fetchAssistant() {
+  const fetchAssistant = useCallback(async () => {
+    if (!assistantId) return
     const { data, error } = await supabase
       .from('assistant')
       .select('*')
@@ -59,7 +53,14 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       setEmail(data.email)
       setCompanyId(data.company_id.toString())
     }
-  }
+  }, [assistantId])
+
+  useEffect(() => {
+    fetchCompanies()
+    if (assistantId) {
+      fetchAssistant()
+    }
+  }, [assistantId, fetchAssistant, fetchCompanies])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -73,7 +74,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
 
     if (assistantId) {
       const { error } = await supabase
-        .from('assistant')
+        .from('assistants')
         .update(assistant)
         .eq('id', assistantId)
 
@@ -81,7 +82,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       else router.push('/secretarias')
     } else {
       const { error } = await supabase
-        .from('assistant')
+        .from('assistants')
         .insert([assistant])
 
       if (error) console.error('Error creating assistant:', error)

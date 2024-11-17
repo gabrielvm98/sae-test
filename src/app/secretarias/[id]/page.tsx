@@ -1,23 +1,29 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
 
+type Assistant = {
+  id: number
+  dni: string
+  name: string
+  last_name: string
+  email: string
+  company_id: number
+  company: {
+    razon_social: string
+  }
+}
+
 export default function AssistantDetailsPage() {
-  const [assistant, setAssistant] = useState<any>(null)
+  const [assistant, setAssistant] = useState<Assistant | null>(null)
   const params = useParams()
-  const router = useRouter()
 
-  useEffect(() => {
-    if (params.id) {
-      fetchAssistant()
-    }
-  }, [params.id])
-
-  async function fetchAssistant() {
+  const fetchAssistant = useCallback(async () => {
+    if (typeof params.id !== 'string') return
     const { data, error } = await supabase
       .from('assistant')
       .select(`
@@ -32,7 +38,11 @@ export default function AssistantDetailsPage() {
     } else {
       setAssistant(data)
     }
-  }
+  }, [params.id])
+
+  useEffect(() => {
+    fetchAssistant()
+  }, [fetchAssistant])
 
   if (!assistant) return <div>Loading...</div>
 
