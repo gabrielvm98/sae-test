@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from 'next/link'
-import { Eye, Pencil, Building, Users, UserPlus } from 'lucide-react'
+import { Eye, Pencil, Building, UserPlus } from 'lucide-react'
 
 type Company = {
   id: number
