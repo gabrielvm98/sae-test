@@ -1,35 +1,27 @@
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import "./globals.css";
+import './globals.css'
+import { Inter } from 'next/font/google'
+import { Navbar } from '@/components/Navbar'
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: "SAE CRM",
-  description: "Aplicación para Apoyo Consultoría SAE",
-};
+export const metadata = {
+  title: 'SAE CRM APP',
+  description: 'Un app del SAE de Apoyo Consultoría',
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={inter.className}>
+        <Navbar />
+        <main className="container mx-auto p-4">
+          {children}
+        </main>
       </body>
     </html>
-  );
+  )
 }
