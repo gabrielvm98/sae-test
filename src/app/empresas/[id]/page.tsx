@@ -96,7 +96,7 @@ export default function CompanyDetailsPage() {
           <p><strong>RUC:</strong> {company.ruc}</p>
           <p><strong>Razón Social:</strong> {company.razon_social}</p>
           <p><strong>Nombre Comercial:</strong> {company.nombre_comercial}</p>
-          <p><strong>Número de Asientos:</strong> {company.seats}</p>
+          <p><strong>Cantidad de titulares:</strong> {company.seats}</p>
         </div>
         <div className="mt-4 space-x-2">
           <Button asChild>

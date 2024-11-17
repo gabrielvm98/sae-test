@@ -103,10 +103,10 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="seats">Número de Asientos</Label>
+        <Label htmlFor="seats">Cantidad de titulares </Label>
         <Select value={seats} onValueChange={setSeats}>
           <SelectTrigger>
-            <SelectValue placeholder="Selecciona el número de asientos" />
+            <SelectValue placeholder="Selecciona la cantidad de titulares" />
           </SelectTrigger>
           <SelectContent>
             {[...Array(20)].map((_, i) => (

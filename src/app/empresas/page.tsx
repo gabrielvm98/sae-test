@@ -50,7 +50,7 @@ export default function EmpresasPage() {
             <TableHead>RUC</TableHead>
             <TableHead>Razón Social</TableHead>
             <TableHead>Nombre Comercial</TableHead>
-            <TableHead>Asientos</TableHead>
+            <TableHead>Titulares</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
