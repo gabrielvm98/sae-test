@@ -27,6 +27,11 @@ export function Navbar() {
                 Secretarias
               </Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/consultas">
+                Consultas
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
