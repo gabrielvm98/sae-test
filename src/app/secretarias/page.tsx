@@ -14,6 +14,11 @@ type Assistant = {
   last_name: string
   email: string
   company_id: number
+  cc_office_phone: string
+  office_phone: string
+  office_phone_extension: string
+  cc_mobile_phone: string
+  mobile_phone: string
   company: {
     razon_social: string
   }
@@ -41,6 +46,14 @@ export default function SecretariasPage() {
     }
   }
 
+  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
+    let formattedPhone = `${cc} ${phone}`
+    if (extension) {
+      formattedPhone += ` (${extension})`
+    }
+    return formattedPhone
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -59,6 +72,8 @@ export default function SecretariasPage() {
             <TableHead>Apellido</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Empresa</TableHead>
+            <TableHead>Teléfono</TableHead>
+            <TableHead>Celular</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -70,6 +85,12 @@ export default function SecretariasPage() {
               <TableCell>{assistant.last_name}</TableCell>
               <TableCell>{assistant.email}</TableCell>
               <TableCell>{assistant.company.razon_social}</TableCell>
+              <TableCell>
+                {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}
+              </TableCell>
+              <TableCell>
+                {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}
+              </TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" asChild>

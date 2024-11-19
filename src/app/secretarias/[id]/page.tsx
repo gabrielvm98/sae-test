@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
+import { ArrowLeft, Pencil, Building, User, Mail, Phone } from 'lucide-react'
 
 type Assistant = {
   id: number
@@ -13,6 +15,11 @@ type Assistant = {
   last_name: string
   email: string
   company_id: number
+  cc_office_phone: string
+  office_phone: string
+  office_phone_extension: string
+  cc_mobile_phone: string
+  mobile_phone: string
   company: {
     razon_social: string
   }
@@ -46,23 +53,64 @@ export default function AssistantDetailsPage() {
 
   if (!assistant) return <div>Loading...</div>
 
+  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
+    let formattedPhone = `${cc} ${phone}`
+    if (extension) {
+      formattedPhone += ` (${extension})`
+    }
+    return formattedPhone
+  }
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Detalles de la Secretaria</h1>
-      <div className="space-y-2">
-        <p><strong>DNI:</strong> {assistant.dni}</p>
-        <p><strong>Nombre:</strong> {assistant.name}</p>
-        <p><strong>Apellido:</strong> {assistant.last_name}</p>
-        <p><strong>Email:</strong> {assistant.email}</p>
-        <p><strong>Empresa:</strong> {assistant.company.razon_social}</p>
+    <div className="container mx-auto py-10">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Detalles de la Secretaria</h1>
+        <div className="space-x-2">
+          <Button variant="outline" asChild>
+            <Link href="/secretarias">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/secretarias/${assistant.id}/edit`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </Link>
+          </Button>
+        </div>
       </div>
-      <div className="mt-4 space-x-2">
-        <Button asChild>
-          <Link href={`/secretarias/${assistant.id}/edit`}>Editar</Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link href="/secretarias">Volver</Link>
-        </Button>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Información Personal</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p><User className="inline mr-2" /> <strong>Nombre:</strong> {assistant.name} {assistant.last_name}</p>
+            <p><strong>DNI:</strong> {assistant.dni}</p>
+            <p><Mail className="inline mr-2" /> <strong>Email:</strong> {assistant.email}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Información Laboral</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {assistant.company.razon_social}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Contacto</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p><Phone className="inline mr-2" /> <strong>Teléfono de Oficina:</strong> {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

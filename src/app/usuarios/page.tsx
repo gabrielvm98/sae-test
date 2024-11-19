@@ -14,6 +14,21 @@ type Executive = {
   last_name: string
   assistant_id: number
   company_id: number
+  tareco: string
+  birth_date: string
+  country: string
+  email: string
+  position: string
+  area: string
+  user_type: string
+  active: boolean
+  office_phone_cc: string
+  office_phone: string
+  office_phone_extension: string
+  mobile_phone_cc: string
+  mobile_phone: string
+  start_date: string
+  end_date: string | null
   company: {
     razon_social: string
   }
@@ -46,6 +61,14 @@ export default function UsuariosPage() {
     }
   }
 
+  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
+    let formattedPhone = `${cc} ${phone}`
+    if (extension) {
+      formattedPhone += ` (${extension})`
+    }
+    return formattedPhone
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -64,6 +87,18 @@ export default function UsuariosPage() {
             <TableHead>Apellido</TableHead>
             <TableHead>Empresa</TableHead>
             <TableHead>Secretaria</TableHead>
+            <TableHead>Tareco</TableHead>
+            <TableHead>Fecha de Nacimiento</TableHead>
+            <TableHead>País</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Cargo</TableHead>
+            <TableHead>Área</TableHead>
+            <TableHead>Tipo de usuario</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Teléfono</TableHead>
+            <TableHead>Celular</TableHead>
+            <TableHead>Fecha de ingreso</TableHead>
+            <TableHead>Fecha de baja</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -75,6 +110,18 @@ export default function UsuariosPage() {
               <TableCell>{executive.last_name}</TableCell>
               <TableCell>{executive.company.razon_social}</TableCell>
               <TableCell>{`${executive.assistant.name} ${executive.assistant.last_name}`}</TableCell>
+              <TableCell>{executive.tareco}</TableCell>
+              <TableCell>{executive.birth_date}</TableCell>
+              <TableCell>{executive.country}</TableCell>
+              <TableCell>{executive.email}</TableCell>
+              <TableCell>{executive.position}</TableCell>
+              <TableCell>{executive.area}</TableCell>
+              <TableCell>{executive.user_type}</TableCell>
+              <TableCell>{executive.active ? 'Activo' : 'No activo'}</TableCell>
+              <TableCell>{formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</TableCell>
+              <TableCell>{formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</TableCell>
+              <TableCell>{executive.start_date}</TableCell>
+              <TableCell>{executive.end_date || 'N/A'}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" asChild>

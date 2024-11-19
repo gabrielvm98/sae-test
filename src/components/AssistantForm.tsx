@@ -21,6 +21,11 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [companyId, setCompanyId] = useState('')
+  const [ccOfficePhone, setCcOfficePhone] = useState('')
+  const [officePhone, setOfficePhone] = useState('')
+  const [officePhoneExtension, setOfficePhoneExtension] = useState('')
+  const [ccMobilePhone, setCcMobilePhone] = useState('')
+  const [mobilePhone, setMobilePhone] = useState('')
   const [companies, setCompanies] = useState<Company[]>([])
   const router = useRouter()
 
@@ -52,6 +57,11 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       setLastName(data.last_name)
       setEmail(data.email)
       setCompanyId(data.company_id.toString())
+      setCcOfficePhone(data.cc_office_phone)
+      setOfficePhone(data.office_phone)
+      setOfficePhoneExtension(data.office_phone_extension)
+      setCcMobilePhone(data.cc_mobile_phone)
+      setMobilePhone(data.mobile_phone)
     }
   }, [assistantId])
 
@@ -69,12 +79,17 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       name,
       last_name: lastName,
       email,
-      company_id: parseInt(companyId)
+      company_id: parseInt(companyId),
+      cc_office_phone: ccOfficePhone,
+      office_phone: officePhone,
+      office_phone_extension: officePhoneExtension,
+      cc_mobile_phone: ccMobilePhone,
+      mobile_phone: mobilePhone
     }
 
     if (assistantId) {
       const { error } = await supabase
-        .from('assistants')
+        .from('assistant')
         .update(assistant)
         .eq('id', assistantId)
 
@@ -82,7 +97,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       else router.push('/secretarias')
     } else {
       const { error } = await supabase
-        .from('assistants')
+        .from('assistant')
         .insert([assistant])
 
       if (error) console.error('Error creating assistant:', error)
@@ -148,6 +163,54 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label htmlFor="officePhone">Teléfono de oficina</Label>
+        <div className="flex space-x-2">
+          <Input
+            id="ccOfficePhone"
+            type="text"
+            value={ccOfficePhone}
+            onChange={(e) => setCcOfficePhone(e.target.value)}
+            placeholder="Código"
+            className="w-20"
+          />
+          <Input
+            id="officePhone"
+            type="tel"
+            value={officePhone}
+            onChange={(e) => setOfficePhone(e.target.value)}
+            placeholder="Número"
+          />
+          <Input
+            id="officePhoneExtension"
+            type="text"
+            value={officePhoneExtension}
+            onChange={(e) => setOfficePhoneExtension(e.target.value)}
+            placeholder="Anexo"
+            className="w-20"
+          />
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="mobilePhone">Celular</Label>
+        <div className="flex space-x-2">
+          <Input
+            id="ccMobilePhone"
+            type="text"
+            value={ccMobilePhone}
+            onChange={(e) => setCcMobilePhone(e.target.value)}
+            placeholder="Código"
+            className="w-20"
+          />
+          <Input
+            id="mobilePhone"
+            type="tel"
+            value={mobilePhone}
+            onChange={(e) => setMobilePhone(e.target.value)}
+            placeholder="Número"
+          />
+        </div>
       </div>
       <Button type="submit">{assistantId ? 'Actualizar' : 'Crear'} Secretaria</Button>
     </form>
