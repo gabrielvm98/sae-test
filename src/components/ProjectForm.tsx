@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { assignees } from "@/components/common/Assignees"
 
 type ProjectFormProps = {
   projectId?: number
@@ -26,13 +27,7 @@ type Executive = {
 
 const statusOptions = ["Inicial", "Intermedio", "Avanzado", "Finalizado", "Propuesta enviada"]
 
-const assignees = [
-  "Hugo Santa Maria", "Victor Albuquerque", "Iván Portocarrero", "Lorena Mendez",
-  "Hernando Tejada", "Milagros Santa maría", "Daniela Salinas", "Piero Ortiz",
-  "José Carlos Saavedra", "Donita Rodriguez", "Pablo del Aguila", "Sofia Patiño",
-  "Valeria Vargas", "Andrea Sotelo", "Daniela Ramos", "Ana Cristina Angulo",
-  "Camila Bozzo", "Martin Coronado", "Maria Alejandra Gutierrez"
-]
+
 
 export function ProjectForm({ projectId }: ProjectFormProps) {
   const [companyId, setCompanyId] = useState('')
