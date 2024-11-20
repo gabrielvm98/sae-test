@@ -59,7 +59,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
   const [status, setStatus] = useState('')
   const [membershipExpireDate, setMembershipExpireDate] = useState('')
   const [enrollmentDate, setEnrollmentDate] = useState('')
-  const [seats, setSeats] = useState('1')
+  const [seats, setSeats] = useState('0')
   const [extraSeats, setExtraSeats] = useState('0')
   const [panoramaEconomicoPolitico, setPanoramaEconomicoPolitico] = useState(false)
   const [informeSAE, setInformeSAE] = useState(false)
@@ -71,7 +71,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
   const [billAmount, setBillAmount] = useState('')
   const [paymentFrequency, setPaymentFrequency] = useState('')
   const [notes, setNotes] = useState('')
-  const [virtualMember, setVirtualMember] = useState(0)
+  const [virtualMember, setVirtualMember] = useState('0')
 
   const router = useRouter()
 
@@ -356,9 +356,9 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
             <SelectValue placeholder="Selecciona la cantidad de titulares" />
           </SelectTrigger>
           <SelectContent>
-            {[...Array(20)].map((_, i) => (
-              <SelectItem key={i + 1} value={(i + 1).toString()}>
-                {i + 1}
+            {[...Array(21)].map((_, i) => (
+              <SelectItem key={i} value={i.toString()}>
+                {i}
               </SelectItem>
             ))}
           </SelectContent>
@@ -380,15 +380,19 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         </Select>
       </div>
       <div>
-        <Label htmlFor="virtualMember">Titular Virtual</Label>
-        <Input
-          id="virtualMember"
-          type="number"
-          min="0"
-          value={virtualMember.toString()}
-          onChange={(e) => setVirtualMember(parseInt(e.target.value))}
-          required
-        />
+      <Label htmlFor="virtualMember">Titular Virtual</Label>
+        <Select value={virtualMember} onValueChange={setVirtualMember}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona los cupos adicionales" />
+          </SelectTrigger>
+          <SelectContent>
+            {[...Array(21)].map((_, i) => (
+              <SelectItem key={i} value={i.toString()}>
+                {i}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox
