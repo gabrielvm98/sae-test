@@ -24,7 +24,7 @@ type Assistant = {
 }
 
 const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"] // Add more countries as needed
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía"] // Replace with actual user types
+const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional","Titular Axpen"] // Replace with actual user types
 
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
