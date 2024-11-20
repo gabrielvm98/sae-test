@@ -108,7 +108,6 @@ export default function ExecutiveDetailsPage() {
             <p><strong>Tareco:</strong> {executive.tareco}</p>
             <p><Calendar className="inline mr-2" /> <strong>Fecha de Nacimiento:</strong> {executive.birth_date}</p>
             <p><strong>País:</strong> {executive.country}</p>
-            <p><Mail className="inline mr-2" /> <strong>Email:</strong> {executive.email}</p>
           </CardContent>
         </Card>
 
@@ -133,6 +132,7 @@ export default function ExecutiveDetailsPage() {
           <CardContent className="space-y-2">
             <p><Phone className="inline mr-2" /> <strong>Teléfono:</strong> {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</p>
             <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</p>
+            <p><Mail className="inline mr-2" /> <strong>Email:</strong> {executive.email}</p>
           </CardContent>
         </Card>
 
