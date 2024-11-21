@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -15,6 +17,24 @@ type Company = {
   razon_social: string
 }
 
+interface CountryOption {
+  value: string
+  label: string
+  code: string
+}
+
+const countries: CountryOption[] = [
+  { value: "1", label: "United States", code: "+1" },
+  { value: "51", label: "Peru", code: "+51" },
+  { value: "54", label: "Argentina", code: "+54" },
+  { value: "55", label: "Brazil", code: "+55" },
+  { value: "56", label: "Chile", code: "+56" },
+  { value: "57", label: "Colombia", code: "+57" },
+  { value: "52", label: "Mexico", code: "+52" },
+  { value: "34", label: "Spain", code: "+34" },
+  // Add more countries as needed
+]
+
 export function AssistantForm({ assistantId }: AssistantFormProps) {
   const [dni, setDni] = useState('')
   const [name, setName] = useState('')
@@ -27,6 +47,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
   const [ccMobilePhone, setCcMobilePhone] = useState('')
   const [mobilePhone, setMobilePhone] = useState('')
   const [companies, setCompanies] = useState<Company[]>([])
+
   const router = useRouter()
 
   const fetchCompanies = useCallback(async () => {
@@ -167,14 +188,18 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       <div>
         <Label htmlFor="officePhone">Teléfono de oficina</Label>
         <div className="flex space-x-2">
-          <Input
-            id="ccOfficePhone"
-            type="text"
-            value={ccOfficePhone}
-            onChange={(e) => setCcOfficePhone(e.target.value)}
-            placeholder="Código"
-            className="w-20"
-          />
+          <Select value={ccOfficePhone} onValueChange={setCcOfficePhone}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Código" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((country) => (
+                <SelectItem key={country.value} value={country.code}>
+                  {country.code} ({country.label})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             id="officePhone"
             type="tel"
@@ -195,14 +220,18 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       <div>
         <Label htmlFor="mobilePhone">Celular</Label>
         <div className="flex space-x-2">
-          <Input
-            id="ccMobilePhone"
-            type="text"
-            value={ccMobilePhone}
-            onChange={(e) => setCcMobilePhone(e.target.value)}
-            placeholder="Código"
-            className="w-20"
-          />
+          <Select value={ccMobilePhone} onValueChange={setCcMobilePhone}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Código" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((country) => (
+                <SelectItem key={country.value} value={country.code}>
+                  {country.code} ({country.label})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             id="mobilePhone"
             type="tel"
