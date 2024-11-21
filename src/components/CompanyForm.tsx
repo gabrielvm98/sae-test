@@ -45,6 +45,25 @@ const statusOptions = ['Cliente SAE', 'Ex-cliente SAE', 'No cliente SAE']
 
 const paymentFrequencies = ['Mensual', 'Semestral', 'Anual']
 
+interface CountryOption {
+  value: string
+  label: string
+  code: string
+}
+
+const countries: CountryOption[] = [
+  { value: "1", label: "United States", code: "+1" },
+  { value: "51", label: "Peru", code: "+51" },
+  { value: "54", label: "Argentina", code: "+54" },
+  { value: "55", label: "Brazil", code: "+55" },
+  { value: "56", label: "Chile", code: "+56" },
+  { value: "57", label: "Colombia", code: "+57" },
+  { value: "52", label: "Mexico", code: "+52" },
+  { value: "34", label: "Spain", code: "+34" },
+  // Add more countries as needed
+]
+
+
 export function CompanyForm({ companyId }: CompanyFormProps) {
   const [ruc, setRuc] = useState('')
   const [razonSocial, setRazonSocial] = useState('')
@@ -53,6 +72,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
   const [department, setDepartment] = useState('')
   const [district, setDistrict] = useState('')
   const [address, setAddress] = useState('')
+  const [ccphoneNumber, setccPhoneNumber] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [industry, setIndustry] = useState('')
   const [membershipType, setMembershipType] = useState('')
@@ -276,6 +296,19 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
       </div>
       <div>
         <Label htmlFor="phoneNumber">Teléfono</Label>
+        <div className="flex space-x-2">
+        <Select value={ccphoneNumber} onValueChange={setccPhoneNumber}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Código" />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((country) => (
+                <SelectItem key={country.value} value={country.code}>
+                  {country.code} ({country.label})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         <Input
           id="phoneNumber"
           type="tel"
@@ -283,6 +316,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
         />
+        </div>
       </div>
       <div>
         <Label htmlFor="industry">Sector</Label>
