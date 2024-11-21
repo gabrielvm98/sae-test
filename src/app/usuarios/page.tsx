@@ -40,20 +40,27 @@ type Executive = {
 
 export default function UsuariosPage() {
   const [executives, setExecutives] = useState<Executive[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     fetchExecutives()
-  }, [])
+  }, [searchQuery])
 
   async function fetchExecutives() {
-    const { data, error } = await supabase
+    let query = supabase
       .from('executive')
       .select(`
         *,
         company:company_id (razon_social),
         assistant:assistant_id (name, last_name)
       `)
-    
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+    }
+
+    const { data, error } = await query
+
     if (error) {
       console.error('Error fetching executives:', error)
     } else {
@@ -71,13 +78,24 @@ export default function UsuariosPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Usuarios</h1>
-        <Button asChild>
-          <Link href="/usuarios/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar Usuario
-          </Link>
-        </Button>
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Lista de Usuarios</h1>
+          <Button asChild>
+            <Link href="/usuarios/new">
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Usuario
+            </Link>
+          </Button>
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o apellido..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
       </div>
       <Table>
         <TableHeader>

@@ -34,21 +34,28 @@ type Company = {
   bill_amount: number
   payment_frecuency: string
   notes: string
-  virtual_member: number
+  virtual_member: boolean
 }
 
 export default function EmpresasPage() {
   const [companies, setCompanies] = useState<Company[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     fetchCompanies()
-  }, [])
+  }, [searchQuery])
 
   async function fetchCompanies() {
-    const { data, error } = await supabase
-      .from('company')
-      .select('*')
-    
+    let query = supabase.from('company').select('*')
+  
+    if (searchQuery && searchQuery.trim() !== '') {
+      console.log('searchQuery:', searchQuery);
+      query = query.like('razon_social', `%${searchQuery}%`);
+      console.log('query:', query);
+    }
+
+    const { data, error } = await query
+
     if (error) {
       console.error('Error fetching companies:', error)
     } else {
@@ -56,19 +63,34 @@ export default function EmpresasPage() {
     }
   }
 
+  useEffect(() => {
+    fetchCompanies()
+  }, [])
+
   function booleanToSiNo(value: boolean): string {
     return value ? 'Sí' : 'No'
   }
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Empresas</h1>
-        <Button asChild>
-          <Link href="/empresas/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar Empresa
-          </Link>
-        </Button>
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Lista de Empresas</h1>
+          <Button asChild>
+            <Link href="/empresas/new">
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Empresa
+            </Link>
+          </Button>
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por razón social..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
       </div>
       <Table>
         <TableHeader>
@@ -125,7 +147,7 @@ export default function EmpresasPage() {
               <TableCell>{booleanToSiNo(company.sae_mercados)}</TableCell>
               <TableCell>{company.meetings_amount}</TableCell>
               <TableCell>{booleanToSiNo(company.query_access)}</TableCell>
-              <TableCell>{company.virtual_member}</TableCell>
+              <TableCell>{booleanToSiNo(company.virtual_member)}</TableCell>
               <TableCell>{booleanToSiNo(company.query_access)}</TableCell>
               <TableCell>{booleanToSiNo(company.oc_needed)}</TableCell>
               <TableCell>{`${company.bill_currency} ${company.bill_amount}`}</TableCell>
