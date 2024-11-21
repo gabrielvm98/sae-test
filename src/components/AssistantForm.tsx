@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { SearchableSelect } from './SearchableSelect'
 
 type AssistantFormProps = {
   assistantId?: number
@@ -46,27 +47,15 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
   const [officePhoneExtension, setOfficePhoneExtension] = useState('')
   const [ccMobilePhone, setCcMobilePhone] = useState('')
   const [mobilePhone, setMobilePhone] = useState('')
-  const [companies, setCompanies] = useState<Company[]>([])
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
 
   const router = useRouter()
-
-  const fetchCompanies = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('company')
-      .select('id, razon_social')
-
-    if (error) {
-      console.error('Error fetching companies:', error)
-    } else {
-      setCompanies(data || [])
-    }
-  }, [])
 
   const fetchAssistant = useCallback(async () => {
     if (!assistantId) return
     const { data, error } = await supabase
       .from('assistant')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', assistantId)
       .single()
 
@@ -78,6 +67,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       setLastName(data.last_name)
       setEmail(data.email)
       setCompanyId(data.company_id.toString())
+      setInitialCompany(data.company)
       setCcOfficePhone(data.cc_office_phone)
       setOfficePhone(data.office_phone)
       setOfficePhoneExtension(data.office_phone_extension)
@@ -87,11 +77,14 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
   }, [assistantId])
 
   useEffect(() => {
-    fetchCompanies()
     if (assistantId) {
       fetchAssistant()
     }
-  }, [assistantId, fetchAssistant, fetchCompanies])
+  }, [assistantId, fetchAssistant])
+
+  const handleCompanyChange = (value: string) => {
+    setCompanyId(value)
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -172,18 +165,12 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       </div>
       <div>
         <Label htmlFor="companyId">Empresa</Label>
-        <Select value={companyId} onValueChange={setCompanyId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          onSelect={handleCompanyChange}
+          placeholder="Selecciona una empresa"
+          label="empresa"
+          initialValue={initialCompany}
+        />
       </div>
       <div>
         <Label htmlFor="officePhone">Teléfono de oficina</Label>
