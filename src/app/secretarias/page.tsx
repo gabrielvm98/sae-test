@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import Link from 'next/link'
 import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-react'
 
@@ -26,19 +27,26 @@ type Assistant = {
 
 export default function SecretariasPage() {
   const [assistants, setAssistants] = useState<Assistant[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     fetchAssistants()
-  }, [])
+  }, [searchQuery])
 
   async function fetchAssistants() {
-    const { data, error } = await supabase
+    let query = supabase
       .from('assistant')
       .select(`
         *,
         company:company_id (razon_social)
       `)
-    
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+    }
+
+    const { data, error } = await query
+
     if (error) {
       console.error('Error fetching assistants:', error)
     } else {
@@ -63,6 +71,15 @@ export default function SecretariasPage() {
             <PlusCircle className="mr-2 h-4 w-4" /> Agregar Secretaria
           </Link>
         </Button>
+      </div>
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Buscar por nombre, apellido o email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="max-w-sm"
+        />
       </div>
       <Table>
         <TableHeader>
