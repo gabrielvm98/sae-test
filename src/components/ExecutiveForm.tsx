@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -6,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { SearchableSelect } from './SearchableSelect'
 
 type ExecutiveFormProps = {
   executiveId?: number
@@ -23,14 +26,15 @@ type Assistant = {
   company_id: number
 }
 
-const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"] // Add more countries as needed
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional","Titular Axpen"] // Replace with actual user types
+const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"]
+const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen"]
 
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
   const [name, setName] = useState('')
   const [lastName, setLastName] = useState('')
   const [companyId, setCompanyId] = useState('')
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
   const [assistantId, setAssistantId] = useState('')
   const [tareco, setTareco] = useState('')
   const [birthDate, setBirthDate] = useState('')
@@ -47,22 +51,9 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [mobilePhone, setMobilePhone] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [companies, setCompanies] = useState<Company[]>([])
   const [assistants, setAssistants] = useState<Assistant[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-
-  const fetchCompanies = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('company')
-      .select('id, razon_social')
-
-    if (error) {
-      console.error('Error fetching companies:', error)
-    } else {
-      setCompanies(data || [])
-    }
-  }, [])
 
   const fetchAssistants = useCallback(async (companyId: number) => {
     const { data, error } = await supabase
@@ -80,59 +71,54 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const fetchExecutive = useCallback(async () => {
     if (!executiveId) return
 
-    const { data, error } = await supabase
+    const { data: executive, error: executiveError } = await supabase
       .from('executive')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', executiveId)
       .single()
 
-    if (error) {
-      console.error('Error fetching executive:', error)
-    } else if (data) {
-      setDni(data.dni)
-      setName(data.name)
-      setLastName(data.last_name)
-      setCompanyId(data.company_id.toString())
-      setAssistantId(data.assistant_id.toString())
-      setTareco(data.tareco)
-      setBirthDate(data.birth_date)
-      setCountry(data.country)
-      setEmail(data.email)
-      setPosition(data.position)
-      setArea(data.area)
-      setUserType(data.user_type)
-      setActive(data.active)
-      setOfficePhoneCc(data.office_phone_cc)
-      setOfficePhone(data.office_phone)
-      setOfficePhoneExtension(data.office_phone_extension)
-      setMobilePhoneCc(data.mobile_phone_cc)
-      setMobilePhone(data.mobile_phone)
-      setStartDate(data.start_date)
-      setEndDate(data.end_date)
-      await fetchAssistants(data.company_id)
+    if (executiveError) {
+      console.error('Error fetching executive:', executiveError)
+    } else if (executive) {
+      setDni(executive.dni)
+      setName(executive.name)
+      setLastName(executive.last_name)
+      setCompanyId(executive.company_id.toString())
+      setInitialCompany(executive.company)
+      setAssistantId(executive.assistant_id?.toString() || '')
+      setTareco(executive.tareco)
+      setBirthDate(executive.birth_date)
+      setCountry(executive.country)
+      setEmail(executive.email)
+      setPosition(executive.position)
+      setArea(executive.area)
+      setUserType(executive.user_type)
+      setActive(executive.active)
+      setOfficePhoneCc(executive.office_phone_cc)
+      setOfficePhone(executive.office_phone)
+      setOfficePhoneExtension(executive.office_phone_extension)
+      setMobilePhoneCc(executive.mobile_phone_cc)
+      setMobilePhone(executive.mobile_phone)
+      setStartDate(executive.start_date)
+      setEndDate(executive.end_date)
+      await fetchAssistants(executive.company_id)
     }
   }, [executiveId, fetchAssistants])
 
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true)
-      await fetchCompanies()
       await fetchExecutive()
       setLoading(false)
     }
 
     loadInitialData()
-  }, [fetchCompanies, fetchExecutive])
-
-  useEffect(() => {
-    if (companyId) {
-      fetchAssistants(parseInt(companyId))
-    }
-  }, [companyId, fetchAssistants])
+  }, [fetchExecutive])
 
   const handleCompanyChange = (value: string) => {
     setCompanyId(value)
     setAssistantId('')
+    fetchAssistants(parseInt(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,7 +128,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       name,
       last_name: lastName,
       company_id: parseInt(companyId),
-      assistant_id: parseInt(assistantId),
+      assistant_id: parseInt(assistantId) || null,
       tareco,
       birth_date: birthDate,
       country,
@@ -218,18 +204,12 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       </div>
       <div>
         <Label htmlFor="companyId">Empresa</Label>
-        <Select value={companyId} onValueChange={handleCompanyChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          onSelect={handleCompanyChange}
+          placeholder="Selecciona una empresa"
+          label="empresa"
+          initialValue={initialCompany}
+        />
       </div>
       <div>
         <Label htmlFor="assistantId">Secretaria</Label>
