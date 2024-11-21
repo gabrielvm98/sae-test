@@ -37,6 +37,11 @@ type Executive = {
   assistant: {
     name: string
     last_name: string
+    cc_office_phone: string
+    office_phone: string
+    office_phone_extension: string
+    cc_mobile_phone: string
+    mobile_phone: string
   }
 }
 
@@ -51,7 +56,15 @@ export default function ExecutiveDetailsPage() {
       .select(`
         *,
         company:company_id (razon_social),
-        assistant:assistant_id (name, last_name)
+        assistant:assistant_id (
+          name,
+          last_name,
+          cc_office_phone,
+          office_phone,
+          office_phone_extension,
+          cc_mobile_phone,
+          mobile_phone
+        )
       `)
       .eq('id', params.id)
       .single()
@@ -122,6 +135,8 @@ export default function ExecutiveDetailsPage() {
             <p><strong>Tipo de usuario:</strong> {executive.user_type}</p>
             <p><strong>Status:</strong> <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
             <p><strong>Secretaria:</strong> {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
+            <p><Phone className="inline mr-2" /> <strong>Teléfono de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> <strong>Celular de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
           </CardContent>
         </Card>
 

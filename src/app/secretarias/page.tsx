@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import Link from 'next/link'
 import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-react'
 
@@ -64,22 +63,24 @@ export default function SecretariasPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Secretarias</h1>
-        <Button asChild>
-          <Link href="/secretarias/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar Secretaria
-          </Link>
-        </Button>
-      </div>
-      <div className="mb-4">
-        <Input
-          type="text"
-          placeholder="Buscar por nombre, apellido o email..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
-        />
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Lista de Secretarias</h1>
+          <Button asChild>
+            <Link href="/secretarias/new">
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Secretaria
+            </Link>
+          </Button>
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre, apellido o email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
       </div>
       <Table>
         <TableHeader>
@@ -102,12 +103,8 @@ export default function SecretariasPage() {
               <TableCell>{assistant.last_name}</TableCell>
               <TableCell>{assistant.email}</TableCell>
               <TableCell>{assistant.company.razon_social}</TableCell>
-              <TableCell>
-                {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}
-              </TableCell>
-              <TableCell>
-                {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}
-              </TableCell>
+              <TableCell>{formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</TableCell>
+              <TableCell>{formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" asChild>
