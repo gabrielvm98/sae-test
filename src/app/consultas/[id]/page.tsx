@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
+import { ArrowLeft, Pencil, Building, User, Users, FileText, Calendar, Briefcase } from 'lucide-react'
 
 type Query = {
   id: number
@@ -19,6 +21,7 @@ type Query = {
   executive: {
     name: string
     last_name: string
+    position: string
   }
 }
 
@@ -33,7 +36,7 @@ export default function QueryDetailsPage() {
       .select(`
         *,
         company:company_id (razon_social),
-        executive:executive_id (name, last_name)
+        executive:executive_id (name, last_name, position)
       `)
       .eq('id', params.id)
       .single()
@@ -52,23 +55,60 @@ export default function QueryDetailsPage() {
   if (!query) return <div>Loading...</div>
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Detalles de la Consulta</h1>
-      <div className="space-y-2">
-        <p><strong>Empresa:</strong> {query.company.razon_social}</p>
-        <p><strong>Solicitante:</strong> {`${query.executive.name} ${query.executive.last_name}`}</p>
-        <p><strong>Encargado:</strong> {query.assignee.join(', ')}</p>
-        <p><strong>Descripción:</strong> {query.description}</p>
-        <p><strong>Fecha de resolución:</strong> {query.solved_date || 'Pendiente'}</p>
-      </div>
-      <div className="mt-4 space-x-2">
-        <Button asChild>
-          <Link href={`/consultas/${query.id}/edit`}>Editar</Link>
-        </Button>
-        <Button variant="outline" asChild>
-          <Link href="/consultas">Volver</Link>
-        </Button>
-      </div>
+    <div className="container mx-auto py-10">
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Detalles de la Consulta</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Building className="w-5 h-5 text-gray-500" />
+            <span className="font-semibold">Empresa:</span>
+            <span>{query.company.razon_social}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <User className="w-5 h-5 text-gray-500" />
+            <span className="font-semibold">Solicitante:</span>
+            <span>{`${query.executive.name} ${query.executive.last_name}`}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Briefcase className="w-5 h-5 text-gray-500" />
+            <span className="font-semibold">Cargo del Solicitante:</span>
+            <span>{query.executive.position}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Users className="w-5 h-5 text-gray-500" />
+            <span className="font-semibold">Encargado:</span>
+            <span>{query.assignee.join(', ')}</span>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-5 h-5 text-gray-500" />
+              <span className="font-semibold">Descripción:</span>
+            </div>
+            <p className="pl-7">{query.description}</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Calendar className="w-5 h-5 text-gray-500" />
+            <span className="font-semibold">Fecha de resolución:</span>
+            <span>{query.solved_date || 'Pendiente'}</span>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" asChild>
+            <Link href="/consultas">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/consultas/${query.id}/edit`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   )
 }

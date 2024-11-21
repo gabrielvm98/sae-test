@@ -50,7 +50,7 @@ export function SearchableSelect({ onSelect, placeholder, label, initialValue }:
       .order('razon_social', { ascending: true })
 
     if (search) {
-      query = query.like('razon_social', `%${search}%`)
+      query = query.ilike('razon_social', `%${search}%`)
     }
 
     query = query.limit(10)

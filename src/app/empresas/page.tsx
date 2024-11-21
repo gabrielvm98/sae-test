@@ -47,11 +47,9 @@ export default function EmpresasPage() {
 
   async function fetchCompanies() {
     let query = supabase.from('company').select('*')
-  
+
     if (searchQuery && searchQuery.trim() !== '') {
-      console.log('searchQuery:', searchQuery);
-      query = query.like('razon_social', `%${searchQuery}%`);
-      console.log('query:', query);
+      query = query.or(`razon_social.ilike.%${searchQuery}%,nombre_comercial.ilike.%${searchQuery}%,ruc.ilike.%${searchQuery}%`)
     }
 
     const { data, error } = await query
@@ -82,14 +80,26 @@ export default function EmpresasPage() {
             </Link>
           </Button>
         </div>
-        <div className="mt-4">
-          <input
-            type="text"
-            placeholder="Buscar por razón social..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 border rounded"
-          />
+        <div className="mt-8 mb-8 bg-gray-100 p-6 rounded-lg shadow-md">
+          <label htmlFor="companySearch" className="block text-xl font-bold mb-4 text-gray-700">
+            Buscar Empresa
+          </label>
+          <div className="flex items-center bg-white rounded-lg overflow-hidden shadow-sm">
+            <input
+              id="companySearch"
+              type="text"
+              placeholder="Escriba el nombre de la empresa y presione 'Buscar' o Enter para encontrarla."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-4 text-l border-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+            <Button 
+              onClick={fetchCompanies} 
+              className="p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl"
+            >
+              Buscar
+            </Button>
+          </div>
         </div>
       </div>
       <Table>
