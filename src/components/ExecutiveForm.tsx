@@ -29,6 +29,25 @@ type Assistant = {
 const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"]
 const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen"]
 
+interface CountryOption {
+  value: string
+  label: string
+  code: string
+}
+
+const countryCodes: CountryOption[] = [
+  { value: "1", label: "United States", code: "+1" },
+  { value: "51", label: "Peru", code: "+51" },
+  { value: "54", label: "Argentina", code: "+54" },
+  { value: "55", label: "Brazil", code: "+55" },
+  { value: "56", label: "Chile", code: "+56" },
+  { value: "57", label: "Colombia", code: "+57" },
+  { value: "52", label: "Mexico", code: "+52" },
+  { value: "34", label: "Spain", code: "+34" },
+  // Add more countries as needed
+]
+
+
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
   const [name, setName] = useState('')
@@ -313,14 +332,18 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       <div>
         <Label htmlFor="officePhone">Teléfono de oficina</Label>
         <div className="flex space-x-2">
-          <Input
-            id="officePhoneCc"
-            type="text"
-            value={officePhoneCc}
-            onChange={(e) => setOfficePhoneCc(e.target.value)}
-            placeholder="Código"
-            className="w-20"
-          />
+        <Select value={officePhoneCc} onValueChange={setOfficePhoneCc}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Código" />
+            </SelectTrigger>
+            <SelectContent>
+              {countryCodes.map((country) => (
+                <SelectItem key={country.value} value={country.code}>
+                  {country.code} ({country.label})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             id="officePhone"
             type="tel"
@@ -341,14 +364,18 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       <div>
         <Label htmlFor="mobilePhone">Celular</Label>
         <div className="flex space-x-2">
-          <Input
-            id="mobilePhoneCc"
-            type="text"
-            value={mobilePhoneCc}
-            onChange={(e) => setMobilePhoneCc(e.target.value)}
-            placeholder="Código"
-            className="w-20"
-          />
+        <Select value={mobilePhoneCc} onValueChange={setMobilePhoneCc}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Código" />
+            </SelectTrigger>
+            <SelectContent>
+              {countryCodes.map((country) => (
+                <SelectItem key={country.value} value={country.code}>
+                  {country.code} ({country.label})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Input
             id="mobilePhone"
             type="tel"
