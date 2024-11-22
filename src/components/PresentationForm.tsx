@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { assignees } from '@/components/common/Assignees'
 
 type PresentationFormProps = {
   presentationId?: number
@@ -27,12 +28,6 @@ type Executive = {
 const orderSources = ["Comercial", "Secretaria de un usuario", "Usuario", "Trabajador SAE"]
 const presentationTypes = ["Presentación cortesía", "Presentación adicional con costo", "Presentación de la membresía"]
 const modalities = ["Presencial", "Virtual", "Sólo envio"]
-
-// Simulated list of SAE names
-const saeNames = [
-  "Juan Pérez", "María García", "Carlos Rodríguez", "Ana Martínez", "Luis López",
-  "Laura Sánchez", "Diego Fernández", "Sofía Torres", "Andrés Ramírez", "Valentina Herrera"
-]
 
 export function PresentationForm({ presentationId }: PresentationFormProps) {
   const [companyId, setCompanyId] = useState('')
@@ -211,7 +206,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
       <div>
         <Label>Responsable(s) de la elaboración</Label>
         <div className="grid grid-cols-2 gap-2">
-          {saeNames.map((name) => (
+          {assignees.map((name) => (
             <div key={name} className="flex items-center space-x-2">
               <Checkbox
                 id={`elaboration-${name}`}
@@ -226,7 +221,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
       <div>
         <Label>Expositor(es)</Label>
         <div className="grid grid-cols-2 gap-2">
-          {saeNames.map((name) => (
+          {assignees.map((name) => (
             <div key={name} className="flex items-center space-x-2">
               <Checkbox
                 id={`presentation-${name}`}
