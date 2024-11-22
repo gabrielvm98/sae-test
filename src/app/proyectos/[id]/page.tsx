@@ -6,10 +6,11 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, Building, User, Calendar, FileText, Users, Briefcase } from 'lucide-react'
+import { ArrowLeft, Pencil, Building, User, Calendar, FileText, Users, Briefcase, IdCard } from 'lucide-react'
 
 type Project = {
   id: number
+  project_code: string
   company_id: number
   executive_id: number
   assignee: string[]
@@ -83,6 +84,7 @@ export default function ProjectDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {project.company.razon_social}</p>
+            <p><IdCard className="inline mr-2" /> <strong>Código:</strong> {project.project_code}</p>
             <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${project.executive.name} ${project.executive.last_name}`}</p>
             <p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> {project.executive.position}</p>
             <p><strong>Status:</strong> {project.status}</p>

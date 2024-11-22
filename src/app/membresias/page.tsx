@@ -37,6 +37,7 @@ type Membership = {
   oc_needed: boolean
   signed_proposal: boolean
   invoice_sent: boolean
+  area_scope: boolean
 }
 
 export default function MembershipsPage() {
@@ -100,6 +101,7 @@ export default function MembershipsPage() {
             <TableHead>Cupos adicionales</TableHead>
             <TableHead>Fecha de renovación</TableHead>
             <TableHead>Forma de pago</TableHead>
+            <TableHead>Renovación completa</TableHead>
             <TableHead>Tarifa</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
@@ -110,11 +112,12 @@ export default function MembershipsPage() {
               <TableCell>{membership.name}</TableCell>
               <TableCell>{membership.company.razon_social}</TableCell>
               <TableCell>{membership.membership_type}</TableCell>
-              <TableCell>{membership.area}</TableCell>
+              <TableCell>{membership.area_scope ? membership.area : 'General'}</TableCell>
               <TableCell>{membership.titulares}</TableCell>
               <TableCell>{membership.cupos_adicionales}</TableCell>
               <TableCell>{membership.fecha_renovacion}</TableCell>
               <TableCell>{membership.payment_method}</TableCell>
+              <TableCell>{membership.signed_proposal && membership.invoice_sent ? 'Sí' : 'No'}</TableCell>
               <TableCell>{`${membership.payment_currency} ${membership.payment_amount}`}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">

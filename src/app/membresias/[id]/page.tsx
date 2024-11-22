@@ -42,6 +42,7 @@ type Membership = {
   signer_email: string
   signer_phone: string
   comments: string
+  area_scope: boolean
 }
 
 export default function MembershipDetailsPage() {
@@ -98,7 +99,7 @@ export default function MembershipDetailsPage() {
               </p>
               <p className="flex items-center">
                 <span className="font-semibold mr-2">Membresía por área:</span>
-                {membership.area}
+                {membership.area_scope ? membership.area : 'General'}
               </p>
             </div>
 
@@ -192,6 +193,10 @@ export default function MembershipDetailsPage() {
             <p className="flex items-center">
               {membership.oc_needed ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
               <span className="font-semibold mr-2">Necesita O/C</span>
+            </p>
+            <p className="flex items-center">
+              {membership.invoice_sent && membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+              <span className="font-semibold mr-2">Renovación completa</span>
             </p>
             <p className="flex items-center">
               {membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}

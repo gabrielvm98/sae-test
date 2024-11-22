@@ -19,6 +19,9 @@ type Presentation = {
   presentation_type: string
   modalidad: string
   comments: string
+  billable: boolean
+  billable_currency: string | null
+  billable_amount: number | null
   company: {
     razon_social: string
   }
@@ -55,6 +58,13 @@ export default function PresentationsPage() {
     return list.join(', ')
   }
 
+  function formatBillableInfo(presentation: Presentation) {
+    if (presentation.billable && presentation.billable_currency && presentation.billable_amount) {
+      return `${presentation.billable_currency} ${presentation.billable_amount.toFixed(2)}`
+    }
+    return 'No facturable'
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -77,6 +87,7 @@ export default function PresentationsPage() {
             <TableHead>Fecha y hora de presentación</TableHead>
             <TableHead>Tipo de presentación</TableHead>
             <TableHead>Modalidad</TableHead>
+            <TableHead>Facturación</TableHead>
             <TableHead>Comentarios</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
@@ -93,6 +104,7 @@ export default function PresentationsPage() {
               <TableCell>{presentation.presentation_date_hour}</TableCell>
               <TableCell>{presentation.presentation_type}</TableCell>
               <TableCell>{presentation.modalidad}</TableCell>
+              <TableCell>{formatBillableInfo(presentation)}</TableCell>
               <TableCell>{presentation.comments}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">

@@ -26,6 +26,13 @@ type Assistant = {
   company_id: number
 }
 
+type Executive = {
+  id: number
+  name: string
+  last_name: string
+  active: boolean
+}
+
 const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"]
 const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen"]
 
@@ -36,6 +43,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [companyId, setCompanyId] = useState('')
   const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
   const [assistantId, setAssistantId] = useState('')
+  const [reemplazaA, setReemplazaA] = useState('0')
   const [tareco, setTareco] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [country, setCountry] = useState('')
@@ -52,6 +60,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [assistants, setAssistants] = useState<Assistant[]>([])
+  const [executives, setExecutives] = useState<Executive[]>([])
   const [loading, setLoading] = useState(true)
   const [membershipId, setMembershipId] = useState('')
   const [memberships, setMemberships] = useState<{ id: number; name: string; company_id: number }[]>([])
@@ -83,6 +92,21 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
     }
   }, [])
 
+  const fetchExecutives = useCallback(async (companyId: number) => {
+    const { data, error } = await supabase
+      .from('executive')
+      .select('id, name, last_name, active')
+      .eq('company_id', companyId)
+      .eq('active', false)
+      .neq('id', executiveId || 0)  // Excluye al ejecutivo actual si existe
+
+    if (error) {
+      console.error('Error fetching executives:', error)
+    } else {
+      setExecutives(data || [])
+    }
+  }, [executiveId])
+
   const fetchExecutive = useCallback(async () => {
     if (!executiveId) return
 
@@ -101,6 +125,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       setCompanyId(executive.company_id.toString())
       setInitialCompany(executive.company)
       setAssistantId(executive.assistant_id?.toString() || '')
+      setReemplazaA(executive.reemplaza_a?.toString() || '0')
       setTareco(executive.tareco)
       setBirthDate(executive.birth_date)
       setCountry(executive.country)
@@ -119,8 +144,9 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       setMembershipId(executive.membership_id?.toString() || '')
       await fetchAssistants(executive.company_id)
       await fetchMemberships(executive.company_id)
+      await fetchExecutives(executive.company_id)
     }
-  }, [executiveId, fetchAssistants, fetchMemberships])
+  }, [executiveId, fetchAssistants, fetchMemberships, fetchExecutives])
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -136,8 +162,10 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
     setCompanyId(value)
     setAssistantId('')
     setMembershipId('')
+    setReemplazaA('0')
     fetchAssistants(parseInt(value))
     fetchMemberships(parseInt(value))
+    fetchExecutives(parseInt(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,6 +176,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       last_name: lastName,
       company_id: parseInt(companyId),
       assistant_id: parseInt(assistantId) || null,
+      reemplaza_a: reemplazaA === '0' ? null : parseInt(reemplazaA),
       tareco,
       birth_date: birthDate,
       country,
@@ -256,6 +285,22 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
             {assistants.map((assistant) => (
               <SelectItem key={assistant.id} value={assistant.id.toString()}>
                 {`${assistant.name} ${assistant.last_name}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label htmlFor="reemplazaA">Reemplaza a</Label>
+        <Select value={reemplazaA} onValueChange={setReemplazaA}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona un ejecutivo inactivo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">No reemplaza</SelectItem>
+            {executives.map((executive) => (
+              <SelectItem key={executive.id} value={executive.id.toString()}>
+                {`${executive.name} ${executive.last_name}`}
               </SelectItem>
             ))}
           </SelectContent>

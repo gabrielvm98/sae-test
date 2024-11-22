@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Building, Users, UserCircle, FileQuestion, PresentationIcon, FolderKanban } from 'lucide-react'
+import { Building, Users, UserCircle, FileQuestion, PresentationIcon, FolderKanban, DollarSign } from 'lucide-react'
 
 const sections = [
   {
@@ -24,6 +24,13 @@ const sections = [
     icon: UserCircle,
     viewAllLink: '/secretarias',
     addLink: '/secretarias/new'
+  },
+  {
+    title: 'Membresías',
+    description: 'Gestiona las membresías de las empresas.',
+    icon: DollarSign,
+    viewAllLink: '/membresias',
+    addLink: '/membresias/new'
   },
   {
     title: 'Consultas',

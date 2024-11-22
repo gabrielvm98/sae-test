@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, Building, User, Calendar, FileText, Users, Briefcase } from 'lucide-react'
+import { ArrowLeft, Pencil, Building, User, Calendar, FileText, Users, Briefcase, DollarSign } from 'lucide-react'
 
 type Presentation = {
   id: number
@@ -20,6 +20,9 @@ type Presentation = {
   presentation_type: string
   modalidad: string
   comments: string
+  billable: boolean
+  billable_currency: string | null
+  billable_amount: number | null
   company: {
     razon_social: string
   }
@@ -111,6 +114,21 @@ export default function PresentationDetailsPage() {
           <CardContent className="space-y-2">
             <p><Users className="inline mr-2" /> <strong>Responsable(s) de la elaboración:</strong> {presentation.elaboration_assignee.join(', ')}</p>
             <p><Users className="inline mr-2" /> <strong>Expositor(es):</strong> {presentation.presentation_assignee.join(', ')}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Facturación</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p><DollarSign className="inline mr-2" /> <strong>Facturable:</strong> {presentation.billable ? 'Sí' : 'No'}</p>
+            {presentation.billable && (
+              <>
+                <p><strong>Moneda:</strong> {presentation.billable_currency}</p>
+                <p><strong>Monto:</strong> {presentation.billable_amount?.toFixed(2)}</p>
+              </>
+            )}
           </CardContent>
         </Card>
 

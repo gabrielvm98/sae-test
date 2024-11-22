@@ -27,8 +27,6 @@ type Executive = {
 
 const statusOptions = ["Inicial", "Intermedio", "Avanzado", "Finalizado", "Propuesta enviada"]
 
-
-
 export function ProjectForm({ projectId }: ProjectFormProps) {
   const [companyId, setCompanyId] = useState('')
   const [executiveId, setExecutiveId] = useState('')
@@ -39,6 +37,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
   const [comments, setComments] = useState('')
   const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
+  const [projectCode, setProjectCode] = useState('')
   const router = useRouter()
 
   const fetchCompanies = useCallback(async () => {
@@ -85,6 +84,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
       setEndDate(data.end_date)
       setStatus(data.status)
       setComments(data.comments)
+      setProjectCode(data.project_code || '')
     }
   }, [projectId, fetchExecutives])
 
@@ -124,7 +124,8 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
       start_date: startDate,
       end_date: endDate,
       status,
-      comments
+      comments,
+      project_code: projectCode
     }
 
     if (projectId) {
@@ -161,6 +162,15 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label htmlFor="projectCode">Código</Label> {/* Updated: New input field for project_code */}
+        <Input
+          id="projectCode"
+          type="text"
+          value={projectCode}
+          onChange={(e) => setProjectCode(e.target.value)}
+        />
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>

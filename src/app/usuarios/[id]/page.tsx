@@ -46,6 +46,11 @@ type Executive = {
   membership: {
     name: string
   } | null
+  reemplaza_a: number | null
+  reemplazado_executive?: {
+    name: string
+    last_name: string
+  }
 }
 
 export default function ExecutiveDetailsPage() {
@@ -68,7 +73,8 @@ export default function ExecutiveDetailsPage() {
           cc_mobile_phone,
           mobile_phone
         ),
-        membership:membership_id (name)
+        membership:membership_id (name),
+        reemplazado_executive:reemplaza_a (name, last_name)
       `)
       .eq('id', params.id)
       .single()
@@ -139,6 +145,9 @@ export default function ExecutiveDetailsPage() {
             <p><strong>Área:</strong> {executive.area}</p>
             <p><strong>Tipo de usuario:</strong> {executive.user_type}</p>
             <p><strong>Status:</strong> <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
+            {executive.reemplaza_a && executive.reemplazado_executive && (
+              <p><User className="inline mr-2" /> <strong>Reemplaza a:</strong> {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
+            )}
             <p><strong>Secretaria:</strong> {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
             <p><Phone className="inline mr-2" /> <strong>Teléfono de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
             <p><Phone className="inline mr-2" /> <strong>Celular de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>

@@ -35,6 +35,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
   const [name, setName] = useState('')
   const [companyId, setCompanyId] = useState('')
   const [membershipType, setMembershipType] = useState('')
+  const [areaScope, setAreaScope] = useState(false)
   const [area, setArea] = useState('')
   const [titulares, setTitulares] = useState('0')
   const [cuposAdicionales, setCuposAdicionales] = useState('0')
@@ -85,6 +86,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
       setName(data.name)
       setCompanyId(data.company_id.toString())
       setMembershipType(data.membership_type)
+      setAreaScope(data.area_scope)
       setArea(data.area)
       setTitulares(data.titulares.toString())
       setCuposAdicionales(data.cupos_adicionales.toString())
@@ -121,7 +123,8 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
       name,
       company_id: parseInt(companyId),
       membership_type: membershipType,
-      area,
+      area_scope: areaScope,
+      area: area,
       titulares: parseInt(titulares),
       cupos_adicionales: parseInt(cuposAdicionales),
       titular_adicional: parseInt(titularAdicional),
@@ -203,14 +206,32 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
         </Select>
       </div>
 
-      <div>
-        <Label htmlFor="area">Membresía por área</Label>
-        <Input
-          id="area"
-          value={area}
-          onChange={(e) => setArea(e.target.value)}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="areaScope"
+          checked={areaScope}
+          onCheckedChange={(checked) => setAreaScope(checked as boolean)}
         />
+        <Label htmlFor="areaScope">Membresía por área</Label>
       </div>
+
+      {areaScope && (
+        <div>
+          <Label htmlFor="area">Área</Label>
+          <Select value={area} onValueChange={setArea}>
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona un área" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Finanzas">Finanzas</SelectItem>
+              <SelectItem value="Recursos Humanos">Recursos Humanos</SelectItem>
+              <SelectItem value="Marketing">Marketing</SelectItem>
+              <SelectItem value="Operaciones">Operaciones</SelectItem>
+              <SelectItem value="Tecnología">Tecnología</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
       <div>
         <Label htmlFor="titulares">Cantidad de titulares</Label>

@@ -9,6 +9,7 @@ import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-react'
 
 type Project = {
   id: number
+  project_code: string
   company_id: number
   executive_id: number
   assignee: string[]
@@ -61,6 +62,7 @@ export default function ProjectsPage() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Código</TableHead>
             <TableHead>Empresa</TableHead>
             <TableHead>Solicitante</TableHead>
             <TableHead>Responsable(s)</TableHead>
@@ -73,6 +75,7 @@ export default function ProjectsPage() {
         <TableBody>
           {projects.map((project) => (
             <TableRow key={project.id}>
+              <TableCell>{project.project_code}</TableCell>
               <TableCell>{project.company.razon_social}</TableCell>
               <TableCell>{`${project.executive.name} ${project.executive.last_name}`}</TableCell>
               <TableCell>{project.assignee.join(', ')}</TableCell>
