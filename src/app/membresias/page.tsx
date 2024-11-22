@@ -68,10 +68,6 @@ export default function MembershipsPage() {
     }
   }
 
-  function booleanToSiNo(value: boolean): string {
-    return value ? 'Sí' : 'No'
-  }
-
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">

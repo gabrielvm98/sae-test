@@ -15,11 +15,6 @@ type MembershipFormProps = {
   membershipId?: number
 }
 
-type Company = {
-  id: number
-  razon_social: string
-}
-
 const membershipTypes = [
   "SAE Ejecutivo",
   "SAE Reuniones",
