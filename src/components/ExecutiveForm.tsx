@@ -29,25 +29,6 @@ type Assistant = {
 const countries = ["Perú", "Chile", "Colombia", "México", "Argentina"]
 const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen"]
 
-interface CountryOption {
-  value: string
-  label: string
-  code: string
-}
-
-const countryCodes: CountryOption[] = [
-  { value: "1", label: "United States", code: "+1" },
-  { value: "51", label: "Peru", code: "+51" },
-  { value: "54", label: "Argentina", code: "+54" },
-  { value: "55", label: "Brazil", code: "+55" },
-  { value: "56", label: "Chile", code: "+56" },
-  { value: "57", label: "Colombia", code: "+57" },
-  { value: "52", label: "Mexico", code: "+52" },
-  { value: "34", label: "Spain", code: "+34" },
-  // Add more countries as needed
-]
-
-
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
   const [name, setName] = useState('')
@@ -72,6 +53,8 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [endDate, setEndDate] = useState('')
   const [assistants, setAssistants] = useState<Assistant[]>([])
   const [loading, setLoading] = useState(true)
+  const [membershipId, setMembershipId] = useState('')
+  const [memberships, setMemberships] = useState<{ id: number; name: string; company_id: number }[]>([])
   const router = useRouter()
 
   const fetchAssistants = useCallback(async (companyId: number) => {
@@ -84,6 +67,19 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       console.error('Error fetching assistants:', error)
     } else {
       setAssistants(data || [])
+    }
+  }, [])
+
+  const fetchMemberships = useCallback(async (companyId: number) => {
+    const { data, error } = await supabase
+      .from('membership')
+      .select('id, name, company_id')
+      .eq('company_id', companyId)
+
+    if (error) {
+      console.error('Error fetching memberships:', error)
+    } else {
+      setMemberships(data || [])
     }
   }, [])
 
@@ -120,9 +116,11 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       setMobilePhone(executive.mobile_phone)
       setStartDate(executive.start_date)
       setEndDate(executive.end_date)
+      setMembershipId(executive.membership_id?.toString() || '')
       await fetchAssistants(executive.company_id)
+      await fetchMemberships(executive.company_id)
     }
-  }, [executiveId, fetchAssistants])
+  }, [executiveId, fetchAssistants, fetchMemberships])
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -137,7 +135,9 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const handleCompanyChange = (value: string) => {
     setCompanyId(value)
     setAssistantId('')
+    setMembershipId('')
     fetchAssistants(parseInt(value))
+    fetchMemberships(parseInt(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -162,7 +162,8 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       mobile_phone_cc: mobilePhoneCc,
       mobile_phone: mobilePhone,
       start_date: startDate,
-      end_date: endDate
+      end_date: endDate,
+      membership_id: parseInt(membershipId) || null,
     }
 
     if (executiveId) {
@@ -229,6 +230,21 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           label="empresa"
           initialValue={initialCompany}
         />
+      </div>
+      <div>
+        <Label htmlFor="membershipId">Membresía</Label>
+        <Select value={membershipId} onValueChange={setMembershipId}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona una membresía" />
+          </SelectTrigger>
+          <SelectContent>
+            {memberships.map((membership) => (
+              <SelectItem key={membership.id} value={membership.id.toString()}>
+                {membership.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div>
         <Label htmlFor="assistantId">Secretaria</Label>
@@ -332,18 +348,14 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       <div>
         <Label htmlFor="officePhone">Teléfono de oficina</Label>
         <div className="flex space-x-2">
-        <Select value={officePhoneCc} onValueChange={setOfficePhoneCc}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Código" />
-            </SelectTrigger>
-            <SelectContent>
-              {countryCodes.map((country) => (
-                <SelectItem key={country.value} value={country.code}>
-                  {country.code} ({country.label})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="officePhoneCc"
+            type="text"
+            value={officePhoneCc}
+            onChange={(e) => setOfficePhoneCc(e.target.value)}
+            placeholder="Código"
+            className="w-20"
+          />
           <Input
             id="officePhone"
             type="tel"
@@ -364,18 +376,14 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       <div>
         <Label htmlFor="mobilePhone">Celular</Label>
         <div className="flex space-x-2">
-        <Select value={mobilePhoneCc} onValueChange={setMobilePhoneCc}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Código" />
-            </SelectTrigger>
-            <SelectContent>
-              {countryCodes.map((country) => (
-                <SelectItem key={country.value} value={country.code}>
-                  {country.code} ({country.label})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Input
+            id="mobilePhoneCc"
+            type="text"
+            value={mobilePhoneCc}
+            onChange={(e) => setMobilePhoneCc(e.target.value)}
+            placeholder="Código"
+            className="w-20"
+          />
           <Input
             id="mobilePhone"
             type="tel"

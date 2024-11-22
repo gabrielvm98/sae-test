@@ -43,6 +43,9 @@ type Executive = {
     cc_mobile_phone: string
     mobile_phone: string
   }
+  membership: {
+    name: string
+  } | null
 }
 
 export default function ExecutiveDetailsPage() {
@@ -64,7 +67,8 @@ export default function ExecutiveDetailsPage() {
           office_phone_extension,
           cc_mobile_phone,
           mobile_phone
-        )
+        ),
+        membership:membership_id (name)
       `)
       .eq('id', params.id)
       .single()
@@ -130,6 +134,7 @@ export default function ExecutiveDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {executive.company.razon_social}</p>
+            <p><strong>Membresía:</strong> {executive.membership ? executive.membership.name : 'No asignado'}</p>
             <p><strong>Cargo:</strong> {executive.position}</p>
             <p><strong>Área:</strong> {executive.area}</p>
             <p><strong>Tipo de usuario:</strong> {executive.user_type}</p>

@@ -1,0 +1,248 @@
+'use client'
+
+import { useState, useEffect, useCallback } from 'react'
+import { useParams } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from 'next/link'
+import { ArrowLeft, Pencil, Building, User, Calendar, FileText, DollarSign, Check, X } from 'lucide-react'
+
+type Membership = {
+  id: number
+  name: string
+  company: {
+    razon_social: string
+  }
+  membership_type: string
+  area: string
+  titulares: number
+  cupos_adicionales: number
+  titular_adicional: number
+  cupos_foros: number
+  panorama_economico: boolean
+  panorama_politico: boolean
+  informe_sae: boolean
+  sae_mercados: boolean
+  cantidad_reuniones: number
+  daily_note: boolean
+  app_sae: boolean
+  web_sae: boolean
+  titular_virtual: number
+  cantidad_presentaciones: number
+  consultas_acceso: boolean
+  fecha_renovacion: string
+  payment_method: string
+  payment_currency: string
+  payment_amount: number
+  oc_needed: boolean
+  signed_proposal: boolean
+  invoice_sent: boolean
+  signer_name: string
+  signer_email: string
+  signer_phone: string
+  comments: string
+}
+
+export default function MembershipDetailsPage() {
+  const [membership, setMembership] = useState<Membership | null>(null)
+  const params = useParams()
+
+  const fetchMembership = useCallback(async () => {
+    if (typeof params.id !== 'string') return
+    const { data, error } = await supabase
+      .from('membership')
+      .select(`
+        *,
+        company:company_id (razon_social)
+      `)
+      .eq('id', params.id)
+      .single()
+
+    if (error) {
+      console.error('Error fetching membership:', error)
+    } else {
+      setMembership(data)
+    }
+  }, [params.id])
+
+  useEffect(() => {
+    fetchMembership()
+  }, [fetchMembership])
+
+  if (!membership) return <div>Loading...</div>
+
+  return (
+    <div className="container mx-auto py-10">
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold">Detalles de la Membresía</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold">Información General</h3>
+              <p className="flex items-center">
+                <User className="w-5 h-5 mr-2 text-gray-500" />
+                <span className="font-semibold mr-2">Nombre de la membresía:</span>
+                {membership.name}
+              </p>
+              <p className="flex items-center">
+                <Building className="w-5 h-5 mr-2 text-gray-500" />
+                <span className="font-semibold mr-2">Empresa:</span>
+                {membership.company.razon_social}
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Tipo de membresía:</span>
+                {membership.membership_type}
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Membresía por área:</span>
+                {membership.area}
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold">Detalles de la Membresía</h3>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Titulares:</span>
+                {membership.titulares}
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Cupos adicionales:</span>
+                {membership.cupos_adicionales}
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Titular adicional:</span>
+                {membership.titular_adicional}
+              </p>
+              <p className="flex items-center">
+                <span className="font-semibold mr-2">Cupos foros:</span>
+                {membership.cupos_foros}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Servicios Incluidos</h3>
+            <div className="grid gap-2 md:grid-cols-2">
+              <p className="flex items-center">
+                {membership.panorama_economico ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Panorama económico</span>
+              </p>
+              <p className="flex items-center">
+                {membership.panorama_politico ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Panorama político</span>
+              </p>
+              <p className="flex items-center">
+                {membership.informe_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Informe SAE</span>
+              </p>
+              <p className="flex items-center">
+                {membership.sae_mercados ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">SAE Mercados</span>
+              </p>
+              <p className="flex items-center">
+                {membership.daily_note ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Daily note</span>
+              </p>
+              <p className="flex items-center">
+                {membership.app_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">App SAE</span>
+              </p>
+              <p className="flex items-center">
+                {membership.web_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Web SAE</span>
+              </p>
+              <p className="flex items-center">
+                {membership.consultas_acceso ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Acceso a consultas</span>
+              </p>
+            </div>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Cantidad de reuniones:</span>
+              {membership.cantidad_reuniones}
+            </p>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Titular virtual:</span>
+              {membership.titular_virtual}
+            </p>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Cantidad de presentaciones:</span>
+              {membership.cantidad_presentaciones}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Información de Pago</h3>
+            <p className="flex items-center">
+              <Calendar className="w-5 h-5 mr-2 text-gray-500" />
+              <span className="font-semibold mr-2">Fecha de renovación:</span>
+              {membership.fecha_renovacion}
+            </p>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Forma de pago:</span>
+              {membership.payment_method}
+            </p>
+            <p className="flex items-center">
+              <DollarSign className="w-5 h-5 mr-2 text-gray-500" />
+              <span className="font-semibold mr-2">Tarifa:</span>
+              {`${membership.payment_currency} ${membership.payment_amount}`}
+            </p>
+            <p className="flex items-center">
+              {membership.oc_needed ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+              <span className="font-semibold mr-2">Necesita O/C</span>
+            </p>
+            <p className="flex items-center">
+              {membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+              <span className="font-semibold mr-2">Propuesta firmada</span>
+            </p>
+            <p className="flex items-center">
+              {membership.invoice_sent ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+              <span className="font-semibold mr-2">Factura enviada</span>
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Información del Firmante</h3>
+            <p className="flex items-center">
+              <User className="w-5 h-5 mr-2 text-gray-500" />
+              <span className="font-semibold mr-2">Nombre:</span>
+              {membership.signer_name}
+            </p>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Email:</span>
+              {membership.signer_email}
+            </p>
+            <p className="flex items-center">
+              <span className="font-semibold mr-2">Teléfono:</span>
+              {membership.signer_phone}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold">Comentarios</h3>
+            <p className="flex items-start">
+              <FileText className="w-5 h-5 mr-2 mt-1 text-gray-500" />
+              {membership.comments}
+            </p>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Button variant="outline" asChild>
+            <Link href="/membresias">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/membresias/${membership.id}/edit`}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  )
+}

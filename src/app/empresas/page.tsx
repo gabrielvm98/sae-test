@@ -12,29 +12,17 @@ type Company = {
   ruc: string
   razon_social: string
   nombre_comercial: string
+  seats: number
   country: string
   department: string
-  district: string
   address: string
   phone_number: string
   industry: string
-  membership_type: string
   status: string
-  membership_expire_date: string
   enrollment_date: string
-  seats: number
-  extra_seats: number
-  panorama_economico_politico: boolean
-  informe_sae: boolean
-  sae_mercados: boolean
-  meetings_amount: number
-  query_access: boolean
-  oc_needed: boolean
-  bill_currency: string
-  bill_amount: number
-  payment_frecuency: string
   notes: string
-  virtual_member: boolean
+  headcount: number
+  sales: number
 }
 
 export default function EmpresasPage() {
@@ -59,14 +47,6 @@ export default function EmpresasPage() {
     } else {
       setCompanies(data || [])
     }
-  }
-
-  useEffect(() => {
-    fetchCompanies()
-  }, [])
-
-  function booleanToSiNo(value: boolean): string {
-    return value ? 'Sí' : 'No'
   }
 
   return (
@@ -108,28 +88,16 @@ export default function EmpresasPage() {
             <TableHead>RUC</TableHead>
             <TableHead>Razón Social</TableHead>
             <TableHead>Nombre Comercial</TableHead>
+            <TableHead>Titulares</TableHead>
             <TableHead>País</TableHead>
             <TableHead>Departamento</TableHead>
-            <TableHead>Distrito</TableHead>
             <TableHead>Dirección</TableHead>
             <TableHead>Teléfono</TableHead>
             <TableHead>Sector</TableHead>
-            <TableHead>Tipo de Membresía</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Fecha de Término</TableHead>
             <TableHead>Fecha de Ingreso</TableHead>
-            <TableHead>Titulares</TableHead>
-            <TableHead>Cupos Adicionales</TableHead>
-            <TableHead>Panorama Económico y Político</TableHead>
-            <TableHead>Informe SAE</TableHead>
-            <TableHead>SAE Mercados</TableHead>
-            <TableHead>Cantidad de Reuniones</TableHead>
-            <TableHead>Daily Note</TableHead>
-            <TableHead>Titular Virtual</TableHead>
-            <TableHead>Acceso a Consultas</TableHead>
-            <TableHead>Necesita O/C</TableHead>
-            <TableHead>Tarifa</TableHead>
-            <TableHead>Forma de Pago</TableHead>
+            <TableHead>Número de Trabajadores</TableHead>
+            <TableHead>Ventas</TableHead>
             <TableHead>Notas</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
@@ -140,28 +108,16 @@ export default function EmpresasPage() {
               <TableCell>{company.ruc}</TableCell>
               <TableCell>{company.razon_social}</TableCell>
               <TableCell>{company.nombre_comercial}</TableCell>
+              <TableCell>{company.seats}</TableCell>
               <TableCell>{company.country}</TableCell>
               <TableCell>{company.department}</TableCell>
-              <TableCell>{company.district}</TableCell>
               <TableCell>{company.address}</TableCell>
               <TableCell>{company.phone_number}</TableCell>
               <TableCell>{company.industry}</TableCell>
-              <TableCell>{company.membership_type}</TableCell>
               <TableCell>{company.status}</TableCell>
-              <TableCell>{company.membership_expire_date}</TableCell>
               <TableCell>{company.enrollment_date}</TableCell>
-              <TableCell>{company.seats}</TableCell>
-              <TableCell>{company.extra_seats}</TableCell>
-              <TableCell>{booleanToSiNo(company.panorama_economico_politico)}</TableCell>
-              <TableCell>{booleanToSiNo(company.informe_sae)}</TableCell>
-              <TableCell>{booleanToSiNo(company.sae_mercados)}</TableCell>
-              <TableCell>{company.meetings_amount}</TableCell>
-              <TableCell>{booleanToSiNo(company.query_access)}</TableCell>
-              <TableCell>{booleanToSiNo(company.virtual_member)}</TableCell>
-              <TableCell>{booleanToSiNo(company.query_access)}</TableCell>
-              <TableCell>{booleanToSiNo(company.oc_needed)}</TableCell>
-              <TableCell>{`${company.bill_currency} ${company.bill_amount}`}</TableCell>
-              <TableCell>{company.payment_frecuency}</TableCell>
+              <TableCell>{company.headcount}</TableCell>
+              <TableCell>{company.sales}</TableCell>
               <TableCell>{company.notes}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">

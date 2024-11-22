@@ -28,6 +28,11 @@ export function Navbar() {
               </Link>
             </Button>
             <Button variant="ghost" asChild>
+              <Link href="/membresias">
+                Membresías
+              </Link>
+            </Button>
+            <Button variant="ghost" asChild>
               <Link href="/consultas">
                 Consultas
               </Link>

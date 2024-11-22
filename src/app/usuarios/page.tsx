@@ -36,6 +36,10 @@ type Executive = {
     name: string
     last_name: string
   }
+  membership_id: number | null
+  membership: {
+    name: string
+  } | null
 }
 
 export default function UsuariosPage() {
@@ -52,7 +56,8 @@ export default function UsuariosPage() {
       .select(`
         *,
         company:company_id (razon_social),
-        assistant:assistant_id (name, last_name)
+        assistant:assistant_id (name, last_name),
+        membership:membership_id (name)
       `)
 
     if (searchQuery && searchQuery.trim() !== '') {
@@ -116,6 +121,7 @@ export default function UsuariosPage() {
             <TableHead>Nombre</TableHead>
             <TableHead>Apellido</TableHead>
             <TableHead>Empresa</TableHead>
+            <TableHead>Membresía</TableHead>
             <TableHead>Secretaria</TableHead>
             <TableHead>Tareco</TableHead>
             <TableHead>Fecha de Nacimiento</TableHead>
@@ -139,6 +145,7 @@ export default function UsuariosPage() {
               <TableCell>{executive.name}</TableCell>
               <TableCell>{executive.last_name}</TableCell>
               <TableCell>{executive.company.razon_social}</TableCell>
+              <TableCell>{executive.membership ? executive.membership.name : 'No asignado'}</TableCell>
               <TableCell>{`${executive.assistant.name} ${executive.assistant.last_name}`}</TableCell>
               <TableCell>{executive.tareco}</TableCell>
               <TableCell>{executive.birth_date}</TableCell>
