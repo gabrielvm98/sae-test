@@ -45,6 +45,9 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
   const [billableAmount, setBillableAmount] = useState('')
   const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
+  const [otherExecutive, setOtherExecutive] = useState(false)
+  const [otherFullname, setOtherFullname] = useState('')
+  const [otherEmail, setOtherEmail] = useState('')
   const router = useRouter()
 
   const fetchCompanies = useCallback(async () => {
@@ -85,7 +88,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
     } else if (data) {
       setCompanyId(data.company_id.toString())
       await fetchExecutives(data.company_id)
-      setExecutiveId(data.executive_id.toString())
+      setExecutiveId(data.executive_id ? data.executive_id.toString() : '0')
       setElaborationAssignee(data.elaboration_assignee)
       setPresentationAssignee(data.presentation_assignee)
       setOrderSource(data.order_source)
@@ -97,6 +100,9 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
       setBillable(data.billable)
       setBillableCurrency(data.billable_currency || '')
       setBillableAmount(data.billable_amount ? data.billable_amount.toString() : '')
+      setOtherExecutive(data.other_executive)
+      setOtherFullname(data.other_fullname || '')
+      setOtherEmail(data.other_email || '')
     }
   }, [presentationId, fetchExecutives])
 
@@ -132,14 +138,28 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
   const handleCompanyChange = (value: string) => {
     setCompanyId(value)
     setExecutiveId('')
+    setOtherExecutive(false)
+    setOtherFullname('')
+    setOtherEmail('')
     fetchExecutives(parseInt(value))
+  }
+
+  const handleExecutiveChange = (value: string) => {
+    setExecutiveId(value)
+    if (value === '0') {
+      setOtherExecutive(true)
+    } else {
+      setOtherExecutive(false)
+      setOtherFullname('')
+      setOtherEmail('')
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const presentation = {
       company_id: parseInt(companyId),
-      executive_id: parseInt(executiveId),
+      executive_id: executiveId === '0' ? null : parseInt(executiveId),
       elaboration_assignee: elaborationAssignee,
       presentation_assignee: presentationAssignee,
       order_source: orderSource,
@@ -151,6 +171,9 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
       billable,
       billable_currency: billable ? billableCurrency : null,
       billable_amount: billable ? parseFloat(billableAmount) : null,
+      other_executive: otherExecutive,
+      other_fullname: otherExecutive ? otherFullname : null,
+      other_email: otherExecutive ? otherEmail : null,
     }
 
     if (presentationId) {
@@ -190,11 +213,12 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>
-        <Select value={executiveId} onValueChange={setExecutiveId}>
+        <Select value={executiveId} onValueChange={handleExecutiveChange}>
           <SelectTrigger>
             <SelectValue placeholder="Selecciona un solicitante" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="0">Otro</SelectItem>
             {executives.map((executive) => (
               <SelectItem key={executive.id} value={executive.id.toString()}>
                 {`${executive.name} ${executive.last_name}`}
@@ -203,6 +227,29 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
           </SelectContent>
         </Select>
       </div>
+      {otherExecutive && (
+        <>
+          <div>
+            <Label htmlFor="otherFullname">Nombre completo</Label>
+            <Input
+              id="otherFullname"
+              value={otherFullname}
+              onChange={(e) => setOtherFullname(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="otherEmail">Correo</Label>
+            <Input
+              id="otherEmail"
+              type="email"
+              value={otherEmail}
+              onChange={(e) => setOtherEmail(e.target.value)}
+              required
+            />
+          </div>
+        </>
+      )}
       <div>
         <Label>Responsable(s) de la elaboración</Label>
         <div className="grid grid-cols-2 gap-2">

@@ -11,6 +11,9 @@ type Presentation = {
   id: number
   company_id: number
   executive_id: number
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   elaboration_assignee: string[]
   presentation_assignee: string[]
   order_source: string
@@ -96,7 +99,11 @@ export default function PresentationsPage() {
           {presentations.map((presentation) => (
             <TableRow key={presentation.id}>
               <TableCell>{presentation.company.razon_social}</TableCell>
-              <TableCell>{`${presentation.executive.name} ${presentation.executive.last_name}`}</TableCell>
+              { presentation.other_executive ? (
+                <TableCell>{presentation.other_fullname}</TableCell>
+              ) : (
+                <TableCell>{`${presentation.executive.name} ${presentation.executive.last_name}`}</TableCell>
+              )}
               <TableCell>{formatListOfStrings(presentation.elaboration_assignee)}</TableCell>
               <TableCell>{formatListOfStrings(presentation.presentation_assignee)}</TableCell>
               <TableCell>{presentation.order_source}</TableCell>

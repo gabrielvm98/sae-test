@@ -12,6 +12,9 @@ type Presentation = {
   id: number
   company_id: number
   executive_id: number
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   elaboration_assignee: string[]
   presentation_assignee: string[]
   order_source: string
@@ -89,8 +92,16 @@ export default function PresentationDetailsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {presentation.company.razon_social}</p>
-            <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
-            <p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> {presentation.executive.position}</p>
+            {presentation.other_executive ? (
+              <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {presentation.other_fullname}</p>
+            ) : (
+              <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
+            )}
+            {presentation.other_executive ? (
+              <p><Briefcase className="inline mr-2" /> <strong>Cargo:</strong> No disponible</p>
+            ) : (
+              <p><Briefcase className="inline mr-2" /> <strong>Cargo:</strong> {presentation.executive.position}</p>
+            )}
             <p><strong>Origen de solicitud:</strong> {presentation.order_source}</p>
             <p><Calendar className="inline mr-2" /> <strong>Fecha de ingreso:</strong> {presentation.order_date}</p>
           </CardContent>

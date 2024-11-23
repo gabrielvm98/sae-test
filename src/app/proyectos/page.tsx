@@ -12,6 +12,9 @@ type Project = {
   project_code: string
   company_id: number
   executive_id: number
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   assignee: string[]
   start_date: string
   end_date: string
@@ -77,7 +80,11 @@ export default function ProjectsPage() {
             <TableRow key={project.id}>
               <TableCell>{project.project_code}</TableCell>
               <TableCell>{project.company.razon_social}</TableCell>
-              <TableCell>{`${project.executive.name} ${project.executive.last_name}`}</TableCell>
+              {project.other_executive ? (
+                <TableCell>{project.other_fullname}</TableCell>
+              ) : (
+                <TableCell>{project.executive.name} {project.executive.last_name}</TableCell>
+              )}
               <TableCell>{project.assignee.join(', ')}</TableCell>
               <TableCell>{project.start_date}</TableCell>
               <TableCell>{project.end_date}</TableCell>

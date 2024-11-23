@@ -27,7 +27,6 @@ type Executive = {
   company_id: number
 }
 
-
 export function QueryForm({ queryId }: QueryFormProps) {
   const [companyId, setCompanyId] = useState('')
   const [executiveId, setExecutiveId] = useState('')
@@ -37,6 +36,9 @@ export function QueryForm({ queryId }: QueryFormProps) {
   const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
   const [loading, setLoading] = useState(true)
+  const [otherExecutive, setOtherExecutive] = useState(false)
+  const [otherFullname, setOtherFullname] = useState('')
+  const [otherEmail, setOtherEmail] = useState('')
   const router = useRouter()
 
   const fetchCompanies = useCallback(async () => {
@@ -77,10 +79,13 @@ export function QueryForm({ queryId }: QueryFormProps) {
       console.error('Error fetching query:', error)
     } else if (data) {
       setCompanyId(data.company_id.toString())
-      setExecutiveId(data.executive_id.toString())
+      setExecutiveId(data.executive_id ? data.executive_id.toString() : '0')
       setSelectedAssignees(data.assignee)
       setDescription(data.description)
       setSolvedDate(data.solved_date)
+      setOtherExecutive(data.other_executive)
+      setOtherFullname(data.other_fullname || '')
+      setOtherEmail(data.other_email || '')
       await fetchExecutives(data.company_id)
     }
   }, [queryId, fetchExecutives])
@@ -105,6 +110,20 @@ export function QueryForm({ queryId }: QueryFormProps) {
   const handleCompanyChange = (value: string) => {
     setCompanyId(value)
     setExecutiveId('')
+    setOtherExecutive(false)
+    setOtherFullname('')
+    setOtherEmail('')
+  }
+
+  const handleExecutiveChange = (value: string) => {
+    setExecutiveId(value)
+    if (value === '0') {
+      setOtherExecutive(true)
+    } else {
+      setOtherExecutive(false)
+      setOtherFullname('')
+      setOtherEmail('')
+    }
   }
 
   const handleAssigneeChange = (assignee: string) => {
@@ -119,10 +138,13 @@ export function QueryForm({ queryId }: QueryFormProps) {
     e.preventDefault()
     const query = {
       company_id: parseInt(companyId),
-      executive_id: parseInt(executiveId),
+      executive_id: executiveId === '0' ? null : parseInt(executiveId),
       assignee: selectedAssignees,
       description,
-      solved_date: solvedDate
+      solved_date: solvedDate,
+      other_executive: otherExecutive,
+      other_fullname: otherExecutive ? otherFullname : null,
+      other_email: otherExecutive ? otherEmail : null
     }
 
     if (queryId) {
@@ -166,11 +188,12 @@ export function QueryForm({ queryId }: QueryFormProps) {
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>
-        <Select value={executiveId} onValueChange={setExecutiveId}>
+        <Select value={executiveId} onValueChange={handleExecutiveChange}>
           <SelectTrigger>
             <SelectValue placeholder="Selecciona un solicitante" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="0">Otro</SelectItem>
             {executives.map((executive) => (
               <SelectItem key={executive.id} value={executive.id.toString()}>
                 {`${executive.name} ${executive.last_name}`}
@@ -179,6 +202,29 @@ export function QueryForm({ queryId }: QueryFormProps) {
           </SelectContent>
         </Select>
       </div>
+      {otherExecutive && (
+        <>
+          <div>
+            <Label htmlFor="otherFullname">Nombre completo</Label>
+            <Input
+              id="otherFullname"
+              value={otherFullname}
+              onChange={(e) => setOtherFullname(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="otherEmail">Correo</Label>
+            <Input
+              id="otherEmail"
+              type="email"
+              value={otherEmail}
+              onChange={(e) => setOtherEmail(e.target.value)}
+              required
+            />
+          </div>
+        </>
+      )}
       <div>
         <Label>Encargado</Label>
         <div className="grid grid-cols-2 gap-2">

@@ -13,6 +13,9 @@ type Project = {
   project_code: string
   company_id: number
   executive_id: number
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   assignee: string[]
   start_date: string
   end_date: string
@@ -85,8 +88,12 @@ export default function ProjectDetailsPage() {
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {project.company.razon_social}</p>
             <p><IdCard className="inline mr-2" /> <strong>Código:</strong> {project.project_code}</p>
-            <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${project.executive.name} ${project.executive.last_name}`}</p>
-            <p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> {project.executive.position}</p>
+            {project.other_executive ? 
+            (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {project.other_fullname}</p>) :
+            (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${project.executive.name} ${project.executive.last_name}`}</p>)}
+            {project.other_executive ? 
+            (<p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> No disponible</p>) :
+            (<p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> {project.executive.position}</p>)}
             <p><strong>Status:</strong> {project.status}</p>
           </CardContent>
         </Card>

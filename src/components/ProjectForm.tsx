@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
-import { assignees } from "@/components/common/Assignees"
+import { assignees } from '@/components/common/Assignees'
 
 type ProjectFormProps = {
   projectId?: number
@@ -35,9 +35,12 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
   const [endDate, setEndDate] = useState('')
   const [status, setStatus] = useState('')
   const [comments, setComments] = useState('')
+  const [projectCode, setProjectCode] = useState('') // Updated: New state variable for project_code
+  const [otherExecutive, setOtherExecutive] = useState(false) // Updated: New state variable for other executive
+  const [otherFullname, setOtherFullname] = useState('') // Updated: New state variable for other executive fullname
+  const [otherEmail, setOtherEmail] = useState('') // Updated: New state variable for other executive email
   const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
-  const [projectCode, setProjectCode] = useState('')
   const router = useRouter()
 
   const fetchCompanies = useCallback(async () => {
@@ -78,13 +81,16 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
     } else if (data) {
       setCompanyId(data.company_id.toString())
       await fetchExecutives(data.company_id)
-      setExecutiveId(data.executive_id.toString())
+      setExecutiveId(data.executive_id ? data.executive_id.toString() : '0') // Updated: Handle new executive fields
+      setOtherExecutive(data.other_executive)
+      setOtherFullname(data.other_fullname || '')
+      setOtherEmail(data.other_email || '')
       setSelectedAssignees(data.assignee)
       setStartDate(data.start_date)
       setEndDate(data.end_date)
       setStatus(data.status)
       setComments(data.comments)
-      setProjectCode(data.project_code || '')
+      setProjectCode(data.project_code || '') // Updated: Set project_code
     }
   }, [projectId, fetchExecutives])
 
@@ -107,6 +113,17 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
     fetchExecutives(parseInt(value))
   }
 
+  const handleExecutiveChange = (value: string) => { // Updated: New function to handle executive changes
+    setExecutiveId(value)
+    if (value === '0') {
+      setOtherExecutive(true)
+    } else {
+      setOtherExecutive(false)
+      setOtherFullname('')
+      setOtherEmail('')
+    }
+  }
+
   const handleAssigneeChange = (assignee: string) => {
     setSelectedAssignees(prev => 
       prev.includes(assignee)
@@ -119,13 +136,16 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
     e.preventDefault()
     const project = {
       company_id: parseInt(companyId),
-      executive_id: parseInt(executiveId),
+      executive_id: executiveId === '0' ? null : parseInt(executiveId), // Updated: Handle new executive fields
+      other_executive: otherExecutive,
+      other_fullname: otherExecutive ? otherFullname : null,
+      other_email: otherExecutive ? otherEmail : null,
       assignee: selectedAssignees,
       start_date: startDate,
       end_date: endDate,
       status,
       comments,
-      project_code: projectCode
+      project_code: projectCode // Updated: Add project_code to the project object
     }
 
     if (projectId) {
@@ -174,11 +194,12 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>
-        <Select value={executiveId} onValueChange={setExecutiveId}>
+        <Select value={executiveId} onValueChange={handleExecutiveChange}> {/* Updated: Modified executive dropdown */}
           <SelectTrigger>
             <SelectValue placeholder="Selecciona un solicitante" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="0">Otro</SelectItem> {/* Updated: Added "Otro" option */}
             {executives.map((executive) => (
               <SelectItem key={executive.id} value={executive.id.toString()}>
                 {`${executive.name} ${executive.last_name}`}
@@ -187,6 +208,29 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
           </SelectContent>
         </Select>
       </div>
+      {otherExecutive && ( // Updated: Conditional rendering for other executive fields
+        <>
+          <div>
+            <Label htmlFor="otherFullname">Nombre completo</Label>
+            <Input
+              id="otherFullname"
+              value={otherFullname}
+              onChange={(e) => setOtherFullname(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="otherEmail">Correo</Label>
+            <Input
+              id="otherEmail"
+              type="email"
+              value={otherEmail}
+              onChange={(e) => setOtherEmail(e.target.value)}
+              required
+            />
+          </div>
+        </>
+      )}
       <div>
         <Label>Responsable(s)</Label>
         <div className="grid grid-cols-2 gap-2">

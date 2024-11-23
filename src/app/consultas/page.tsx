@@ -10,7 +10,10 @@ import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-react'
 type Query = {
   id: number
   company_id: number
-  executive_id: number
+  executive_id: number | null
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   assignee: string[]
   description: string
   solved_date: string | null
@@ -71,7 +74,11 @@ export default function ConsultasPage() {
           {queries.map((query) => (
             <TableRow key={query.id}>
               <TableCell>{query.company.razon_social}</TableCell>
-              <TableCell>{`${query.executive.name} ${query.executive.last_name}`}</TableCell>
+              {query.other_executive ? (
+                <TableCell>{query.other_fullname}</TableCell>
+              ) : (
+                <TableCell>{`${query.executive.name} ${query.executive.last_name}`}</TableCell>
+              )}
               <TableCell>{query.assignee.join(', ')}</TableCell>
               <TableCell>{query.description.substring(0, 50)}...</TableCell>
               <TableCell>{query.solved_date || 'Pendiente'}</TableCell>

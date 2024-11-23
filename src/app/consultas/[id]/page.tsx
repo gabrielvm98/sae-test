@@ -11,7 +11,10 @@ import { ArrowLeft, Pencil, Building, User, Users, FileText, Calendar, Briefcase
 type Query = {
   id: number
   company_id: number
-  executive_id: number
+  executive_id: number | null
+  other_executive: boolean
+  other_fullname: string | null
+  other_email: string | null
   assignee: string[]
   description: string
   solved_date: string | null
@@ -69,12 +72,20 @@ export default function QueryDetailsPage() {
           <div className="flex items-center space-x-2">
             <User className="w-5 h-5 text-gray-500" />
             <span className="font-semibold">Solicitante:</span>
-            <span>{`${query.executive.name} ${query.executive.last_name}`}</span>
+            {query.other_executive ? (
+              <span>{query.other_fullname}</span>
+            ) : (
+              <span>{`${query.executive.name} ${query.executive.last_name}`}</span>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Briefcase className="w-5 h-5 text-gray-500" />
             <span className="font-semibold">Cargo del Solicitante:</span>
-            <span>{query.executive.position}</span>
+            {query.other_executive ? (
+              <span>No disponible</span>
+            ) : (
+              <span>{query.executive.position}</span>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <Users className="w-5 h-5 text-gray-500" />
