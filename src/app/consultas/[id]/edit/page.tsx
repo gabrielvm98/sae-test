@@ -9,7 +9,7 @@ export default function EditQueryPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-4">Editar Consulta</h1>
+      <h1 className="text-2xl font-bold mb-4">Editar consulta</h1>
       <QueryForm queryId={queryId} />
     </div>
   )

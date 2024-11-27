@@ -73,10 +73,10 @@ export default function MembershipsPage() {
     <div className="container mx-auto py-10">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Lista de Membresías</h1>
+          <h1 className="text-xl font-bold">Lista de membresías</h1>
           <Button asChild>
             <Link href="/membresias/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Membresía
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar membresía
             </Link>
           </Button>
         </div>

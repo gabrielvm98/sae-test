@@ -68,7 +68,7 @@ export default function PresentationDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles de la Presentación</h1>
+        <h1 className="text-3xl font-bold">Detalles de la presentación</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/presentaciones">
@@ -88,7 +88,7 @@ export default function PresentationDetailsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Información General</CardTitle>
+            <CardTitle>Información general</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {presentation.company.razon_social}</p>
@@ -109,7 +109,7 @@ export default function PresentationDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Detalles de la Presentación</CardTitle>
+            <CardTitle>Detalles de la presentación</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Calendar className="inline mr-2" /> <strong>Fecha y hora:</strong> {presentation.presentation_date_hour}</p>
@@ -120,7 +120,7 @@ export default function PresentationDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Responsables y Expositores</CardTitle>
+            <CardTitle>Responsables y expositores</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Users className="inline mr-2" /> <strong>Responsable(s) de la elaboración:</strong> {presentation.elaboration_assignee.join(', ')}</p>

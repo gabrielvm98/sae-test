@@ -8,7 +8,7 @@ export default function EditCompanyPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Editar Empresa</h1>
+      <h1 className="text-2xl font-bold mb-4">Editar empresa</h1>
       <CompanyForm companyId={parseInt(params.id as string)} />
     </div>
   )

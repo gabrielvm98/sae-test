@@ -103,7 +103,7 @@ export default function ExecutiveDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles del Usuario</h1>
+        <h1 className="text-3xl font-bold">Detalles del usuario</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/usuarios">
@@ -123,20 +123,20 @@ export default function ExecutiveDetailsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Información Personal</CardTitle>
+            <CardTitle>Información personal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><User className="inline mr-2" /> <strong>Nombre:</strong> {executive.name} {executive.last_name}</p>
             <p><strong>DNI:</strong> {executive.dni}</p>
             <p><strong>Tareco:</strong> {executive.tareco}</p>
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de Nacimiento:</strong> {executive.birth_date}</p>
+            <p><Calendar className="inline mr-2" /> <strong>Fecha de nacimiento:</strong> {executive.birth_date}</p>
             <p><strong>País:</strong> {executive.country}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Información Laboral</CardTitle>
+            <CardTitle>Información laboral</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {executive.company.razon_social}</p>
@@ -148,10 +148,7 @@ export default function ExecutiveDetailsPage() {
             {executive.reemplaza_a && executive.reemplazado_executive && (
               <p><User className="inline mr-2" /> <strong>Reemplaza a:</strong> {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
             )}
-            <p><strong>Secretaria:</strong> {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
-            <p><Phone className="inline mr-2" /> <strong>Teléfono de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> <strong>Celular de Secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
-          </CardContent>
+            </CardContent>
         </Card>
 
         <Card>
@@ -162,12 +159,16 @@ export default function ExecutiveDetailsPage() {
             <p><Phone className="inline mr-2" /> <strong>Teléfono:</strong> {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</p>
             <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</p>
             <p><Mail className="inline mr-2" /> <strong>Email:</strong> {executive.email}</p>
+            <p><strong>Secretaria:</strong> {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
+            <p><Phone className="inline mr-2" /> <strong>Teléfono de secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> <strong>Celular de secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
+          
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Fechas Importantes</CardTitle>
+            <CardTitle>Fechas importantes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Calendar className="inline mr-2" /> <strong>Fecha de ingreso:</strong> {executive.start_date}</p>

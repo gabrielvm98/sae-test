@@ -9,7 +9,7 @@ export default function EditProjectPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Editar Proyecto</h1>
+      <h1 className="text-3xl font-bold mb-6">Editar proyecto</h1>
       <ProjectForm projectId={projectId} />
     </div>
   )

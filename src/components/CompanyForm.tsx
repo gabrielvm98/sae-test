@@ -140,7 +140,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="razonSocial">Razón Social</Label>
+        <Label htmlFor="razonSocial">Razón social</Label>
         <Input
           id="razonSocial"
           type="text"
@@ -150,7 +150,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="nombreComercial">Nombre Comercial</Label>
+        <Label htmlFor="nombreComercial">Nombre comercial</Label>
         <Input
           id="nombreComercial"
           type="text"
@@ -160,7 +160,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="seats">Cantidad de Titulares</Label>
+        <Label htmlFor="seats">Cantidad de titulares</Label>
         <Input
           id="seats"
           type="number"
@@ -260,7 +260,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         </Select>
       </div>
       <div>
-        <Label htmlFor="enrollmentDate">Fecha de Ingreso de la Empresa</Label>
+        <Label htmlFor="enrollmentDate">Fecha de ingreso de la empresa</Label>
         <Input
           id="enrollmentDate"
           type="date"
@@ -270,7 +270,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="headcount">Número de Trabajadores</Label>
+        <Label htmlFor="headcount">Número de trabajadores</Label>
         <Input
           id="headcount"
           type="number"
@@ -300,7 +300,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           onChange={(e) => setNotes(e.target.value)}
         />
       </div>
-      <Button type="submit">{companyId ? 'Actualizar' : 'Crear'} Empresa</Button>
+      <Button type="submit">{companyId ? 'Actualizar' : 'Crear'} empresa</Button>
     </form>
   )
 }

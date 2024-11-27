@@ -64,7 +64,7 @@ export default function AssistantDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles de la Secretaria</h1>
+        <h1 className="text-3xl font-bold">Detalles de la secretaria</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/secretarias">
@@ -84,7 +84,7 @@ export default function AssistantDetailsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Información Personal</CardTitle>
+            <CardTitle>Información personal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><User className="inline mr-2" /> <strong>Nombre:</strong> {assistant.name} {assistant.last_name}</p>
@@ -95,7 +95,7 @@ export default function AssistantDetailsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Información Laboral</CardTitle>
+            <CardTitle>Información laboral</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {assistant.company.razon_social}</p>
@@ -107,7 +107,7 @@ export default function AssistantDetailsPage() {
             <CardTitle>Contacto</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Phone className="inline mr-2" /> <strong>Teléfono de Oficina:</strong> {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> <strong>Teléfono de oficina:</strong> {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
             <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</p>
           </CardContent>
         </Card>

@@ -63,7 +63,7 @@ export default function ProjectDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles del Proyecto</h1>
+        <h1 className="text-3xl font-bold">Detalles del proyecto</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/proyectos">
@@ -92,8 +92,8 @@ export default function ProjectDetailsPage() {
             (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {project.other_fullname}</p>) :
             (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${project.executive.name} ${project.executive.last_name}`}</p>)}
             {project.other_executive ? 
-            (<p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> No disponible</p>) :
-            (<p><Briefcase className="inline mr-2"/><strong>Cargo del Solicitante:</strong> {project.executive.position}</p>)}
+            (<p><Briefcase className="inline mr-2"/><strong>Cargo del solicitante:</strong> No disponible</p>) :
+            (<p><Briefcase className="inline mr-2"/><strong>Cargo del solicitante:</strong> {project.executive.position}</p>)}
             <p><strong>Status:</strong> {project.status}</p>
           </CardContent>
         </Card>

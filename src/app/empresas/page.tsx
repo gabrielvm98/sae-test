@@ -50,44 +50,32 @@ export default function EmpresasPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto py-10">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Lista de Empresas</h1>
+          <h1 className="text-xl font-bold">Lista de empresas</h1>
           <Button asChild>
             <Link href="/empresas/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Empresa
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar empresa
             </Link>
           </Button>
         </div>
-        <div className="mt-8 mb-8 bg-gray-100 p-6 rounded-lg shadow-md">
-          <label htmlFor="companySearch" className="block text-xl font-bold mb-4 text-gray-700">
-            Buscar Empresa
-          </label>
-          <div className="flex items-center bg-white rounded-lg overflow-hidden shadow-sm">
-            <input
-              id="companySearch"
-              type="text"
-              placeholder="Escriba el nombre de la empresa y presione 'Buscar' o Enter para encontrarla."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-4 text-l border-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <Button 
-              onClick={fetchCompanies} 
-              className="p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl"
-            >
-              Buscar
-            </Button>
-          </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre de empresa..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
         </div>
       </div>
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>RUC</TableHead>
-            <TableHead>Razón Social</TableHead>
-            <TableHead>Nombre Comercial</TableHead>
+            <TableHead>Razón social</TableHead>
+            <TableHead>Nombre comercial</TableHead>
             <TableHead>Titulares</TableHead>
             <TableHead>País</TableHead>
             <TableHead>Departamento</TableHead>
@@ -95,8 +83,8 @@ export default function EmpresasPage() {
             <TableHead>Teléfono</TableHead>
             <TableHead>Sector</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Fecha de Ingreso</TableHead>
-            <TableHead>Número de Trabajadores</TableHead>
+            <TableHead>Fecha de ingreso</TableHead>
+            <TableHead>Número de trabajadores</TableHead>
             <TableHead>Ventas</TableHead>
             <TableHead>Notas</TableHead>
             <TableHead>Acciones</TableHead>

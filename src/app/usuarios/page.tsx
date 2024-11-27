@@ -82,36 +82,24 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto py-10">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Lista de Usuarios</h1>
+          <h1 className="text-xl font-bold">Lista de usuarios</h1>
           <Button asChild>
             <Link href="/usuarios/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Usuario
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar usuario
             </Link>
           </Button>
         </div>
-        <div className="mt-8 mb-8 bg-gray-100 p-6 rounded-lg shadow-md">
-          <label htmlFor="companySearch" className="block text-xl font-bold mb-4 text-gray-700">
-            Buscar Usuario
-          </label>
-          <div className="flex items-center bg-white rounded-lg overflow-hidden shadow-sm">
-            <input
-              id="companySearch"
-              type="text"
-              placeholder="Escriba el nombre o apellido y presione 'Buscar' o Enter para encontrarlo."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-4 text-l border-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <Button 
-              onClick={fetchExecutives} 
-              className="p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl"
-            >
-              Buscar
-            </Button>
-          </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre de usuario..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
         </div>
       </div>
       <Table>
@@ -124,7 +112,7 @@ export default function UsuariosPage() {
             <TableHead>Membresía</TableHead>
             <TableHead>Secretaria</TableHead>
             <TableHead>Tareco</TableHead>
-            <TableHead>Fecha de Nacimiento</TableHead>
+            <TableHead>Fecha de nacimiento</TableHead>
             <TableHead>País</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Cargo</TableHead>

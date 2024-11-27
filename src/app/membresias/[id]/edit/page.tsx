@@ -9,7 +9,7 @@ export default function EditMembershipPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-5">Editar Membresía</h1>
+      <h1 className="text-2xl font-bold mb-5">Editar membresía</h1>
       <MembershipForm membershipId={membershipId} />
     </div>
   )

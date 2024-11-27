@@ -62,36 +62,24 @@ export default function SecretariasPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto py-10">
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Lista de Secretarias</h1>
+          <h1 className="text-xl font-bold">Lista de secretarias</h1>
           <Button asChild>
             <Link href="/secretarias/new">
-              <PlusCircle className="mr-2 h-4 w-4" /> Agregar Secretaria
+              <PlusCircle className="mr-2 h-4 w-4" /> Agregar secretaria
             </Link>
           </Button>
         </div>
-        <div className="mt-8 mb-8 bg-gray-100 p-6 rounded-lg shadow-md">
-          <label htmlFor="companySearch" className="block text-xl font-bold mb-4 text-gray-700">
-            Buscar Secretaria
-          </label>
-          <div className="flex items-center bg-white rounded-lg overflow-hidden shadow-sm">
-            <input
-              id="companySearch"
-              type="text"
-              placeholder="Escriba el nombre de la secretaria y presione 'Buscar' o Enter para encontrarla."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-4 text-l border-none focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-            <Button 
-              onClick={fetchAssistants} 
-              className="p-4 bg-blue-500 hover:bg-blue-600 text-white font-bold text-xl"
-            >
-              Buscar
-            </Button>
-          </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre de secretaria..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
         </div>
       </div>
       <Table>

@@ -55,10 +55,10 @@ export default function ProjectsPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Proyectos</h1>
+        <h1 className="text-xl font-bold">Lista de proyectos</h1>
         <Button asChild>
           <Link href="/proyectos/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar Proyecto
+            <PlusCircle className="mr-2 h-4 w-4" /> Agregar proyecto
           </Link>
         </Button>
       </div>

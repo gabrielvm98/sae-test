@@ -77,12 +77,12 @@ export default function MembershipDetailsPage() {
     <div className="container mx-auto py-10">
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Detalles de la Membresía</CardTitle>
+          <CardTitle className="text-3xl font-bold">Detalles de la membresía</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <h3 className="text-xl font-semibold">Información General</h3>
+              <h3 className="text-xl font-semibold">Información general</h3>
               <p className="flex items-center">
                 <User className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-semibold mr-2">Nombre de la membresía:</span>
@@ -104,7 +104,7 @@ export default function MembershipDetailsPage() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xl font-semibold">Detalles de la Membresía</h3>
+              <h3 className="text-xl font-semibold">Detalles de la membresía</h3>
               <p className="flex items-center">
                 <span className="font-semibold mr-2">Titulares:</span>
                 {membership.titulares}
@@ -125,7 +125,7 @@ export default function MembershipDetailsPage() {
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold">Servicios Incluidos</h3>
+            <h3 className="text-xl font-semibold">Servicios incluidos</h3>
             <div className="grid gap-2 md:grid-cols-2">
               <p className="flex items-center">
                 {membership.panorama_economico ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
@@ -195,16 +195,16 @@ export default function MembershipDetailsPage() {
               <span className="font-semibold mr-2">Necesita O/C</span>
             </p>
             <p className="flex items-center">
-              {membership.invoice_sent && membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-              <span className="font-semibold mr-2">Renovación completa</span>
-            </p>
-            <p className="flex items-center">
               {membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
               <span className="font-semibold mr-2">Propuesta firmada</span>
             </p>
             <p className="flex items-center">
               {membership.invoice_sent ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
               <span className="font-semibold mr-2">Factura enviada</span>
+            </p>
+            <p className="flex items-center">
+              {membership.invoice_sent && membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+              <span className="font-semibold mr-2">Renovación completa</span>
             </p>
           </div>
 

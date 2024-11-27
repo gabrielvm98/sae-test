@@ -34,7 +34,7 @@ export default function ConsultasPage() {
   }, [])
 
   async function fetchQueries() {
-    const { data, error } = await supabase
+    const query = supabase
       .from('query')
       .select(`
         *,
@@ -42,6 +42,10 @@ export default function ConsultasPage() {
         executive:executive_id (name, last_name)
       `)
     
+    const { data, error } = await query
+
+    console.log(data);
+
     if (error) {
       console.error('Error fetching queries:', error)
     } else {
@@ -50,12 +54,12 @@ export default function ConsultasPage() {
   }
 
   return (
-    <div>
+    <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Consultas</h1>
+        <h1 className="text-xl font-bold">Lista de consultas</h1>
         <Button asChild>
           <Link href="/consultas/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Nueva Consulta
+            <PlusCircle className="mr-2 h-4 w-4" /> Nueva consulta
           </Link>
         </Button>
       </div>

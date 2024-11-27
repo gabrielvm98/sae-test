@@ -71,10 +71,10 @@ export default function PresentationsPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Lista de Presentaciones</h1>
+        <h1 className="text-xl font-bold">Lista de presentaciones</h1>
         <Button asChild>
           <Link href="/presentaciones/new">
-            <PlusCircle className="mr-2 h-4 w-4" /> Agregar Presentación
+            <PlusCircle className="mr-2 h-4 w-4" /> Agregar presentación
           </Link>
         </Button>
       </div>

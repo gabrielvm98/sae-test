@@ -333,7 +333,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
         />
       </div>
       <div>
-        <Label htmlFor="birthDate">Fecha de Nacimiento</Label>
+        <Label htmlFor="birthDate">Fecha de nacimiento</Label>
         <Input
           id="birthDate"
           type="date"
@@ -481,7 +481,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
-      <Button type="submit">{executiveId ? 'Actualizar' : 'Crear'} Usuario</Button>
+      <Button type="submit">{executiveId ? 'Actualizar' : 'Crear'} usuario</Button>
     </form>
   )
 }

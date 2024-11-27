@@ -61,7 +61,7 @@ export default function QueryDetailsPage() {
     <div className="container mx-auto py-10">
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Detalles de la Consulta</CardTitle>
+          <CardTitle className="text-2xl font-bold">Detalles de la consulta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
@@ -80,7 +80,7 @@ export default function QueryDetailsPage() {
           </div>
           <div className="flex items-center space-x-2">
             <Briefcase className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Cargo del Solicitante:</span>
+            <span className="font-semibold">Cargo del solicitante:</span>
             {query.other_executive ? (
               <span>No disponible</span>
             ) : (

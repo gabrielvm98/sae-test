@@ -126,7 +126,7 @@ export default function CompanyDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles de la Empresa</h1>
+        <h1 className="text-3xl font-bold">Detalles de la empresa</h1>
         <div className="space-x-2">
           <Button asChild>
             <Link href={`/empresas/${company.id}/edit`}>
@@ -137,7 +137,7 @@ export default function CompanyDetailsPage() {
           <Button variant="outline" asChild>
             <Link href="/empresas">
               <Building className="mr-2 h-4 w-4" />
-              Volver a Empresas
+              Volver a empresas
             </Link>
           </Button>
         </div>
@@ -145,22 +145,22 @@ export default function CompanyDetailsPage() {
 
       <Tabs defaultValue="details" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="details">Detalles de la Empresa</TabsTrigger>
-          <TabsTrigger value="users">Usuarios, Membresías y Secretarias</TabsTrigger>
+          <TabsTrigger value="details">Detalles de la empresa</TabsTrigger>
+          <TabsTrigger value="users">Usuarios, membresías y secretarias</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
           <div className="grid gap-4 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Información General</CardTitle>
+                <CardTitle>Información general</CardTitle>
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
                   <dt className="font-semibold">RUC:</dt>
                   <dd>{company.ruc}</dd>
-                  <dt className="font-semibold">Razón Social:</dt>
+                  <dt className="font-semibold">Razón social:</dt>
                   <dd>{company.razon_social}</dd>
-                  <dt className="font-semibold">Nombre Comercial:</dt>
+                  <dt className="font-semibold">Nombre comercial:</dt>
                   <dd>{company.nombre_comercial}</dd>
                   <dt className="font-semibold">País:</dt>
                   <dd>{company.country}</dd>
@@ -177,26 +177,26 @@ export default function CompanyDetailsPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Detalles de Membresía</CardTitle>
+                <CardTitle>Detalles de membresía</CardTitle>
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
                   <dt className="font-semibold">Status:</dt>
                   <dd>{company.status}</dd>
-                  <dt className="font-semibold">Fecha de Ingreso:</dt>
+                  <dt className="font-semibold">Fecha de ingreso:</dt>
                   <dd>{company.enrollment_date}</dd>
-                  <dt className="font-semibold">Cantidad de Titulares:</dt>
+                  <dt className="font-semibold">Cantidad de titulares:</dt>
                   <dd>{company.seats}</dd>
                 </dl>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Información Adicional</CardTitle>
+                <CardTitle>Información adicional</CardTitle>
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
-                  <dt className="font-semibold">Número de Trabajadores:</dt>
+                  <dt className="font-semibold">Número de trabajadores:</dt>
                   <dd>{company.headcount}</dd>
                   <dt className="font-semibold">Ventas:</dt>
                   <dd>{company.sales}</dd>
@@ -216,7 +216,7 @@ export default function CompanyDetailsPage() {
                   <Button size="sm" asChild>
                     <Link href={`/usuarios/new?company_id=${company.id}`}>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Agregar Usuario
+                      Agregar usuario
                     </Link>
                   </Button>
                 </CardTitle>
@@ -275,7 +275,7 @@ export default function CompanyDetailsPage() {
                   <Button size="sm" asChild>
                     <Link href={`/membresias/new?company_id=${company.id}`}>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Agregar Membresía
+                      Agregar membresía
                     </Link>
                   </Button>
                 </CardTitle>
@@ -322,7 +322,7 @@ export default function CompanyDetailsPage() {
                   <Button size="sm" asChild>
                     <Link href={`/secretarias/new?company_id=${company.id}`}>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Agregar Secretaria
+                      Agregar secretaria
                     </Link>
                   </Button>
                 </CardTitle>
