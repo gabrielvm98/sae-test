@@ -47,6 +47,11 @@ export function Navbar() {
                 Proyectos
               </Link>
             </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/eventos">
+                Eventos
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Building, Users, UserCircle, FileQuestion, PresentationIcon, FolderKanban, DollarSign } from 'lucide-react'
+import { Building, Users, UserCircle, FileQuestion, PresentationIcon, FolderKanban, DollarSign, Lightbulb } from 'lucide-react'
 
 const sections = [
   {
@@ -52,6 +52,13 @@ const sections = [
     icon: FolderKanban,
     viewAllLink: '/proyectos',
     addLink: '/proyectos/new'
+  },
+  {
+    title: 'Eventos',
+    description: 'Administra los eventos virtuales y presenciales. Añade asistentes a tus eventos.',
+    icon: Lightbulb,
+    viewAllLink: '/eventos',
+    addLink: '/eventos/new'
   }
 ]
 
