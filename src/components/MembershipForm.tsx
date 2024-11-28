@@ -49,6 +49,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
   const [dailyNote, setDailyNote] = useState(false)
   const [appSae, setAppSae] = useState(false)
   const [webSae, setWebSae] = useState(false)
+  const [forumConsumerFirstSemester, setForumConsumerFirstSemester] = useState(false)
+  const [forumConsumerSecondSemester, setForumConsumerSecondSemester] = useState(false)
+  const [forumSectorialFirstSemester, setForumSectorialFirstSemester] = useState(false)
+  const [forumSectorialSecondSemester, setForumSectorialSecondSemester] = useState(false)
   const [titularVirtual, setTitularVirtual] = useState('0')
   const [cantidadPresentaciones, setCantidadPresentaciones] = useState('0')
   const [consultasAcceso, setConsultasAcceso] = useState(false)
@@ -100,6 +104,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
       setDailyNote(data.daily_note)
       setAppSae(data.app_sae)
       setWebSae(data.web_sae)
+      setForumConsumerFirstSemester(data.forum_consumer_first_semester)
+      setForumConsumerSecondSemester(data.forum_consumer_second_semester)
+      setForumSectorialFirstSemester(data.forum_sectorial_first_semester)
+      setForumSectorialSecondSemester(data.forum_sectorial_second_semester)
       setTitularVirtual(data.titular_virtual.toString())
       setCantidadPresentaciones(data.cantidad_presentaciones.toString())
       setConsultasAcceso(data.consultas_acceso)
@@ -137,6 +145,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
       daily_note: dailyNote,
       app_sae: appSae,
       web_sae: webSae,
+      forum_consumer_first_semester: forumConsumerFirstSemester,
+      forum_consumer_second_semester: forumConsumerSecondSemester,
+      forum_sectorial_first_semester: forumSectorialFirstSemester,
+      forum_sectorial_second_semester: forumSectorialSecondSemester,
       titular_virtual: parseInt(titularVirtual),
       cantidad_presentaciones: parseInt(cantidadPresentaciones),
       consultas_acceso: consultasAcceso,
@@ -361,6 +373,42 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           onCheckedChange={(checked) => setWebSae(checked as boolean)}
         />
         <Label htmlFor="webSae">Web SAE</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="forumConsumerFirstSemester"
+          checked={forumConsumerFirstSemester}
+          onCheckedChange={(checked) => setForumConsumerFirstSemester(checked as boolean)}
+        />
+        <Label htmlFor="forumConsumerFirstSemester">Foro Consumidor 1er semestre</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="forumConsumerSecondSemester"
+          checked={forumConsumerSecondSemester}
+          onCheckedChange={(checked) => setForumConsumerSecondSemester(checked as boolean)}
+        />
+        <Label htmlFor="forumConsumerSecondSemester">Foro Consumidor 2do semestre</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="forumSectorialFirstSemester"
+          checked={forumSectorialFirstSemester}
+          onCheckedChange={(checked) => setForumSectorialFirstSemester(checked as boolean)}
+        />
+        <Label htmlFor="forumSectorialFirstSemester">Foro Sectorial 1er semestre</Label>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="forumSectorialSecondSemester"
+          checked={forumSectorialSecondSemester}
+          onCheckedChange={(checked) => setForumSectorialSecondSemester(checked as boolean)}
+        />
+        <Label htmlFor="forumSectorialSecondSemester">Foro Sectorial 2do semestre</Label>
       </div>
 
       <div>

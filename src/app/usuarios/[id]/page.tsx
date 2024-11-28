@@ -51,6 +51,7 @@ type Executive = {
     name: string
     last_name: string
   }
+  sae_meetings: string[] | null
 }
 
 export default function ExecutiveDetailsPage() {
@@ -100,6 +101,13 @@ export default function ExecutiveDetailsPage() {
     return formattedPhone
   }
 
+  function formatSaeMeetings(meetings: string[] | null): string {
+    if (!meetings || meetings.length === 0) {
+      return 'No asignado'
+    }
+    return meetings.join(', ')
+  }
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
@@ -144,6 +152,7 @@ export default function ExecutiveDetailsPage() {
             <p><strong>Cargo:</strong> {executive.position}</p>
             <p><strong>Área:</strong> {executive.area}</p>
             <p><strong>Tipo de usuario:</strong> {executive.user_type}</p>
+            <p><strong>Reuniones SAE:</strong> {formatSaeMeetings(executive.sae_meetings)}</p>
             <p><strong>Status:</strong> <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
             {executive.reemplaza_a && executive.reemplazado_executive && (
               <p><User className="inline mr-2" /> <strong>Reemplaza a:</strong> {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>

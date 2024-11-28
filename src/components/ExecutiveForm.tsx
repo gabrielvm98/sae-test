@@ -39,6 +39,14 @@ interface CountryOption {
   code: string
 }
 
+const saeMeetingsOptions = [
+  "Encuentro mensual presencial",
+  "Encuentro mensual virtual",
+  "Convención anual",
+  "SAE Especiales",
+  "Reuniones especiales con autoridades"
+]
+
 const countries: CountryOption[] = [
   { value: "1", label: "United States", code: "+1" },
   { value: "51", label: "Peru", code: "+51" },
@@ -51,7 +59,8 @@ const countries: CountryOption[] = [
   // Add more countries as needed
 ]
 
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen"]
+const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
+  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
 
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
@@ -81,6 +90,8 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [loading, setLoading] = useState(true)
   const [membershipId, setMembershipId] = useState('')
   const [memberships, setMemberships] = useState<{ id: number; name: string; company_id: number }[]>([])
+  const [saeMeetings, setSaeMeetings] = useState<string[]>([])
+
   const router = useRouter()
 
   const fetchAssistants = useCallback(async (companyId: number) => {
@@ -159,6 +170,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       setStartDate(executive.start_date)
       setEndDate(executive.end_date)
       setMembershipId(executive.membership_id?.toString() || '')
+      setSaeMeetings(executive.sae_meetings || [])
       await fetchAssistants(executive.company_id)
       await fetchMemberships(executive.company_id)
       await fetchExecutives(executive.company_id)
@@ -183,6 +195,14 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
     fetchAssistants(parseInt(value))
     fetchMemberships(parseInt(value))
     fetchExecutives(parseInt(value))
+  }
+
+  const handleSaeMeetingsChange = (meeting: string) => {
+    setSaeMeetings(prev =>
+      prev.includes(meeting)
+        ? prev.filter(m => m !== meeting)
+        : [...prev, meeting]
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -210,6 +230,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
       start_date: startDate,
       end_date: endDate,
       membership_id: parseInt(membershipId) || null,
+      sae_meetings: saeMeetings,
     }
 
     if (executiveId) {
@@ -398,6 +419,21 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
             ))}
           </SelectContent>
         </Select>
+      </div>
+      <div>
+        <Label>Reuniones SAE</Label>
+        <div className="grid grid-cols-2 gap-2">
+          {saeMeetingsOptions.map((meeting) => (
+            <div key={meeting} className="flex items-center space-x-2">
+              <Checkbox
+                id={`sae-meeting-${meeting}`}
+                checked={saeMeetings.includes(meeting)}
+                onCheckedChange={() => handleSaeMeetingsChange(meeting)}
+              />
+              <Label htmlFor={`sae-meeting-${meeting}`}>{meeting}</Label>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox

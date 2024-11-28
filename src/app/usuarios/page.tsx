@@ -40,6 +40,7 @@ type Executive = {
   membership: {
     name: string
   } | null
+  sae_meetings: string[] | null
 }
 
 export default function UsuariosPage() {
@@ -79,6 +80,13 @@ export default function UsuariosPage() {
       formattedPhone += ` (${extension})`
     }
     return formattedPhone
+  }
+  
+  function formatSaeMeetings(meetings: string[] | null): string {
+    if (!meetings || meetings.length === 0) {
+      return 'No asignado'
+    }
+    return meetings.join(', ')
   }
 
   return (
@@ -123,6 +131,7 @@ export default function UsuariosPage() {
             <TableHead>Celular</TableHead>
             <TableHead>Fecha de ingreso</TableHead>
             <TableHead>Fecha de baja</TableHead>
+            <TableHead>Reuniones SAE</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -147,6 +156,7 @@ export default function UsuariosPage() {
               <TableCell>{formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</TableCell>
               <TableCell>{executive.start_date}</TableCell>
               <TableCell>{executive.end_date || 'N/A'}</TableCell>
+              <TableCell>{formatSaeMeetings(executive.sae_meetings)}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" asChild>

@@ -28,6 +28,10 @@ type Membership = {
   daily_note: boolean
   app_sae: boolean
   web_sae: boolean
+  forum_consumer_first_semester: boolean
+  forum_consumer_second_semester: boolean
+  forum_sectorial_first_semester: boolean
+  forum_sectorial_second_semester: boolean
   titular_virtual: number
   cantidad_presentaciones: number
   consultas_acceso: boolean
@@ -154,6 +158,22 @@ export default function MembershipDetailsPage() {
               <p className="flex items-center">
                 {membership.web_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
                 <span className="font-semibold mr-2">Web SAE</span>
+              </p>
+              <p className="flex items-center">
+                {membership.forum_consumer_first_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Foro Consumidor 1er semestre</span>
+              </p>
+              <p className="flex items-center">
+                {membership.forum_consumer_second_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Foro Consumidor 2do semestre</span>
+              </p>
+              <p className="flex items-center">
+                {membership.forum_sectorial_first_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Foro Sectorial 1er semestre</span>
+              </p>
+              <p className="flex items-center">
+                {membership.forum_sectorial_second_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
+                <span className="font-semibold mr-2">Foro Sectorial 2do semestre</span>
               </p>
               <p className="flex items-center">
                 {membership.consultas_acceso ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
