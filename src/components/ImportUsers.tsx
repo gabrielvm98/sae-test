@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "@/hooks/use-toast"
 
 type Executive = {
   id: number
@@ -23,8 +25,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedUserType, setSelectedUserType] = useState<string>('all')
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all')
-  console.log(eventId)
-
+  const [selectedExecutives, setSelectedExecutives] = useState<number[]>([])
 
   useEffect(() => {
     fetchExecutives()
@@ -61,6 +62,59 @@ export function ImportUsers({ eventId }: { eventId: number }) {
     return userTypeMatch && companyMatch
   })
 
+  const handleExecutiveSelect = (executiveId: number) => {
+    setSelectedExecutives(prev => 
+      prev.includes(executiveId)
+        ? prev.filter(id => id !== executiveId)
+        : [...prev, executiveId]
+    )
+  }
+
+  async function createEventGuestsBatch(eventId: number, executiveIds: number[]) {
+    const eventGuests = executiveIds.map((executiveId) => {
+      const executive = executives.find(e => e.id === executiveId)
+      return {
+        event_id: eventId,
+        executive_id: executiveId,
+        company_id: executive?.company_id,
+        is_client_company: true,
+        is_user: true
+      }
+    })
+
+    const { error } = await supabase
+      .from('event_guest')
+      .upsert(eventGuests)
+
+    if (error) {
+      console.error('Error creating/updating event_guests:', error)
+      toast({
+        title: "Error",
+        description: "Hubo un problema al importar los usuarios seleccionados.",
+        variant: "destructive",
+      })
+    } else {
+      console.log('Event guests created/updated successfully!')
+      toast({
+        title: "Éxito",
+        description: "Los usuarios seleccionados han sido importados correctamente.",
+      })
+      setSelectedExecutives([])
+    }
+  }
+
+  const handleImportSelected = () => {
+    if (selectedExecutives.length === 0) {
+      toast({
+        title: "Advertencia",
+        description: "Por favor, seleccione al menos un usuario para importar.",
+        variant: "warning",
+      })
+      return
+    }
+    createEventGuestsBatch(eventId, selectedExecutives)
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex space-x-4">
@@ -91,6 +145,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]">Seleccionar</TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Tipo de usuario</TableHead>
             <TableHead>Empresa</TableHead>
@@ -99,6 +154,12 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         <TableBody>
           {filteredExecutives.map(executive => (
             <TableRow key={executive.id}>
+              <TableCell>
+                <Checkbox
+                  checked={selectedExecutives.includes(executive.id)}
+                  onCheckedChange={() => handleExecutiveSelect(executive.id)}
+                />
+              </TableCell>
               <TableCell>{executive.name}</TableCell>
               <TableCell>{executive.user_type}</TableCell>
               <TableCell>
@@ -108,7 +169,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
           ))}
         </TableBody>
       </Table>
-      <Button>Importar Seleccionados</Button>
+      <Button onClick={handleImportSelected}>Importar Seleccionados</Button>
     </div>
   )
 }

@@ -26,6 +26,14 @@ type EventGuest = {
   virtual_session_time: number | null
   registered: boolean
   assisted: boolean
+  company?: {
+    razon_social: string
+  }
+  executive?: {
+    name: string
+    email: string
+    office_phone: string
+  }
 }
 
 export function EventGuestTable({ eventId }: { eventId: number }) {
@@ -39,7 +47,11 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
   async function fetchGuests() {
     const { data, error } = await supabase
       .from('event_guest')
-      .select('*')
+      .select(`
+        *,
+        company:company_id (razon_social),
+        executive:executive_id (name, email, office_phone)
+      `)
       .eq('event_id', eventId)
 
     if (error) {
@@ -48,13 +60,6 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       setGuests(data || [])
     }
   }
-
-  /*
-  function handleDownloadCSV() {
-    // Implementación pendiente
-    console.log('Descarga de CSV no implementada aún')
-  }
-    */
 
   return (
     <div>
@@ -65,6 +70,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
             <TableHead>Empresa</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Teléfono</TableHead>
+            <TableHead>Interno/Externo</TableHead>
             <TableHead>Registrado</TableHead>
             <TableHead>Asistió</TableHead>
             <TableHead>Tiempo en sesión virtual</TableHead>
@@ -74,10 +80,15 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         <TableBody>
           {guests.map((guest) => (
             <TableRow key={guest.id}>
-              <TableCell>{guest.name}</TableCell>
-              <TableCell>{guest.is_client_company ? 'Interna' : guest.company_razon_social}</TableCell>
-              <TableCell>{guest.email}</TableCell>
-              <TableCell>{guest.phone}</TableCell>
+              <TableCell>{guest.is_user ? guest.executive?.name : guest.name}</TableCell>
+              <TableCell>
+                {guest.is_client_company
+                  ? guest.company?.razon_social
+                  : guest.company_razon_social}
+              </TableCell>
+              <TableCell>{guest.is_user ? guest.executive?.email : guest.email}</TableCell>
+              <TableCell>{guest.is_user ? guest.executive?.office_phone : guest.phone}</TableCell>
+              <TableCell>{guest.is_user ? 'Interno' : 'Externo'}</TableCell>
               <TableCell>{guest.registered ? 'Sí' : 'No'}</TableCell>
               <TableCell>{guest.assisted ? 'Sí' : 'No'}</TableCell>
               <TableCell>{guest.virtual_session_time || 'N/A'}</TableCell>
