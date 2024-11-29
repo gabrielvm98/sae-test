@@ -150,6 +150,8 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         .eq('event_id', eventId)
         .eq('is_user', true)
         .in('executive.email', internalEmails); // Relación con el email en la tabla executive
+
+      console.log("Internal guests", internalGuests)
   
       if (internalError) {
         console.error('Error al obtener usuarios internos:', internalError);
@@ -159,7 +161,8 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
       console.log('Usuarios internos obtenidos:', internalGuests);
   
       const updates = internalGuests.map((guest) => {
-        const attendanceInfo = batch.find((item) => item.email === guest.executive?.email.toLowerCase());
+        const executiveEmail = guest.executive?.[0]?.email; // Accede al primer elemento del array
+        const attendanceInfo = batch.find((item) => item.email === executiveEmail?.toLowerCase());
         if (attendanceInfo) {
           return {
             id: guest.id,
@@ -168,7 +171,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           };
         }
         return null;
-      }).filter(Boolean);
+      }).filter(Boolean);      
   
       console.log('Actualizaciones para usuarios internos:', updates);
   

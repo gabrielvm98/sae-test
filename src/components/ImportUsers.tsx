@@ -108,7 +108,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
       toast({
         title: "Advertencia",
         description: "Por favor, seleccione al menos un usuario para importar.",
-        variant: "warning",
+        variant: "default",
       })
       return
     }
