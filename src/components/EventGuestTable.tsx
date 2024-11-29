@@ -31,6 +31,7 @@ type EventGuest = {
   }
   executive?: {
     name: string
+    last_name: string
     email: string
     office_phone: string
   }
@@ -50,7 +51,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       .select(`
         *,
         company:company_id (razon_social),
-        executive:executive_id (name, email, office_phone)
+        executive:executive_id (name, last_name, email, office_phone)
       `)
       .eq('event_id', eventId)
 
@@ -80,7 +81,12 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         <TableBody>
           {guests.map((guest) => (
             <TableRow key={guest.id}>
-              <TableCell>{guest.is_user ? guest.executive?.name : guest.name}</TableCell>
+              <TableCell>
+                {guest.is_user 
+                  ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
+                  : guest.name
+                }
+              </TableCell>
               <TableCell>
                 {guest.is_client_company
                   ? guest.company?.razon_social
