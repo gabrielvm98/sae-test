@@ -24,17 +24,31 @@ type Company = {
   status: string
 }
 
+const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
+  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
+
+const saeMeetingsOptions = [
+  "Encuentro mensual presencial",
+  "Encuentro mensual virtual",
+  "Convención anual",
+  "SAE Especiales",
+  "Reuniones especiales con autoridades"
+]
+
+const statusOptions = ['Cliente SAE', 'Ex-cliente SAE', 'No cliente SAE']
+
 export function ImportUsers({ eventId }: { eventId: number }) {
   const [executives, setExecutives] = useState<Executive[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
   const [selectedUserType, setSelectedUserType] = useState<string>('all')
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all')
+  const [selectedCompanyId] = useState<string>('all')
   const [selectedActive, setSelectedActive] = useState<string>('all')
   const [selectedSaeMeeting, setSelectedSaeMeeting] = useState<string>('all')
   const [selectedCompanyStatus, setSelectedCompanyStatus] = useState<string>('all')
   const [selectedExecutives, setSelectedExecutives] = useState<number[]>([])
   const [selectAll, setSelectAll] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+
 
   useEffect(() => {
     fetchExecutives()
@@ -42,9 +56,20 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   }, [])
 
   async function fetchExecutives() {
-    const { data, error } = await supabase
+    let query = supabase
       .from('executive')
-      .select('*')
+      .select(`
+        *,
+        company:company_id (razon_social),
+        assistant:assistant_id (name, last_name),
+        membership:membership_id (name)
+      `)
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('Error fetching executives:', error)
@@ -66,20 +91,30 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   }
 
   const filteredExecutives = executives.filter(executive => {
-    const userTypeMatch = selectedUserType === 'all' || executive.user_type === selectedUserType
-    const companyMatch = selectedCompanyId === 'all' || executive.company_id.toString() === selectedCompanyId
-    const activeMatch = selectedActive === 'all' || executive.active.toString() === selectedActive
-    const saeMeetingMatch = selectedSaeMeeting === 'all' || executive.sae_meetings.includes(selectedSaeMeeting)
+    const userTypeMatch =
+      selectedUserType === 'all' || (executive.user_type && executive.user_type === selectedUserType);
+  
+    const companyMatch =
+      selectedCompanyId === 'all' || (executive.company_id && executive.company_id.toString() === selectedCompanyId);
+  
+    const activeMatch =
+      selectedActive === 'all' || (executive.active !== null && executive.active.toString() === selectedActive);
+  
+    const saeMeetingMatch =
+      selectedSaeMeeting === 'all' || 
+      (executive.sae_meetings && Array.isArray(executive.sae_meetings) && executive.sae_meetings.includes(selectedSaeMeeting));
+  
+    const companyStatusMatch =
+      selectedCompanyStatus === 'all' ||
+      (companies.find(company => company.id === executive.company_id)?.status === selectedCompanyStatus);
+  
     const searchMatch =
       executive.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      executive.last_name.toLowerCase().includes(searchQuery.toLowerCase())
-
-    return userTypeMatch && companyMatch && activeMatch && saeMeetingMatch && searchMatch
-  })
-
-  const filteredCompanies = companies.filter(company => {
-    return selectedCompanyStatus === 'all' || company.status === selectedCompanyStatus
-  })
+      executive.last_name.toLowerCase().includes(searchQuery.toLowerCase());
+  
+    return userTypeMatch && companyMatch && activeMatch && saeMeetingMatch && companyStatusMatch && searchMatch;
+  });
+  
 
   const handleExecutiveSelect = (executiveId: number) => {
     setSelectedExecutives(prev => 
@@ -144,71 +179,75 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap space-x-4">
-        <Select value={selectedUserType} onValueChange={setSelectedUserType}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Tipo de usuario" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="internal">Interno</SelectItem>
-            <SelectItem value="external">Externo</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            {filteredCompanies.map(company => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={selectedActive} onValueChange={setSelectedActive}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Estado Activo" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="true">Activo</SelectItem>
-            <SelectItem value="false">No Activo</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={selectedSaeMeeting} onValueChange={setSelectedSaeMeeting}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Reuniones SAE" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas</SelectItem>
-            <SelectItem value="Meeting1">Reunión 1</SelectItem>
-            <SelectItem value="Meeting2">Reunión 2</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={selectedCompanyStatus} onValueChange={setSelectedCompanyStatus}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="Estado de Empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="active">Activo</SelectItem>
-            <SelectItem value="inactive">Inactivo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="space-y-8">
       <div className="mt-4">
-        <input
-          type="text"
-          placeholder="Buscar por nombre o apellido..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
+          <input
+            type="text"
+            placeholder="Buscar por nombre de usuario..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <h4 className="text-md font-medium">Tipo de Usuario</h4>
+          <Select value={selectedUserType} onValueChange={setSelectedUserType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {userTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <h4 className="text-md font-medium">Estado Activo</h4>
+          <Select value={selectedActive} onValueChange={setSelectedActive}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="true">Activo</SelectItem>
+              <SelectItem value="false">No Activo</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <h4 className="text-md font-medium">Reuniones SAE</h4>
+          <Select value={selectedSaeMeeting} onValueChange={setSelectedSaeMeeting}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona una reunión" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas</SelectItem>
+              {saeMeetingsOptions.map(option => (
+                <SelectItem key={option} value={option}>{option}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <h4 className="text-md font-medium">Estado de Empresa</h4>
+          <Select value={selectedCompanyStatus} onValueChange={setSelectedCompanyStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {statusOptions.map(status => (
+                <SelectItem key={status} value={status}>{status}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+  
+      {/* Tabla */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -216,7 +255,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
               <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} />
             </TableHead>
             <TableHead>Nombre</TableHead>
-            <TableHead>Tipo de usuario</TableHead>
+            <TableHead>Tipo de Usuario</TableHead>
             <TableHead>Empresa</TableHead>
           </TableRow>
         </TableHeader>
@@ -238,7 +277,12 @@ export function ImportUsers({ eventId }: { eventId: number }) {
           ))}
         </TableBody>
       </Table>
-      <Button onClick={handleImportSelected}>Importar Seleccionados</Button>
+  
+      {/* Botón de acción */}
+      <Button onClick={handleImportSelected} className="mt-4">
+        Importar Seleccionados
+      </Button>
     </div>
   )
+  
 }
