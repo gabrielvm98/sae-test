@@ -6,7 +6,6 @@ import { supabase } from '@/lib/supabase';
 import Papa from 'papaparse';
 import { toast } from "@/hooks/use-toast";
 
-
 export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -93,12 +92,12 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         const consolidated = rows.reduce((acc, row, rowIndex) => {
           if (row.length !== headers.length) {
             console.warn(`Fila ${rowIndex + 1} tiene un número incorrecto de columnas:`, row);
-            return acc; // Ignorar filas mal formateadas
           }
   
           const attended = row[attendedIndex]?.toLowerCase().trim();
           const email = row[emailIndex]?.trim().toLowerCase();
           const time = parseInt(row[timeIndex], 10) || 0;
+          console.log('Fila procesada:', { attended, email, time });
   
           if (attended === 'sí' && email) {
             if (!acc[email]) {
@@ -161,7 +160,12 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
       console.log('Usuarios internos obtenidos:', internalGuests);
   
       const updates = internalGuests.map((guest) => {
-        const executiveEmail = guest.executive?.[0]?.email; // Accede al primer elemento del array
+        // @ts-expect-error wrong assumption in type from supabase
+        const executiveEmail = guest.executive?.email;
+        if (!executiveEmail) {
+          console.warn('No se encontró el email del ejecutivo:', guest);
+          return null;
+        }
         const attendanceInfo = batch.find((item) => item.email === executiveEmail?.toLowerCase());
         if (attendanceInfo) {
           return {

@@ -7,6 +7,18 @@ import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/hooks/use-toast"
+import { SearchableSelectFilter } from './SearchableSelectFilter'
+
+type Membership = {
+  id: number
+  name: string
+  company_id: number
+  membership_type: string
+  forum_consumer_first_semester: boolean
+  forum_consumer_second_semester: boolean
+  forum_sectorial_first_semester: boolean
+  forum_sectorial_second_semester: boolean
+}
 
 type Executive = {
   id: number
@@ -14,8 +26,10 @@ type Executive = {
   last_name: string
   user_type: string
   company_id: number
+  membership_id: number
   active: boolean
   sae_meetings: string[]
+  membership: Membership
 }
 
 type Company = {
@@ -23,6 +37,23 @@ type Company = {
   razon_social: string
   status: string
 }
+
+const forumTypes = [
+  "Primero Comercial",
+  "Segundo Comercial",
+  "Primero Sectorial",
+  "Segundo Sectorial"
+]
+
+const membershipTypes = [
+  "SAE Ejecutivo",
+  "SAE Reuniones",
+  "SAE Virtual",
+  "SAE Básico",
+  "SAE Completo",
+  "SAE Especial",
+  "Titular Adicional"
+]
 
 const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
   "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
@@ -41,11 +72,13 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   const [executives, setExecutives] = useState<Executive[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
   const [selectedUserType, setSelectedUserType] = useState<string>('all')
-  const [selectedCompanyId] = useState<string>('all')
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all')
   const [selectedActive, setSelectedActive] = useState<string>('all')
   const [selectedSaeMeeting, setSelectedSaeMeeting] = useState<string>('all')
   const [selectedCompanyStatus, setSelectedCompanyStatus] = useState<string>('all')
   const [selectedExecutives, setSelectedExecutives] = useState<number[]>([])
+  const [selectedMembershipType, setSelectedMembershipType] = useState<string>('all')
+  const [selectedForumType, setSelectedForumType] = useState<string>('all')
   const [selectAll, setSelectAll] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -62,7 +95,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         *,
         company:company_id (razon_social),
         assistant:assistant_id (name, last_name),
-        membership:membership_id (name)
+        membership:membership_id (name, company_id, membership_type, forum_consumer_first_semester, forum_consumer_second_semester, forum_sectorial_first_semester, forum_sectorial_second_semester)
       `)
 
     if (searchQuery && searchQuery.trim() !== '') {
@@ -111,8 +144,17 @@ export function ImportUsers({ eventId }: { eventId: number }) {
     const searchMatch =
       executive.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       executive.last_name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const membershipTypeMatch = selectedMembershipType === 'all' || executive.membership?.membership_type === selectedMembershipType;
+
+    const forumTypeMatch = selectedForumType === 'all' || 
+      (selectedForumType === "Primero Comercial" && executive.membership?.forum_consumer_first_semester) ||
+      (selectedForumType === "Segundo Comercial" && executive.membership?.forum_consumer_second_semester) ||
+      (selectedForumType === "Primero Sectorial" && executive.membership?.forum_sectorial_first_semester) ||
+      (selectedForumType === "Segundo Sectorial" && executive.membership?.forum_sectorial_second_semester);
+    
   
-    return userTypeMatch && companyMatch && activeMatch && saeMeetingMatch && companyStatusMatch && searchMatch;
+    return userTypeMatch && companyMatch && activeMatch && saeMeetingMatch && companyStatusMatch && searchMatch && membershipTypeMatch && forumTypeMatch;
   });
   
 
@@ -178,6 +220,16 @@ export function ImportUsers({ eventId }: { eventId: number }) {
     createEventGuestsBatch(eventId, selectedExecutives)
   }
 
+  const getForumSemestrales = (executive: Executive) => {
+    const forums = [];
+    if (executive.membership?.forum_consumer_first_semester) forums.push("Primero Comercial");
+    if (executive.membership?.forum_consumer_second_semester) forums.push("Segundo Comercial");
+    if (executive.membership?.forum_sectorial_first_semester) forums.push("Primero Sectorial");
+    if (executive.membership?.forum_sectorial_second_semester) forums.push("Segundo Sectorial");
+    return forums.join(", ") || "N/A";
+  };
+
+
   return (
     <div className="space-y-8">
       <div className="mt-4">
@@ -190,6 +242,13 @@ export function ImportUsers({ eventId }: { eventId: number }) {
           />
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div>
+          <h4 className="text-md font-medium">Empresa</h4>
+          <SearchableSelectFilter
+            onSelect={(value) => setSelectedCompanyId(value)}
+            label="empresa"
+          />
+        </div>
         <div>
           <h4 className="text-md font-medium">Tipo de Usuario</h4>
           <Select value={selectedUserType} onValueChange={setSelectedUserType}>
@@ -245,6 +304,34 @@ export function ImportUsers({ eventId }: { eventId: number }) {
             </SelectContent>
           </Select>
         </div>
+        <div>
+          <h4 className="text-md font-medium">Tipo de Membresía</h4>
+          <Select value={selectedMembershipType} onValueChange={setSelectedMembershipType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {membershipTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <h4 className="text-md font-medium">Foros Semestrales</h4>
+          <Select value={selectedForumType} onValueChange={setSelectedForumType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un foro" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {forumTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
   
       {/* Tabla */}
@@ -256,7 +343,12 @@ export function ImportUsers({ eventId }: { eventId: number }) {
             </TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Tipo de Usuario</TableHead>
+            <TableHead>Estado de usuario</TableHead>
             <TableHead>Empresa</TableHead>
+            <TableHead>Estado de Empresa</TableHead>
+            <TableHead>Reuniones SAE</TableHead>
+            <TableHead>Tipo de Membresía</TableHead>
+            <TableHead>Foros Semestrales</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -270,8 +362,21 @@ export function ImportUsers({ eventId }: { eventId: number }) {
               </TableCell>
               <TableCell>{executive.name} {executive.last_name}</TableCell>
               <TableCell>{executive.user_type}</TableCell>
+              <TableCell>{executive.active ? 'Activo' : 'No Activo'}</TableCell>
               <TableCell>
                 {companies.find(company => company.id === executive.company_id)?.razon_social || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {companies.find(company => company.id === executive.company_id)?.status || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {executive.sae_meetings?.join(', ') || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {executive.membership?.membership_type || 'N/A'}
+              </TableCell>
+              <TableCell>
+                {getForumSemestrales(executive)}
               </TableCell>
             </TableRow>
           ))}
