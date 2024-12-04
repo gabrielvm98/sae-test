@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, Building, User, Calendar, FileText, DollarSign, Check, X } from 'lucide-react'
+import { ArrowLeft, Pencil, User, Calendar, FileText, DollarSign, Check, X } from 'lucide-react'
 
 type Membership = {
   id: number
@@ -81,28 +81,26 @@ export default function MembershipDetailsPage() {
     <div className="container mx-auto py-10">
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold">Detalles de la membresía</CardTitle>
+          <CardTitle className="text-2xl font-bold">Detalles de la membresía</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold">Información general</h3>
               <p className="flex items-center">
-                <User className="w-5 h-5 mr-2 text-gray-500" />
-                <span className="font-semibold mr-2">Nombre de la membresía:</span>
+                <span className="mr-2">Nombre de la membresía:</span>
                 {membership.name}
               </p>
               <p className="flex items-center">
-                <Building className="w-5 h-5 mr-2 text-gray-500" />
-                <span className="font-semibold mr-2">Empresa:</span>
+                <span className="mr-2">Empresa:</span>
                 {membership.company.razon_social}
               </p>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Tipo de membresía:</span>
+                <span className="mr-2">Tipo de membresía:</span>
                 {membership.membership_type}
               </p>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Membresía por área:</span>
+                <span className="mr-2">Membresía por área:</span>
                 {membership.area_scope ? membership.area : 'General'}
               </p>
             </div>
@@ -110,19 +108,19 @@ export default function MembershipDetailsPage() {
             <div className="space-y-2">
               <h3 className="text-xl font-semibold">Detalles de la membresía</h3>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Titulares:</span>
+                <span className="mr-2">Titulares:</span>
                 {membership.titulares}
               </p>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Cupos adicionales:</span>
+                <span className="mr-2">Cupos adicionales:</span>
                 {membership.cupos_adicionales}
               </p>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Titular adicional:</span>
+                <span className="mr-2">Titular adicional:</span>
                 {membership.titular_adicional}
               </p>
               <p className="flex items-center">
-                <span className="font-semibold mr-2">Cupos foros:</span>
+                <span className="mr-2">Cupos foros:</span>
                 {membership.cupos_foros}
               </p>
             </div>
@@ -133,63 +131,63 @@ export default function MembershipDetailsPage() {
             <div className="grid gap-2 md:grid-cols-2">
               <p className="flex items-center">
                 {membership.panorama_economico ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Panorama económico</span>
+                <span className="mr-2">Panorama económico</span>
               </p>
               <p className="flex items-center">
                 {membership.panorama_politico ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Panorama político</span>
+                <span className="mr-2">Panorama político</span>
               </p>
               <p className="flex items-center">
                 {membership.informe_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Informe SAE</span>
+                <span className="mr-2">Informe SAE</span>
               </p>
               <p className="flex items-center">
                 {membership.sae_mercados ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">SAE Mercados</span>
+                <span className="mr-2">SAE Mercados</span>
               </p>
               <p className="flex items-center">
                 {membership.daily_note ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Daily note</span>
+                <span className="mr-2">Daily note</span>
               </p>
               <p className="flex items-center">
                 {membership.app_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">App SAE</span>
+                <span className="mr-2">App SAE</span>
               </p>
               <p className="flex items-center">
                 {membership.web_sae ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Web SAE</span>
+                <span className="mr-2">Web SAE</span>
               </p>
               <p className="flex items-center">
                 {membership.forum_consumer_first_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Foro Consumidor 1er semestre</span>
+                <span className="mr-2">Foro Consumidor 1er semestre</span>
               </p>
               <p className="flex items-center">
                 {membership.forum_consumer_second_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Foro Consumidor 2do semestre</span>
+                <span className="mr-2">Foro Consumidor 2do semestre</span>
               </p>
               <p className="flex items-center">
                 {membership.forum_sectorial_first_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Foro Sectorial 1er semestre</span>
+                <span className="mr-2">Foro Sectorial 1er semestre</span>
               </p>
               <p className="flex items-center">
                 {membership.forum_sectorial_second_semester ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Foro Sectorial 2do semestre</span>
+                <span className="mr-2">Foro Sectorial 2do semestre</span>
               </p>
               <p className="flex items-center">
                 {membership.consultas_acceso ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-                <span className="font-semibold mr-2">Acceso a consultas</span>
+                <span className="mr-2">Acceso a consultas</span>
               </p>
             </div>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Cantidad de reuniones:</span>
+              <span className="mr-2">Cantidad de reuniones:</span>
               {membership.cantidad_reuniones}
             </p>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Titular virtual:</span>
+              <span className="mr-2">Titular virtual:</span>
               {membership.titular_virtual}
             </p>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Cantidad de presentaciones:</span>
+              <span className="mr-2">Cantidad de presentaciones:</span>
               {membership.cantidad_presentaciones}
             </p>
           </div>

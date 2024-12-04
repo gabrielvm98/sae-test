@@ -23,6 +23,7 @@ type Membership = {
 type Executive = {
   id: number
   name: string
+  email: string
   last_name: string
   user_type: string
   company_id: number
@@ -182,6 +183,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         event_id: eventId,
         executive_id: executiveId,
         company_id: executive?.company_id,
+        email: executive?.email,
         is_client_company: true,
         is_user: true
       }

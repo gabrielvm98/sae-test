@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [orphanedEmails, setOrphanedEmails] = useState<string[]>([]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -125,94 +126,32 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   
 
   async function updateEventGuests(attendanceData: { email: string; totalTime: number }[]) {
-    console.log('Actualizando asistentes en Supabase...');
+    console.log('Actualizando asistentes en Supabase...', attendanceData);
     const batchSize = 50;
+    const orphanedEmails: string[] = [];
   
-    // 1. Manejar usuarios internos (is_user: true)
     for (let i = 0; i < attendanceData.length; i += batchSize) {
       const batch = attendanceData.slice(i, i + batchSize);
-      console.log('Procesando lote de usuarios internos:', batch);
+      console.log('Procesando lote:', batch);
   
-      const internalEmails = batch.map((item) => item.email);
+      const emails = batch.map((item) => item.email.toLowerCase());
   
-      const { data: internalGuests, error: internalError } = await supabase
-        .from('event_guest')
-        .select(`
-          id,
-          executive_id,
-          is_user,
-          email,
-          executive (
-            email
-          )
-        `)
-        .eq('event_id', eventId)
-        .eq('is_user', true)
-        .in('executive.email', internalEmails); // Relación con el email en la tabla executive
-
-      console.log("Internal guests", internalGuests)
-  
-      if (internalError) {
-        console.error('Error al obtener usuarios internos:', internalError);
-        continue;
-      }
-  
-      console.log('Usuarios internos obtenidos:', internalGuests);
-  
-      const updates = internalGuests.map((guest) => {
-        // @ts-expect-error wrong assumption in type from supabase
-        const executiveEmail = guest.executive?.email;
-        if (!executiveEmail) {
-          console.warn('No se encontró el email del ejecutivo:', guest);
-          return null;
-        }
-        const attendanceInfo = batch.find((item) => item.email === executiveEmail?.toLowerCase());
-        if (attendanceInfo) {
-          return {
-            id: guest.id,
-            virtual_session_time: attendanceInfo.totalTime,
-            assisted: true,
-          };
-        }
-        return null;
-      }).filter(Boolean);      
-  
-      console.log('Actualizaciones para usuarios internos:', updates);
-  
-      if (updates.length > 0) {
-        const { error: updateError } = await supabase
-          .from('event_guest')
-          .upsert(updates);
-  
-        if (updateError) {
-          console.error('Error actualizando usuarios internos:', updateError);
-        }
-      }
-    }
-  
-    // 2. Manejar usuarios externos (is_user: false o null)
-    for (let i = 0; i < attendanceData.length; i += batchSize) {
-      const batch = attendanceData.slice(i, i + batchSize);
-      console.log('Procesando lote de usuarios externos:', batch);
-  
-      const externalEmails = batch.map((item) => item.email);
-  
-      const { data: externalGuests, error: externalError } = await supabase
+      const { data: guests, error } = await supabase
         .from('event_guest')
         .select('id, email, is_user')
         .eq('event_id', eventId)
-        .or('is_user.is.null,is_user.eq.false')
-        .in('email', externalEmails);
+        .or(`email.in.(${emails.join(',')})`)
   
-      if (externalError) {
-        console.error('Error al obtener usuarios externos:', externalError);
+      if (error) {
+        console.error('Error al obtener invitados:', error);
         continue;
       }
   
-      console.log('Usuarios externos obtenidos:', externalGuests);
+      console.log('Invitados obtenidos:', guests);
   
-      const updates = externalGuests.map((guest) => {
-        const attendanceInfo = batch.find((item) => item.email === guest.email?.toLowerCase());
+      const updates = guests.map((guest) => {
+        const guestEmail = guest.email;
+        const attendanceInfo = batch.find((item) => item.email === guestEmail?.toLowerCase());
         if (attendanceInfo) {
           return {
             id: guest.id,
@@ -223,7 +162,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         return null;
       }).filter(Boolean);
   
-      console.log('Actualizaciones para usuarios externos:', updates);
+      console.log('Actualizaciones para invitados:', updates);
   
       if (updates.length > 0) {
         const { error: updateError } = await supabase
@@ -231,12 +170,27 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           .upsert(updates);
   
         if (updateError) {
-          console.error('Error actualizando usuarios externos:', updateError);
+          console.error('Error actualizando invitados:', updateError);
         }
       }
+  
+      // Check for orphaned emails
+      const updatedEmails = new Set(guests.map(guest => guest.email).filter(Boolean));
+      console.log('Correos actualizados:', updatedEmails);
+      const batchOrphanedEmails = emails.filter(email => !updatedEmails.has(email));
+      orphanedEmails.push(...batchOrphanedEmails);
+    }
+  
+    setOrphanedEmails(orphanedEmails);
+    if (orphanedEmails.length > 0) {
+      console.log('Correos huérfanos encontrados:', orphanedEmails);
+      toast({
+        title: "Correos huérfanos encontrados",
+        description: `Se encontraron ${orphanedEmails.length} correos en el CSV que no están en la tabla event_guest.`,
+        variant: "default",
+      });
     }
   }
-  
 
   const handleUpload = async () => {
     if (!file) return;
@@ -286,6 +240,17 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
       <Button onClick={handleUpload} disabled={!file || isUploading}>
         {isUploading ? 'Subiendo...' : 'Subir asistencia de Zoom'}
       </Button>
+      {orphanedEmails.length > 0 && (
+        <div className="mt-4 p-4 border rounded-md bg-yellow-50">
+          <h3 className="text-lg font-semibold mb-2 text-yellow-800">Correos huérfanos encontrados:</h3>
+          <ul className="list-disc pl-5 max-h-60 overflow-y-auto">
+            {orphanedEmails.map((email, index) => (
+              <li key={index} className="text-yellow-700">{email}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-sm text-yellow-600">Total: {orphanedEmails.length} correos huérfanos</p>
+        </div>
+      )}
     </div>
   );
 }

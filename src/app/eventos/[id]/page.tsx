@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EventGuestTable } from '@/components/EventGuestTable'
-import { EventGuestForm } from '@/components/EventGuestForm'
+import { CreateGuestForm } from '@/components/CreateGuestForm'
 import { ImportUsers } from '@/components/ImportUsers'
 import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
@@ -84,7 +84,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </Button>
               <Button variant="outline">Descargar CSV</Button>
             </div>
-            {showForm && <EventGuestForm eventId={parseInt(resolvedParams.id)} onComplete={() => setShowForm(false)} />}
+            {showForm && <CreateGuestForm eventId={parseInt(resolvedParams.id)} onComplete={() => setShowForm(false)} />}
             <EventGuestTable eventId={parseInt(resolvedParams.id)} />
           </div>
         </TabsContent>

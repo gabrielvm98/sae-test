@@ -8,13 +8,25 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 
-type EventGuestFormProps = {
+type Company = {
+  id: number
+  razon_social: string
+}
+
+type Executive = {
+  id: number
+  name: string
+  last_name: string
+  email: string
+  company_id: number
+}
+
+type CreateGuestFormProps = {
   eventId: number
-  guestId?: number
   onComplete: () => void
 }
 
-export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormProps) {
+export function CreateGuestForm({ eventId, onComplete }: CreateGuestFormProps) {
   const [isClientCompany, setIsClientCompany] = useState(false)
   const [isUser, setIsUser] = useState(false)
   const [companyId, setCompanyId] = useState<number | null>(null)
@@ -29,19 +41,13 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
   const [substitute, setSubstitute] = useState(false)
   const [substituteName, setSubstituteName] = useState('')
   const [substituteEmail, setSubstituteEmail] = useState('')
-  const [companies, setCompanies] = useState<{ id: number, razon_social: string }[]>([])
-  const [executives, setExecutives] = useState<{ id: number, name: string, email: string }[]>([])
-  const [virtualSessionTime, setVirtualSessionTime] = useState<number | null>(null)
-  const [registered, setRegistered] = useState(false)
-  const [assisted, setAssisted] = useState(false)
+  const [companies, setCompanies] = useState<Company[]>([])
+  const [executives, setExecutives] = useState<Executive[]>([])
 
   useEffect(() => {
     fetchCompanies()
     fetchExecutives()
-    if (guestId) {
-      fetchGuest()
-    }
-  }, [guestId])
+  }, [])
 
   async function fetchCompanies() {
     const { data, error } = await supabase
@@ -57,7 +63,7 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
   async function fetchExecutives() {
     const { data, error } = await supabase
       .from('executive')
-      .select('id, name, email')
+      .select('id, name, last_name, email, company_id')
     if (error) {
       console.error('Error fetching executives:', error)
     } else {
@@ -65,35 +71,7 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
     }
   }
 
-  async function fetchGuest() {
-    if (!guestId) return
-    const { data, error } = await supabase
-      .from('event_guest')
-      .select('*')
-      .eq('id', guestId)
-      .single()
-    if (error) {
-      console.error('Error fetching guest:', error)
-    } else if (data) {
-      setIsClientCompany(data.is_client_company)
-      setIsUser(data.is_user)
-      setCompanyId(data.company_id)
-      setCompanyRazonSocial(data.company_razon_social || '')
-      setExecutiveId(data.executive_id)
-      setName(data.name)
-      setDni(data.dni)
-      setEmail(data.email)
-      setPhone(data.phone)
-      setAssistantName(data.assistant_name || '')
-      setAssistantEmail(data.assistant_email || '')
-      setSubstitute(data.substitute)
-      setSubstituteName(data.substitute_name || '')
-      setSubstituteEmail(data.substitute_email || '')
-      setVirtualSessionTime(data.virtual_session_time)
-      setRegistered(data.registered)
-      setAssisted(data.assisted)
-    }
-  }
+  const filteredExecutives = executives.filter(executive => executive.company_id === companyId)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -113,31 +91,17 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
       substitute,
       substitute_name: substitute ? substituteName : null,
       substitute_email: substitute ? substituteEmail : null,
-      virtual_session_time: virtualSessionTime,
-      registered,
-      assisted,
     }
 
-    if (guestId) {
-      const { error } = await supabase
-        .from('event_guest')
-        .update(guest)
-        .eq('id', guestId)
-      if (error) console.error('Error updating guest:', error)
-      else onComplete()
-    } else {
-      const { error } = await supabase
-        .from('event_guest')
-        .insert([guest])
-      if (error) console.error('Error creating guest:', error)
-      else onComplete()
-    }
+    const { error } = await supabase
+      .from('event_guest')
+      .insert([guest])
+    if (error) console.error('Error creating guest:', error)
+    else onComplete()
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {!guestId && 
-      <>
       <div>
         <Label>
           <Checkbox 
@@ -153,7 +117,13 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
       {isClientCompany ? (
         <div>
           <Label htmlFor="companyId">Empresa</Label>
-          <Select value={companyId?.toString()} onValueChange={(value) => setCompanyId(parseInt(value))}>
+          <Select 
+            value={companyId?.toString()} 
+            onValueChange={(value) => {
+              setCompanyId(parseInt(value))
+              setExecutiveId(null) // Reset executive when company changes
+            }}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Selecciona la empresa" />
             </SelectTrigger>
@@ -187,43 +157,44 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
           {' '}Usuario Interno
         </Label>
       </div>
-      {isUser ? (
+      {isUser && companyId && (
         <>
-        <div>
-          <Label htmlFor="executiveId">Ejecutivo</Label>
-          <Select
-            value={executiveId?.toString()}
-            onValueChange={(value) => {
-              setExecutiveId(parseInt(value))
-              const selectedExecutive = executives.find((executive) => executive.id === parseInt(value))
-              if (selectedExecutive) {
-                setEmail(selectedExecutive.email)
-              }
-            }}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona el ejecutivo" />
-            </SelectTrigger>
-            <SelectContent>
-              {executives.map((executive) => (
-                <SelectItem key={executive.id} value={executive.id.toString()}>
-                  {executive.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-        <Label htmlFor="email">Email del evento</Label>
-        <Input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      </>
-      ) : (
+          <div>
+            <Label htmlFor="executiveId">Ejecutivo</Label>
+            <Select
+              value={executiveId?.toString()}
+              onValueChange={(value) => {
+                setExecutiveId(parseInt(value))
+                const selectedExecutive = filteredExecutives.find((executive) => executive.id === parseInt(value))
+                if (selectedExecutive) {
+                  setEmail(selectedExecutive.email)
+                }
+              }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecciona el ejecutivo" />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredExecutives.map((executive) => (
+                  <SelectItem key={executive.id} value={executive.id.toString()}>
+                    {`${executive.name} ${executive.last_name}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="email">Email del evento</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+        </>
+      )}
+      {!isUser && (
         <>
           <div>
             <Label htmlFor="name">Nombre</Label>
@@ -313,40 +284,8 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
           </div>
         </>
       )}
-      </>
-      }
-      {guestId && (
-        <>
-          <div>
-            <Label htmlFor="virtualSessionTime">Tiempo en sesión virtual (minutos)</Label>
-            <Input
-              id="virtualSessionTime"
-              type="number"
-              value={virtualSessionTime?.toString() || ''}
-              onChange={(e) => setVirtualSessionTime(parseInt(e.target.value) || null)}
-            />
-          </div>
-          <div>
-            <Label>
-              <Checkbox 
-                checked={registered} 
-                onCheckedChange={(checked) => setRegistered(checked as boolean)}
-              />
-              {' '}Registrado
-            </Label>
-          </div>
-          <div>
-            <Label>
-              <Checkbox 
-                checked={assisted} 
-                onCheckedChange={(checked) => setAssisted(checked as boolean)}
-              />
-              {' '}Asistió
-            </Label>
-          </div>
-        </>
-      )}
-      <Button type="submit">{guestId ? 'Actualizar' : 'Añadir'} Invitado</Button>
+      <Button type="submit">Añadir Invitado</Button>
     </form>
   )
 }
+
