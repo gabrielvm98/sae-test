@@ -517,7 +517,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
-      <Button type="submit">{executiveId ? 'Actualizar' : 'Crear'} usuario</Button>
+      <Button type="submit">{executiveId ? 'Actualizar' : 'Crear'}</Button>
     </form>
   )
 }

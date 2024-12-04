@@ -120,7 +120,7 @@ export function EventForm({ eventId }: EventFormProps) {
           required
         />
       </div>
-      <Button type="submit">{eventId ? 'Actualizar' : 'Crear'} evento</Button>
+      <Button type="submit">{eventId ? 'Actualizar' : 'Crear'}</Button>
     </form>
   )
 }
