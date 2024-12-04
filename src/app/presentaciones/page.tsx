@@ -67,7 +67,13 @@ export default function PresentationsPage() {
     }
     return 'No facturable'
   }
-
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
+  }
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -107,7 +113,7 @@ export default function PresentationsPage() {
               <TableCell>{formatListOfStrings(presentation.elaboration_assignee)}</TableCell>
               <TableCell>{formatListOfStrings(presentation.presentation_assignee)}</TableCell>
               <TableCell>{presentation.order_source}</TableCell>
-              <TableCell>{presentation.order_date}</TableCell>
+              <TableCell>{convertDateFormat(presentation.order_date)}</TableCell>
               <TableCell>{presentation.presentation_date_hour}</TableCell>
               <TableCell>{presentation.presentation_type}</TableCell>
               <TableCell>{presentation.modalidad}</TableCell>

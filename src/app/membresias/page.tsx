@@ -68,7 +68,13 @@ export default function MembershipsPage() {
       setMemberships(data || [])
     }
   }
-
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
+  }
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -115,7 +121,7 @@ export default function MembershipsPage() {
               <TableCell>{membership.area_scope ? membership.area : 'General'}</TableCell>
               <TableCell>{membership.titulares}</TableCell>
               <TableCell>{membership.cupos_adicionales}</TableCell>
-              <TableCell>{membership.fecha_renovacion}</TableCell>
+              <TableCell>{convertDateFormat(membership.fecha_renovacion)}</TableCell>
               <TableCell>{membership.payment_method}</TableCell>
               <TableCell>{membership.signed_proposal && membership.invoice_sent ? 'Sí' : 'No'}</TableCell>
               <TableCell>{`${membership.payment_currency} ${membership.payment_amount}`}</TableCell>
