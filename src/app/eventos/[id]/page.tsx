@@ -10,6 +10,7 @@ import { CreateGuestForm } from '@/components/CreateGuestForm'
 import { ImportUsers } from '@/components/ImportUsers'
 import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
+import { EventReportTab } from '@/components/EventReportTab'
 
 type Event = {
   id: number
@@ -69,11 +70,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       </div>
       
       <Tabs defaultValue="invitados" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="invitados">Invitados</TabsTrigger>
           <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>
           <TabsTrigger value="importar-externos">Importar Externos</TabsTrigger>
           <TabsTrigger value="subir-asistencia">Subir Asistencia Zoom</TabsTrigger>
+          <TabsTrigger value="reporte">Reporte</TabsTrigger>
         </TabsList>
         
         <TabsContent value="invitados">
@@ -99,6 +101,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         
         <TabsContent value="subir-asistencia">
           <UploadZoomAttendance eventId={parseInt(resolvedParams.id)} />
+        </TabsContent>
+
+        <TabsContent value="reporte">
+          <EventReportTab eventId={parseInt(resolvedParams.id)}/>
         </TabsContent>
       </Tabs>
     </div>

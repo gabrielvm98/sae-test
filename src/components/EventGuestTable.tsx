@@ -42,12 +42,14 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
   const [guests, setGuests] = useState<EventGuest[]>([])
   const [editingGuestId, setEditingGuestId] = useState<string | null>(null)
   const [showEditForm, setShowEditForm] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     fetchGuests()
-  }, [])
+  }, [searchQuery])
 
   async function fetchGuests() {
+    console.log("Fetching guests")
     const { data, error } = await supabase
       .from('event_guest')
       .select(`
@@ -56,11 +58,28 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         executive:executive_id (name, last_name, email, office_phone)
       `)
       .eq('event_id', eventId)
-
+  
     if (error) {
       console.error('Error fetching guests:', error)
-    } else {
-      setGuests(data || [])
+      return
+    }
+  
+    if (data) {
+      const filteredData = data.filter((guest) => {
+        const lowerSearch = searchQuery.toLowerCase()
+        if (guest.is_user) {
+          // Si es un usuario interno, buscar en los campos de executive
+          return (
+            guest.executive?.name?.toLowerCase().includes(lowerSearch) ||
+            guest.executive?.last_name?.toLowerCase().includes(lowerSearch)
+          )
+        } else {
+          // Si no es usuario interno, buscar en el campo name del invitado
+          return guest.name?.toLowerCase().includes(lowerSearch)
+        }
+      })
+  
+      setGuests(filteredData)
     }
   }
 
@@ -79,6 +98,20 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
 
   return (
     <div>
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl font-semibold">Lista de invitados</h1>
+        </div>
+        <div className="mt-4">
+          <input
+            type="text"
+            placeholder="Buscar por nombre de usuario..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+        </div>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
