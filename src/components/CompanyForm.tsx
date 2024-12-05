@@ -300,7 +300,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           onChange={(e) => setNotes(e.target.value)}
         />
       </div>
-      <Button type="submit">{companyId ? 'Actualizar' : 'Crear'}</Button>
+      <Button type="submit">{companyId ? 'Actualizar' : 'Agregar Nueva Empresa'}</Button>
     </form>
   )
 }

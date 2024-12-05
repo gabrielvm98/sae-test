@@ -561,7 +561,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
         />
       </div>
 
-      <Button type="submit">{membershipId ? 'Actualizar' : 'Crear'}</Button>
+      <Button type="submit">{membershipId ? 'Actualizar' : 'Agregar Nueva Membresía'}</Button>
     </form>
   )
 }

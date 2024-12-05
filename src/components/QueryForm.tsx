@@ -258,7 +258,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
           onChange={(e) => setSolvedDate(e.target.value)}
         />
       </div>
-      <Button type="submit">{queryId ? 'Actualizar' : 'Crear'}</Button>
+      <Button type="submit">{queryId ? 'Actualizar' : 'Agregar Nueva Consulta'}</Button>
     </form>
   )
 }
