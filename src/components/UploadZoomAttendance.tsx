@@ -76,7 +76,8 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           if (!Array.isArray(parsedRow) || !Array.isArray(parsedRow[0])) {
             throw new Error("El primer parseo no devolvió un array de strings.");
           }
-        
+          
+          
           // Segundo parseo del primer elemento
           const reParsedRow = Papa.parse(parsedRow[0][0], { delimiter: ',', quoteChar: '"' }).data;
         
