@@ -87,9 +87,9 @@ export default function AssistantDetailsPage() {
             <CardTitle>Información personal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><User className="inline mr-2" /> <strong>Nombre:</strong> {assistant.name} {assistant.last_name}</p>
-            <p><strong>DNI:</strong> {assistant.dni}</p>
-            <p><Mail className="inline mr-2" /> <strong>Email:</strong> {assistant.email}</p>
+            <p><User className="inline mr-2" /> Nombre: {assistant.name} {assistant.last_name}</p>
+            <p>DNI: {assistant.dni}</p>
+            <p><Mail className="inline mr-2" /> Email: {assistant.email}</p>
           </CardContent>
         </Card>
 
@@ -98,7 +98,7 @@ export default function AssistantDetailsPage() {
             <CardTitle>Información laboral</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {assistant.company.razon_social}</p>
+            <p><Building className="inline mr-2" /> Empresa: {assistant.company.razon_social}</p>
           </CardContent>
         </Card>
 
@@ -107,8 +107,8 @@ export default function AssistantDetailsPage() {
             <CardTitle>Contacto</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Phone className="inline mr-2" /> <strong>Teléfono de oficina:</strong> {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</p>
+            <p><Phone className="inline mr-2" /> Teléfono de oficina: {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> Celular: {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</p>
           </CardContent>
         </Card>
       </div>

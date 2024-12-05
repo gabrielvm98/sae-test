@@ -86,15 +86,15 @@ export default function ProjectDetailsPage() {
             <CardTitle>Información General</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {project.company.razon_social}</p>
-            <p><IdCard className="inline mr-2" /> <strong>Código:</strong> {project.project_code}</p>
+            <p><Building className="inline mr-2" /> Empresa: {project.company.razon_social}</p>
+            <p><IdCard className="inline mr-2" /> Código: {project.project_code}</p>
             {project.other_executive ? 
-            (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {project.other_fullname}</p>) :
-            (<p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${project.executive.name} ${project.executive.last_name}`}</p>)}
+            (<p><User className="inline mr-2" /> Solicitante: {project.other_fullname}</p>) :
+            (<p><User className="inline mr-2" /> Solicitante: {`${project.executive.name} ${project.executive.last_name}`}</p>)}
             {project.other_executive ? 
-            (<p><Briefcase className="inline mr-2"/><strong>Cargo del solicitante:</strong> No disponible</p>) :
-            (<p><Briefcase className="inline mr-2"/><strong>Cargo del solicitante:</strong> {project.executive.position}</p>)}
-            <p><strong>Status:</strong> {project.status}</p>
+            (<p><Briefcase className="inline mr-2"/>Cargo del solicitante: No disponible</p>) :
+            (<p><Briefcase className="inline mr-2"/>Cargo del solicitante: {project.executive.position}</p>)}
+            <p>Status: {project.status}</p>
           </CardContent>
         </Card>
 
@@ -103,8 +103,8 @@ export default function ProjectDetailsPage() {
             <CardTitle>Fechas</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de ingreso:</strong> {project.start_date}</p>
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de cierre:</strong> {project.end_date || 'No especificada'}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {project.start_date}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de cierre: {project.end_date || 'No especificada'}</p>
           </CardContent>
         </Card>
 

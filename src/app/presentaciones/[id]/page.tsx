@@ -91,19 +91,19 @@ export default function PresentationDetailsPage() {
             <CardTitle>Información general</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {presentation.company.razon_social}</p>
+            <p><Building className="inline mr-2" /> Empresa: {presentation.company.razon_social}</p>
             {presentation.other_executive ? (
-              <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {presentation.other_fullname}</p>
+              <p><User className="inline mr-2" /> Solicitante: {presentation.other_fullname}</p>
             ) : (
-              <p><User className="inline mr-2" /> <strong>Solicitante:</strong> {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
+              <p><User className="inline mr-2" /> Solicitante: {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
             )}
             {presentation.other_executive ? (
-              <p><Briefcase className="inline mr-2" /> <strong>Cargo:</strong> No disponible</p>
+              <p><Briefcase className="inline mr-2" /> Cargo: No disponible</p>
             ) : (
-              <p><Briefcase className="inline mr-2" /> <strong>Cargo:</strong> {presentation.executive.position}</p>
+              <p><Briefcase className="inline mr-2" /> Cargo: {presentation.executive.position}</p>
             )}
-            <p><strong>Origen de solicitud:</strong> {presentation.order_source}</p>
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de ingreso:</strong> {presentation.order_date}</p>
+            <p>Origen de solicitud: {presentation.order_source}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {presentation.order_date}</p>
           </CardContent>
         </Card>
 
@@ -112,9 +112,9 @@ export default function PresentationDetailsPage() {
             <CardTitle>Detalles de la presentación</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> <strong>Fecha y hora:</strong> {presentation.presentation_date_hour}</p>
-            <p><strong>Tipo:</strong> {presentation.presentation_type}</p>
-            <p><strong>Modalidad:</strong> {presentation.modalidad}</p>
+            <p><Calendar className="inline mr-2" /> Fecha y hora: {presentation.presentation_date_hour}</p>
+            <p>Tipo: {presentation.presentation_type}</p>
+            <p>Modalidad: {presentation.modalidad}</p>
           </CardContent>
         </Card>
 
@@ -123,8 +123,8 @@ export default function PresentationDetailsPage() {
             <CardTitle>Responsables y expositores</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Users className="inline mr-2" /> <strong>Responsable(s) de la elaboración:</strong> {presentation.elaboration_assignee.join(', ')}</p>
-            <p><Users className="inline mr-2" /> <strong>Expositor(es):</strong> {presentation.presentation_assignee.join(', ')}</p>
+            <p><Users className="inline mr-2" /> Responsable(s) de la elaboración: {presentation.elaboration_assignee.join(', ')}</p>
+            <p><Users className="inline mr-2" /> Expositor(es): {presentation.presentation_assignee.join(', ')}</p>
           </CardContent>
         </Card>
 
@@ -133,11 +133,11 @@ export default function PresentationDetailsPage() {
             <CardTitle>Facturación</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><DollarSign className="inline mr-2" /> <strong>Facturable:</strong> {presentation.billable ? 'Sí' : 'No'}</p>
+            <p><DollarSign className="inline mr-2" /> Facturable: {presentation.billable ? 'Sí' : 'No'}</p>
             {presentation.billable && (
               <>
-                <p><strong>Moneda:</strong> {presentation.billable_currency}</p>
-                <p><strong>Monto:</strong> {presentation.billable_amount?.toFixed(2)}</p>
+                <p>Moneda: {presentation.billable_currency}</p>
+                <p>Monto: {presentation.billable_amount?.toFixed(2)}</p>
               </>
             )}
           </CardContent>

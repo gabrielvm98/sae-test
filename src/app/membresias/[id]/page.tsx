@@ -196,33 +196,33 @@ export default function MembershipDetailsPage() {
             <h3 className="text-xl font-semibold">Información de Pago</h3>
             <p className="flex items-center">
               <Calendar className="w-5 h-5 mr-2 text-gray-500" />
-              <span className="font-semibold mr-2">Fecha de renovación:</span>
+              <span >Fecha de renovación:</span>
               {membership.fecha_renovacion}
             </p>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Forma de pago:</span>
+              <span >Forma de pago:</span>
               {membership.payment_method}
             </p>
             <p className="flex items-center">
               <DollarSign className="w-5 h-5 mr-2 text-gray-500" />
-              <span className="font-semibold mr-2">Tarifa:</span>
+              <span >Tarifa:</span>
               {`${membership.payment_currency} ${membership.payment_amount}`}
             </p>
             <p className="flex items-center">
               {membership.oc_needed ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-              <span className="font-semibold mr-2">Necesita O/C</span>
+              <span >Necesita O/C</span>
             </p>
             <p className="flex items-center">
               {membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-              <span className="font-semibold mr-2">Propuesta firmada</span>
+              <span >Propuesta firmada</span>
             </p>
             <p className="flex items-center">
               {membership.invoice_sent ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-              <span className="font-semibold mr-2">Factura enviada</span>
+              <span >Factura enviada</span>
             </p>
             <p className="flex items-center">
               {membership.invoice_sent && membership.signed_proposal ? <Check className="w-5 h-5 mr-2 text-green-500" /> : <X className="w-5 h-5 mr-2 text-red-500" />}
-              <span className="font-semibold mr-2">Renovación completa</span>
+              <span >Renovación completa</span>
             </p>
           </div>
 
@@ -230,15 +230,15 @@ export default function MembershipDetailsPage() {
             <h3 className="text-xl font-semibold">Información del Firmante</h3>
             <p className="flex items-center">
               <User className="w-5 h-5 mr-2 text-gray-500" />
-              <span className="font-semibold mr-2">Nombre:</span>
+              <span>Nombre:</span>
               {membership.signer_name}
             </p>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Email:</span>
+              <span>Email:</span>
               {membership.signer_email}
             </p>
             <p className="flex items-center">
-              <span className="font-semibold mr-2">Teléfono:</span>
+              <span>Teléfono:</span>
               {membership.signer_phone}
             </p>
           </div>

@@ -66,12 +66,12 @@ export default function QueryDetailsPage() {
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
             <Building className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Empresa:</span>
+            <span >Empresa:</span>
             <span>{query.company.razon_social}</span>
           </div>
           <div className="flex items-center space-x-2">
             <User className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Solicitante:</span>
+            <span >Solicitante:</span>
             {query.other_executive ? (
               <span>{query.other_fullname}</span>
             ) : (
@@ -80,7 +80,7 @@ export default function QueryDetailsPage() {
           </div>
           <div className="flex items-center space-x-2">
             <Briefcase className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Cargo del solicitante:</span>
+            <span >Cargo del solicitante:</span>
             {query.other_executive ? (
               <span>No disponible</span>
             ) : (
@@ -89,19 +89,19 @@ export default function QueryDetailsPage() {
           </div>
           <div className="flex items-center space-x-2">
             <Users className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Encargado:</span>
+            <span >Encargado:</span>
             <span>{query.assignee.join(', ')}</span>
           </div>
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
               <FileText className="w-5 h-5 text-gray-500" />
-              <span className="font-semibold">Descripción:</span>
+              <span >Descripción:</span>
             </div>
             <p className="pl-7">{query.description}</p>
           </div>
           <div className="flex items-center space-x-2">
             <Calendar className="w-5 h-5 text-gray-500" />
-            <span className="font-semibold">Fecha de resolución:</span>
+            <span >Fecha de resolución:</span>
             <span>{query.solved_date || 'Pendiente'}</span>
           </div>
         </CardContent>

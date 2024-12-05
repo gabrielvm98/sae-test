@@ -134,11 +134,11 @@ export default function ExecutiveDetailsPage() {
             <CardTitle>Información personal</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><User className="inline mr-2" /> <strong>Nombre:</strong> {executive.name} {executive.last_name}</p>
-            <p><strong>DNI:</strong> {executive.dni}</p>
-            <p><strong>Tareco:</strong> {executive.tareco}</p>
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de nacimiento:</strong> {executive.birth_date}</p>
-            <p><strong>País:</strong> {executive.country}</p>
+            <p><User className="inline mr-2" /> Nombre: {executive.name} {executive.last_name}</p>
+            <p>DNI: {executive.dni}</p>
+            <p>Tareco: {executive.tareco}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de nacimiento: {executive.birth_date}</p>
+            <p>País: {executive.country}</p>
           </CardContent>
         </Card>
 
@@ -147,15 +147,15 @@ export default function ExecutiveDetailsPage() {
             <CardTitle>Información laboral</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> <strong>Empresa:</strong> {executive.company.razon_social}</p>
-            <p><strong>Membresía:</strong> {executive.membership ? executive.membership.name : 'No asignado'}</p>
-            <p><strong>Cargo:</strong> {executive.position}</p>
-            <p><strong>Área:</strong> {executive.area}</p>
-            <p><strong>Tipo de usuario:</strong> {executive.user_type}</p>
-            <p><strong>Reuniones SAE:</strong> {formatSaeMeetings(executive.sae_meetings)}</p>
-            <p><strong>Status:</strong> <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
+            <p><Building className="inline mr-2" /> Empresa: {executive.company.razon_social}</p>
+            <p>Membresía: {executive.membership ? executive.membership.name : 'No asignado'}</p>
+            <p>Cargo: {executive.position}</p>
+            <p>Área: {executive.area}</p>
+            <p>Tipo de usuario: {executive.user_type}</p>
+            <p>Reuniones SAE: {formatSaeMeetings(executive.sae_meetings)}</p>
+            <p>Status: <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
             {executive.reemplaza_a && executive.reemplazado_executive && (
-              <p><User className="inline mr-2" /> <strong>Reemplaza a:</strong> {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
+              <p><User className="inline mr-2" /> Reemplaza a: {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
             )}
             </CardContent>
         </Card>
@@ -165,12 +165,12 @@ export default function ExecutiveDetailsPage() {
             <CardTitle>Contacto</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Phone className="inline mr-2" /> <strong>Teléfono:</strong> {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> <strong>Celular:</strong> {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</p>
-            <p><Mail className="inline mr-2" /> <strong>Email:</strong> {executive.email}</p>
-            <p><strong>Secretaria:</strong> {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
-            <p><Phone className="inline mr-2" /> <strong>Teléfono de secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> <strong>Celular de secretaria:</strong> {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
+            <p><Phone className="inline mr-2" /> Teléfono: {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> Celular: {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</p>
+            <p><Mail className="inline mr-2" /> Email: {executive.email}</p>
+            <p>Secretaria: {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
+            <p><Phone className="inline mr-2" /> Teléfono de secretaria: {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
+            <p><Phone className="inline mr-2" /> Celular de secretaria: {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
           
           </CardContent>
         </Card>
@@ -180,8 +180,8 @@ export default function ExecutiveDetailsPage() {
             <CardTitle>Fechas importantes</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de ingreso:</strong> {executive.start_date}</p>
-            <p><Calendar className="inline mr-2" /> <strong>Fecha de baja:</strong> {executive.end_date || 'N/A'}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {executive.start_date}</p>
+            <p><Calendar className="inline mr-2" /> Fecha de baja: {executive.end_date || 'N/A'}</p>
           </CardContent>
         </Card>
       </div>

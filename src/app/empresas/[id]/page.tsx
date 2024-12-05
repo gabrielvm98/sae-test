@@ -156,21 +156,21 @@ export default function CompanyDetailsPage() {
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
-                  <dt className="font-semibold">RUC:</dt>
+                  <dt >RUC:</dt>
                   <dd>{company.ruc}</dd>
-                  <dt className="font-semibold">Razón social:</dt>
+                  <dt >Razón social:</dt>
                   <dd>{company.razon_social}</dd>
-                  <dt className="font-semibold">Nombre comercial:</dt>
+                  <dt >Nombre comercial:</dt>
                   <dd>{company.nombre_comercial}</dd>
-                  <dt className="font-semibold">País:</dt>
+                  <dt >País:</dt>
                   <dd>{company.country}</dd>
-                  <dt className="font-semibold">Departamento:</dt>
+                  <dt >Departamento:</dt>
                   <dd>{company.department}</dd>
-                  <dt className="font-semibold">Dirección:</dt>
+                  <dt >Dirección:</dt>
                   <dd>{company.address}</dd>
-                  <dt className="font-semibold">Teléfono:</dt>
+                  <dt >Teléfono:</dt>
                   <dd>{company.phone_number}</dd>
-                  <dt className="font-semibold">Sector:</dt>
+                  <dt >Sector:</dt>
                   <dd>{company.industry}</dd>
                 </dl>
               </CardContent>
@@ -181,11 +181,11 @@ export default function CompanyDetailsPage() {
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
-                  <dt className="font-semibold">Status:</dt>
+                  <dt >Status:</dt>
                   <dd>{company.status}</dd>
-                  <dt className="font-semibold">Fecha de ingreso:</dt>
+                  <dt >Fecha de ingreso:</dt>
                   <dd>{company.enrollment_date}</dd>
-                  <dt className="font-semibold">Cantidad de titulares:</dt>
+                  <dt >Cantidad de titulares:</dt>
                   <dd>{company.seats}</dd>
                 </dl>
               </CardContent>
@@ -196,11 +196,11 @@ export default function CompanyDetailsPage() {
               </CardHeader>
               <CardContent>
                 <dl className="grid grid-cols-2 gap-2">
-                  <dt className="font-semibold">Número de trabajadores:</dt>
+                  <dt >Número de trabajadores:</dt>
                   <dd>{company.headcount}</dd>
-                  <dt className="font-semibold">Ventas:</dt>
+                  <dt >Ventas:</dt>
                   <dd>{company.sales}</dd>
-                  <dt className="font-semibold">Notas:</dt>
+                  <dt >Notas:</dt>
                   <dd>{company.notes}</dd>
                 </dl>
               </CardContent>
