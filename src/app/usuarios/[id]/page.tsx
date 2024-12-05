@@ -128,63 +128,85 @@ export default function ExecutiveDetailsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Información personal</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><User className="inline mr-2" /> Nombre: {executive.name} {executive.last_name}</p>
-            <p>DNI: {executive.dni}</p>
-            <p>Tareco: {executive.tareco}</p>
-            <p><Calendar className="inline mr-2" /> Fecha de nacimiento: {executive.birth_date}</p>
-            <p>País: {executive.country}</p>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Información laboral</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> Empresa: {executive.company.razon_social}</p>
-            <p>Membresía: {executive.membership ? executive.membership.name : 'No asignado'}</p>
-            <p>Cargo: {executive.position}</p>
-            <p>Área: {executive.area}</p>
-            <p>Tipo de usuario: {executive.user_type}</p>
-            <p>Reuniones SAE: {formatSaeMeetings(executive.sae_meetings)}</p>
-            <p>Status: <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
-            {executive.reemplaza_a && executive.reemplazado_executive && (
-              <p><User className="inline mr-2" /> Reemplaza a: {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
-            )}
-            </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contacto</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Phone className="inline mr-2" /> Teléfono: {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> Celular: {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</p>
-            <p><Mail className="inline mr-2" /> Email: {executive.email}</p>
-            <p>Secretaria: {`${executive.assistant.name} ${executive.assistant.last_name}`}</p>
-            <p><Phone className="inline mr-2" /> Teléfono de secretaria: {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> Celular de secretaria: {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}</p>
-          
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Fechas importantes</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {executive.start_date}</p>
-            <p><Calendar className="inline mr-2" /> Fecha de baja: {executive.end_date || 'N/A'}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2 ">
+              <h3 className="text-xl font-semibold">Información personal</h3>
+              <p className="flex items-center">
+                Nombre: {executive.name} {executive.last_name}
+              </p>
+              <p className="flex items-center">
+                DNI: {executive.dni}
+              </p>
+              <p className="flex items-center">
+                Tareco: {executive.tareco}
+              </p>
+              <p className="flex items-center">
+                Fecha de nacimiento: {executive.birth_date}
+              </p>
+              <p className="flex items-center">
+                País: {executive.country}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold">Información laboral</h3>
+              <p className="flex items-center">
+                Empresa: {executive.company.razon_social}
+              </p>
+              <p className="flex items-center">
+                Membresía: {executive.membership ? executive.membership.name : 'No asignado'}
+              </p>
+              <p className="flex items-center">
+                Cargo: {executive.position}
+              </p>
+              <p className="flex items-center">
+                Área: {executive.area}
+              </p>
+              <p className="flex items-center">
+                Tipo de usuario: {executive.user_type}
+              </p>
+              <p className="flex items-center">
+                Reuniones SAE: {formatSaeMeetings(executive.sae_meetings)}
+              </p>
+              <p className="flex items-center">Status: <Badge variant={executive.active ? "default" : "secondary"}>{executive.active ? 'Activo' : 'No activo'}</Badge></p>
+              {executive.reemplaza_a && executive.reemplazado_executive && (
+                <p><User className="inline mr-2" /> Reemplaza a: {`${executive.reemplazado_executive.name} ${executive.reemplazado_executive.last_name}`}</p>
+              )}
+            </div>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2 ">
+              <h3 className="text-xl font-semibold">Contacto</h3>
+              <p className="flex items-center">
+              Teléfono: {formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}
+              </p>
+              <p className="flex items-center">
+              Celular: {formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}
+              </p>
+              <p className="flex items-center">
+              Email: {executive.email}
+              </p>
+              <p className="flex items-center">
+              Secretaria: {`${executive.assistant.name} ${executive.assistant.last_name}`}
+              </p>
+              <p className="flex items-center">
+              Teléfono de secretaria: {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}
+              </p>
+              <p className="flex items-center">
+              Celular de secretaria: {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-semibold">Fechas importantes</h3>
+              <p className="flex items-center">
+              Fecha de ingreso: {executive.start_date}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

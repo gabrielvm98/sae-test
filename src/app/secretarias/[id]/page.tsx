@@ -81,36 +81,41 @@ export default function AssistantDetailsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Información personal</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><User className="inline mr-2" /> Nombre: {assistant.name} {assistant.last_name}</p>
-            <p>DNI: {assistant.dni}</p>
-            <p><Mail className="inline mr-2" /> Email: {assistant.email}</p>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+      <Card>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Información personal</h3>
+                <p className="flex items-center">
+                Nombre: {assistant.name} {assistant.last_name}
+                </p>
+                <p className="flex items-center">
+                DNI: {assistant.dni}
+                </p>
+                <p className="flex items-center">
+                Email: {assistant.email}
+                </p>
+              </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Información laboral</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> Empresa: {assistant.company.razon_social}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contacto</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Phone className="inline mr-2" /> Teléfono de oficina: {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</p>
-            <p><Phone className="inline mr-2" /> Celular: {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</p>
-          </CardContent>
-        </Card>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Información laboral</h3>
+                <p className="flex items-center">
+                Empresa: {assistant.company.razon_social}
+                </p>
+              </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Contacto</h3>
+                <p className="flex items-center">
+                Teléfono de oficina: {formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}
+                </p>
+                <p className="flex items-center">
+                Celular: {formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
       </div>
     </div>
   )

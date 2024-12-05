@@ -80,49 +80,52 @@ export default function ProjectDetailsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Información General</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> Empresa: {project.company.razon_social}</p>
-            <p><IdCard className="inline mr-2" /> Código: {project.project_code}</p>
-            {project.other_executive ? 
-            (<p><User className="inline mr-2" /> Solicitante: {project.other_fullname}</p>) :
-            (<p><User className="inline mr-2" /> Solicitante: {`${project.executive.name} ${project.executive.last_name}`}</p>)}
-            {project.other_executive ? 
-            (<p><Briefcase className="inline mr-2"/>Cargo del solicitante: No disponible</p>) :
-            (<p><Briefcase className="inline mr-2"/>Cargo del solicitante: {project.executive.position}</p>)}
-            <p>Status: {project.status}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Fechas</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {project.start_date}</p>
-            <p><Calendar className="inline mr-2" /> Fecha de cierre: {project.end_date || 'No especificada'}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Responsables</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p><Users className="inline mr-2" /> {project.assignee.join(', ')}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Comentarios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p><FileText className="inline mr-2" /> {project.comments}</p>
+          <CardContent className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Información General</h3>
+                <p className="flex items-center">
+                  Empresa: {project.company.razon_social}
+                </p>
+                <p className="flex items-center">
+                  Código: {project.project_code}
+                </p>
+                {project.other_executive ?
+                  (<p> Solicitante: {project.other_fullname}</p>) :
+                  (<p> Solicitante: {`${project.executive.name} ${project.executive.last_name}`}</p>)}
+                {project.other_executive ?
+                  (<p>Cargo del solicitante: No disponible</p>) :
+                  (<p>Cargo del solicitante: {project.executive.position}</p>)}
+                <p className="flex items-center">
+                Status: {project.status}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Fechas</h3>
+                <p className="flex items-center">
+                Fecha de ingreso: {project.start_date}
+                </p>
+                <p className="flex items-center">
+                Fecha de cierre: {project.end_date || 'No especificada'}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Responsables</h3>
+                <p className="flex items-center">
+                {project.assignee.join(', ')}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Comentarios</h3>
+                <p className="flex items-center">
+                {project.comments}
+                </p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>

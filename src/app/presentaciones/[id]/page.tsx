@@ -85,70 +85,74 @@ export default function PresentationDetailsPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="space-y-6">
         <Card>
-          <CardHeader>
-            <CardTitle>Información general</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Building className="inline mr-2" /> Empresa: {presentation.company.razon_social}</p>
-            {presentation.other_executive ? (
-              <p><User className="inline mr-2" /> Solicitante: {presentation.other_fullname}</p>
-            ) : (
-              <p><User className="inline mr-2" /> Solicitante: {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
-            )}
-            {presentation.other_executive ? (
-              <p><Briefcase className="inline mr-2" /> Cargo: No disponible</p>
-            ) : (
-              <p><Briefcase className="inline mr-2" /> Cargo: {presentation.executive.position}</p>
-            )}
-            <p>Origen de solicitud: {presentation.order_source}</p>
-            <p><Calendar className="inline mr-2" /> Fecha de ingreso: {presentation.order_date}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Detalles de la presentación</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Calendar className="inline mr-2" /> Fecha y hora: {presentation.presentation_date_hour}</p>
-            <p>Tipo: {presentation.presentation_type}</p>
-            <p>Modalidad: {presentation.modalidad}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Responsables y expositores</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><Users className="inline mr-2" /> Responsable(s) de la elaboración: {presentation.elaboration_assignee.join(', ')}</p>
-            <p><Users className="inline mr-2" /> Expositor(es): {presentation.presentation_assignee.join(', ')}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Facturación</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p><DollarSign className="inline mr-2" /> Facturable: {presentation.billable ? 'Sí' : 'No'}</p>
-            {presentation.billable && (
-              <>
-                <p>Moneda: {presentation.billable_currency}</p>
-                <p>Monto: {presentation.billable_amount?.toFixed(2)}</p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Comentarios</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p><FileText className="inline mr-2" /> {presentation.comments}</p>
+          <CardContent className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Información general</h3>
+                <p className="flex items-center">
+                  Empresa: {presentation.company.razon_social}
+                </p>
+                {presentation.other_executive ? (
+                  <p>Solicitante: {presentation.other_fullname}</p>
+                ) : (
+                  <p>Solicitante: {`${presentation.executive.name} ${presentation.executive.last_name}`}</p>
+                )}
+                {presentation.other_executive ? (
+                  <p>Cargo: No disponible</p>
+                ) : (
+                  <p>Cargo: {presentation.executive.position}</p>
+                )}
+                <p className="flex items-center">
+                  Origen de solicitud: {presentation.order_source}
+                </p>
+                <p className="flex items-center">
+                  Fecha de ingreso: {presentation.order_date}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Detalles de la presentación</h3>
+                <p className="flex items-center">
+                  Fecha y hora: {presentation.presentation_date_hour}
+                </p>
+                <p className="flex items-center">
+                  Tipo: {presentation.presentation_type}
+                </p>
+                <p className="flex items-center">
+                  Modalidad: {presentation.modalidad}
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Responsables y expositores</h3>
+                <p className="flex items-center">
+                  Responsable(s) de la elaboración: {presentation.elaboration_assignee.join(', ')}
+                </p>
+                <p className="flex items-center">
+                  Expositor(es): {presentation.presentation_assignee.join(', ')}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Facturación</h3>
+                <p className="flex items-center">
+                  Facturable: {presentation.billable ? 'Sí' : 'No'}
+                </p>
+                {presentation.billable && (
+                  <>
+                    <p>Moneda: {presentation.billable_currency}</p>
+                    <p>Monto: {presentation.billable_amount?.toFixed(2)}</p>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Comentarios</h3>
+                <p className="flex items-center">
+                {presentation.comments}
+                </p>
+              </div>
           </CardContent>
         </Card>
       </div>

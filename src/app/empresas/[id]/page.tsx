@@ -149,63 +149,78 @@ export default function CompanyDetailsPage() {
           <TabsTrigger value="users">Usuarios, membresías y secretarias</TabsTrigger>
         </TabsList>
         <TabsContent value="details">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Información general</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="grid grid-cols-2 gap-2">
-                  <dt >RUC:</dt>
-                  <dd>{company.ruc}</dd>
-                  <dt >Razón social:</dt>
-                  <dd>{company.razon_social}</dd>
-                  <dt >Nombre comercial:</dt>
-                  <dd>{company.nombre_comercial}</dd>
-                  <dt >País:</dt>
-                  <dd>{company.country}</dd>
-                  <dt >Departamento:</dt>
-                  <dd>{company.department}</dd>
-                  <dt >Dirección:</dt>
-                  <dd>{company.address}</dd>
-                  <dt >Teléfono:</dt>
-                  <dd>{company.phone_number}</dd>
-                  <dt >Sector:</dt>
-                  <dd>{company.industry}</dd>
-                </dl>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Detalles de membresía</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="grid grid-cols-2 gap-2">
-                  <dt >Status:</dt>
-                  <dd>{company.status}</dd>
-                  <dt >Fecha de ingreso:</dt>
-                  <dd>{company.enrollment_date}</dd>
-                  <dt >Cantidad de titulares:</dt>
-                  <dd>{company.seats}</dd>
-                </dl>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Información adicional</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <dl className="grid grid-cols-2 gap-2">
-                  <dt >Número de trabajadores:</dt>
-                  <dd>{company.headcount}</dd>
-                  <dt >Ventas:</dt>
-                  <dd>{company.sales}</dd>
-                  <dt >Notas:</dt>
-                  <dd>{company.notes}</dd>
-                </dl>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardContent className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-2 ">
+                <h3 className="text-xl font-semibold">Información general</h3>
+                <p className="flex items-center">
+                  <span className="mr-2">RUC:</span>
+                  {company.ruc}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Razón social:</span>
+                  {company.razon_social}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Nombre comercial:</span>
+                  {company.nombre_comercial}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">País:</span>
+                  {company.country}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Departamento:</span>
+                  {company.department}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Dirección:</span>
+                  {company.address}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Teléfono:</span>
+                  {company.phone_number}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Sector:</span>
+                  {company.industry}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Detalles de membresía</h3>
+                <p className="flex items-center">
+                  <span className="mr-2">Status:</span>
+                  {company.status}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Fecha de ingreso:</span>
+                  {company.enrollment_date}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Cantidad de titulares:</span>
+                  {company.seats}
+                </p>
+              </div>
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-semibold">Información adicional</h3>
+                <p className="flex items-center">
+                  <span className="mr-2">Número de trabajadores:</span>
+                  {company.headcount}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Ventas:</span>
+                  {company.sales}
+                </p>
+                <p className="flex items-center">
+                  <span className="mr-2">Notas:</span>
+                  {company.notes}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="users">
           <div className="space-y-6">
