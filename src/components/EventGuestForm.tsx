@@ -346,7 +346,7 @@ export function EventGuestForm({ eventId, guestId, onComplete }: EventGuestFormP
           </div>
         </>
       )}
-      <Button type="submit">{guestId ? 'Actualizar' : 'Añadir'} Invitado</Button>
+      <Button type="submit">{guestId ? 'Actualizar' : 'Añadir'}</Button>
     </form>
   )
 }

@@ -25,6 +25,7 @@ type Company = {
   sales: number
 }
 
+
 export default function EmpresasPage() {
   const [companies, setCompanies] = useState<Company[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -47,6 +48,13 @@ export default function EmpresasPage() {
     } else {
       setCompanies(data || [])
     }
+  }
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
   }
 
   return (
@@ -103,7 +111,7 @@ export default function EmpresasPage() {
               <TableCell>{company.phone_number}</TableCell>
               <TableCell>{company.industry}</TableCell>
               <TableCell>{company.status}</TableCell>
-              <TableCell>{company.enrollment_date}</TableCell>
+              <TableCell>{convertDateFormat(company.enrollment_date)}</TableCell>
               <TableCell>{company.headcount}</TableCell>
               <TableCell>{company.sales}</TableCell>
               <TableCell>{company.notes}</TableCell>

@@ -51,7 +51,13 @@ export default function ProjectsPage() {
       setProjects(data || [])
     }
   }
-
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
+  }
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -86,8 +92,8 @@ export default function ProjectsPage() {
                 <TableCell>{project.executive.name} {project.executive.last_name}</TableCell>
               )}
               <TableCell>{project.assignee.join(', ')}</TableCell>
-              <TableCell>{project.start_date}</TableCell>
-              <TableCell>{project.end_date}</TableCell>
+              <TableCell>{convertDateFormat(project.start_date)}</TableCell>
+              <TableCell>{convertDateFormat(project.end_date)}</TableCell>
               <TableCell>{project.status}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">

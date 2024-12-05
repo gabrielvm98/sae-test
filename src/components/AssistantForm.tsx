@@ -228,7 +228,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
           />
         </div>
       </div>
-      <Button type="submit">{assistantId ? 'Actualizar' : 'Crear'} secretaria</Button>
+      <Button type="submit">{assistantId ? 'Actualizar' : 'Agregar Nueva Secretaria'}</Button>
     </form>
   )
 }

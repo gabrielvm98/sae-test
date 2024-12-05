@@ -289,7 +289,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
           rows={4}
         />
       </div>
-      <Button type="submit">{projectId ? 'Actualizar' : 'Crear'} proyecto</Button>
+      <Button type="submit">{projectId ? 'Actualizar' : 'Agregar Nuevo Proyecto'}</Button>
     </form>
   )
 }

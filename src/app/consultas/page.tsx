@@ -52,6 +52,14 @@ export default function ConsultasPage() {
       setQueries(data || [])
     }
   }
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    if(dateString === 'Pendiente') return 'Pendiente'
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
+  }
 
   return (
     <div className="container mx-auto py-10">
@@ -85,7 +93,7 @@ export default function ConsultasPage() {
               )}
               <TableCell>{query.assignee.join(', ')}</TableCell>
               <TableCell>{query.description.substring(0, 50)}...</TableCell>
-              <TableCell>{query.solved_date || 'Pendiente'}</TableCell>
+              <TableCell>{convertDateFormat(query.solved_date || 'Pendiente')}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" asChild>
