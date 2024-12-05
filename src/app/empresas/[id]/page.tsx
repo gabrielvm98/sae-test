@@ -126,7 +126,7 @@ export default function CompanyDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles de la empresa</h1>
+        <h1 className="text-xl font-bold">Detalles de la empresa</h1>
         <div className="space-x-2">
           <Button asChild>
             <Link href={`/empresas/${company.id}/edit`}>

@@ -9,7 +9,7 @@ export default function EditPresentationPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Editar presentación</h1>
+      <h1 className="text-xl font-bold mb-6">Editar presentación</h1>
       <PresentationForm presentationId={presentationId} />
     </div>
   )

@@ -81,7 +81,7 @@ export default function MembershipDetailsPage() {
     <div className="container mx-auto py-10">
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Detalles de la membresía</CardTitle>
+          <CardTitle className="text-xl font-bold">Detalles de la membresía</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">

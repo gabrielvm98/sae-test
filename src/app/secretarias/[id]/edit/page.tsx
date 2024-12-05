@@ -8,7 +8,7 @@ export default function EditAssistantPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Editar secretaria</h1>
+      <h1 className="text-xl font-bold mb-4">Editar secretaria</h1>
       <AssistantForm assistantId={parseInt(params.id as string)} />
     </div>
   )

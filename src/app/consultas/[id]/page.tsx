@@ -61,7 +61,7 @@ export default function QueryDetailsPage() {
     <div className="container mx-auto py-10">
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Detalles de la consulta</CardTitle>
+          <CardTitle className="text-xl font-bold">Detalles de la consulta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">

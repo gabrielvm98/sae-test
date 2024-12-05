@@ -68,7 +68,7 @@ export default function PresentationDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles de la presentación</h1>
+        <h1 className="text-xl font-bold">Detalles de la presentación</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/presentaciones">

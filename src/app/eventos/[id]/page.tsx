@@ -58,7 +58,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">{event.name}</h1>
+      <h1 className="text-xl font-bold mb-6">{event.name}</h1>
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div>
           <p><strong>Modalidad:</strong> {event.event_type}</p>

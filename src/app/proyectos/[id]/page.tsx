@@ -63,7 +63,7 @@ export default function ProjectDetailsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Detalles del proyecto</h1>
+        <h1 className="text-xl font-bold">Detalles del proyecto</h1>
         <div className="space-x-2">
           <Button variant="outline" asChild>
             <Link href="/proyectos">
