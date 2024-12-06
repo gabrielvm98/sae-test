@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [orphanedEmails, setOrphanedEmails] = useState<string[]>([]);
+  const [orphanedEmails, setOrphanedEmails] = useState<{email: string, username: string}[]>([]);
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -61,6 +61,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         // Validar cabeceras necesarias
         const attendedIndex = headers.indexOf('Asistió');
         const emailIndex = headers.indexOf('Correo electrónico');
+        const usernameIndex = headers.indexOf('Nombre de usuario (nombre original)');
         const timeIndex = headers.indexOf('Tiempo en la sesión (minutos)');
   
         if (attendedIndex === -1 || emailIndex === -1 || timeIndex === -1) {
@@ -99,16 +100,17 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           const attended = row[attendedIndex]?.toLowerCase().trim();
           const email = row[emailIndex]?.trim().toLowerCase();
           const time = parseInt(row[timeIndex], 10) || 0;
-          console.log('Fila procesada:', { attended, email, time });
+          const username = row[usernameIndex]?.trim() || '';
+          console.log('Fila procesada:', { attended, email, time, username });
   
           if (attended === 'sí' && email) {
             if (!acc[email]) {
-              acc[email] = { email, totalTime: 0 };
+              acc[email] = { email, totalTime: 0, username: username || '' };
             }
             acc[email].totalTime += time;
           }
           return acc;
-        }, {} as Record<string, { email: string; totalTime: number }>);
+        }, {} as Record<string, { email: string; totalTime: number; username: string }>);
   
         const result = Object.values(consolidated);
         console.log('Asistencia consolidada:', result);
@@ -126,10 +128,10 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   
   
 
-  async function updateEventGuests(attendanceData: { email: string; totalTime: number }[]) {
+  async function updateEventGuests(attendanceData: { email: string; totalTime: number; username: string }[]) {
     console.log('Actualizando asistentes en Supabase...', attendanceData);
     const batchSize = 50;
-    const orphanedEmails: string[] = [];
+    const orphanedEmails: {email: string, username: string}[] = [];
   
     for (let i = 0; i < attendanceData.length; i += batchSize) {
       const batch = attendanceData.slice(i, i + batchSize);
@@ -178,8 +180,17 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
       // Check for orphaned emails
       const updatedEmails = new Set(guests.map(guest => guest.email).filter(Boolean));
       console.log('Correos actualizados:', updatedEmails);
-      const batchOrphanedEmails = emails.filter(email => !updatedEmails.has(email));
-      orphanedEmails.push(...batchOrphanedEmails);
+      const batchOrphanedEmails = emails
+      .filter(email => !updatedEmails.has(email))
+      .map(email => {
+        const attendanceInfo = batch.find(item => item.email === email);
+        return {
+          email,
+          username: attendanceInfo?.username || 'Sin username', // Extrae el username o asigna un valor predeterminado
+        };
+      });
+    
+    orphanedEmails.push(...batchOrphanedEmails);
     }
   
     setOrphanedEmails(orphanedEmails);
@@ -200,7 +211,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
     try {
       console.log('Subiendo archivo:', file.name);
       const attendanceData = await processZoomAttendance(file);
-      await updateEventGuests(attendanceData as { email: string; totalTime: number }[]);
+      await updateEventGuests(attendanceData as { email: string; totalTime: number; username: string }[]);
       toast({
         title: "Éxito",
         description: "La asistencia de Zoom se ha actualizado correctamente.",
@@ -245,8 +256,10 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         <div className="mt-4 p-4 border rounded-md bg-yellow-50">
           <h3 className="text-lg font-semibold mb-2 text-yellow-800">Correos huérfanos encontrados:</h3>
           <ul className="list-disc pl-5 max-h-60 overflow-y-auto">
-            {orphanedEmails.map((email, index) => (
-              <li key={index} className="text-yellow-700">{email}</li>
+            {orphanedEmails.map(({ email, username }, index) => (
+              <li key={index} className="text-yellow-700">
+                {email} {username && <span className="text-gray-500">({username})</span>}
+              </li>
             ))}
           </ul>
           <p className="mt-2 text-sm text-yellow-600">Total: {orphanedEmails.length} correos huérfanos</p>

@@ -94,7 +94,7 @@ export function EditGuestForm({guestId, onComplete }: EditGuestFormProps) {
           required
         />
       </div>
-      <Button type="submit">Actualizar Invitado</Button>
+      <Button type="submit">Actualizar</Button>
     </form>
   )
 }

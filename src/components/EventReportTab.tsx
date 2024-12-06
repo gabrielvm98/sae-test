@@ -1,11 +1,16 @@
-import { useState, useEffect } from 'react'
+'use client'
+
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { ConnectionTimeDistributionChart } from './ConnectionTimeDistributionChart'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-type SupabaseAttendee = {
+type SupabaseGuest = {
   id: string
   name: string
   company_razon_social: string | null
@@ -13,6 +18,7 @@ type SupabaseAttendee = {
   is_user: boolean
   registered: boolean
   assisted: boolean
+  is_client_company: boolean
   executive?: {
     name: string
     last_name: string
@@ -20,10 +26,9 @@ type SupabaseAttendee = {
   company?: {
     razon_social: string
   } | null
-  is_client_company?: boolean
 }
 
-type ReportAttendee = {
+type ReportGuest = {
   id: string
   name: string
   company: string
@@ -37,13 +42,18 @@ type EventData = {
   totalRegistrados: number
   totalAsistentes: number
   tiempoConexionPromedio: string
-  asistentes: ReportAttendee[]
+  invitados: ReportGuest[]
 }
 
 export function EventReportTab({ eventId }: { eventId: number }) {
   const [eventData, setEventData] = useState<EventData | null>(null)
   const [loading, setLoading] = useState(true)
   const [companySeleccionada, setEmpresaSeleccionada] = useState("Todas")
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [registeredFilter, setRegisteredFilter] = useState("Todos")
+  const [attendedFilter, setAttendedFilter] = useState("Todos")
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchEventData()
@@ -72,35 +82,39 @@ export function EventReportTab({ eventId }: { eventId: number }) {
       return
     }
 
-    const attendees = guests.filter(guest => guest.assisted)
+    const sortedGuests = guests.sort((a, b) => {
+      // @ts-expect-error - TS doesn't know that sortedGuests is an array of SupabaseGuest
+      const companyNameA = a.is_client_company ? a.company?.razon_social : a.company_razon_social;
+      // @ts-expect-error - TS doesn't know that sortedGuests is an array of SupabaseGuest
+      const companyNameB = b.is_client_company ? b.company?.razon_social : b.company_razon_social;
+      return (companyNameA || '').localeCompare(companyNameB || '');
+    });
 
-    // Transformación a ReportAttendee
-    // @ts-expect-error no se
-    const formattedAttendees: ReportAttendee[] = attendees.map((attendee: SupabaseAttendee) => ({
-      id: attendee.id,
-      name: attendee.is_user && attendee.executive? `${attendee.executive.name} ${attendee.executive.last_name}`.trim(): attendee.name || '',
-      company: attendee.is_client_company && attendee.company ? attendee.company.razon_social : attendee.company_razon_social || '',
-      registered: attendee.registered,
-      assisted: attendee.assisted,
-      virtual_session_time: attendee.virtual_session_time || 0
+    // @ts-expect-error - TS doesn't know that sortedGuests is an array of SupabaseGuest
+    const formattedGuests: ReportGuest[] = sortedGuests.map((guest: SupabaseGuest) => ({
+      id: guest.id,
+      name: guest.is_user && guest.executive? `${guest.executive.name} ${guest.executive.last_name}`.trim(): guest.name || '',
+      company: guest.is_client_company && guest.company ? guest.company.razon_social : guest.company_razon_social || '',
+      registered: guest.registered,
+      assisted: guest.assisted,
+      virtual_session_time: guest.virtual_session_time || 0
     }))
 
-    const totalInvitados = guests.length
-    const totalRegistrados = guests.filter(guest => guest.registered).length
-    const totalAsistentes = attendees.length
-    const tiempoConexionTotal = formattedAttendees.reduce((sum, attendee) => sum + attendee.virtual_session_time, 0)
-    const tiempoConexionPromedio = formatTime(
-      totalAsistentes > 0 ? Math.round(tiempoConexionTotal / totalAsistentes) : 0
-    )
-
     setEventData({
-      totalInvitados,
-      totalRegistrados,
-      totalAsistentes,
-      tiempoConexionPromedio,
-      asistentes: formattedAttendees
+      totalInvitados: formattedGuests.length,
+      totalRegistrados: formattedGuests.filter(guest => guest.registered).length,
+      totalAsistentes: formattedGuests.filter(guest => guest.assisted).length,
+      tiempoConexionPromedio: calcularTiempoConexionPromedio(formattedGuests),
+      invitados: formattedGuests
     })
     setLoading(false)
+  }
+
+  function calcularTiempoConexionPromedio(guests: ReportGuest[]): string {
+    const asistentes = guests.filter(guest => guest.assisted)
+    const totalTiempo = asistentes.reduce((sum, guest) => sum + guest.virtual_session_time, 0)
+    const promedio = asistentes.length > 0 ? Math.round(totalTiempo / asistentes.length) : 0
+    return formatTime(promedio)
   }
 
   function formatTime(minutes: number): string {
@@ -109,49 +123,57 @@ export function EventReportTab({ eventId }: { eventId: number }) {
     return `${hours}h ${mins}m`
   }
 
-  const companies = ["Todas", ...new Set(eventData?.asistentes.map(a => a.company).filter(Boolean))]
-
-  const filtrarPorEmpresa = (data: EventData) => {
+  const filtrarPorEmpresa = (data: EventData | null) => {
+    if (!data) return null
     if (companySeleccionada === "Todas") return data
 
-    const asistentesFiltrados = data.asistentes.filter(a => a.company === companySeleccionada)
-    const totalAsistentes = asistentesFiltrados.length
-    const tiempoConexionTotal = asistentesFiltrados.reduce((sum, attendee) => sum + attendee.virtual_session_time, 0)
-    const tiempoConexionPromedio = formatTime(
-      totalAsistentes > 0 ? Math.round(tiempoConexionTotal / totalAsistentes) : 0
-    )
-
+    const invitadosFiltrados = data.invitados.filter(a => a.company === companySeleccionada)
     return {
-      ...data,
-      totalInvitados: Math.round(data.totalInvitados * (asistentesFiltrados.length / data.asistentes.length)),
-      totalRegistrados: Math.round(data.totalRegistrados * (asistentesFiltrados.length / data.asistentes.length)),
-      totalAsistentes,
-      tiempoConexionPromedio,
-      asistentes: asistentesFiltrados,
+      totalInvitados: invitadosFiltrados.length,
+      totalRegistrados: invitadosFiltrados.filter(a => a.registered).length,
+      totalAsistentes: invitadosFiltrados.filter(a => a.assisted).length,
+      tiempoConexionPromedio: calcularTiempoConexionPromedio(invitadosFiltrados),
+      invitados: invitadosFiltrados,
     }
   }
 
-  const datosFiltrados = eventData ? filtrarPorEmpresa(eventData) : null
+  const filtrarTabla = (invitados: ReportGuest[]) => {
+    return invitados.filter(invitado => {
+      const cumpleRegistro = registeredFilter === "Todos" || 
+        (registeredFilter === "Sí" && invitado.registered) || 
+        (registeredFilter === "No" && !invitado.registered)
+      const cumpleAsistencia = attendedFilter === "Todos" || 
+        (attendedFilter === "Sí" && invitado.assisted) || 
+        (attendedFilter === "No" && !invitado.assisted)
+      const cumpleBusqueda = searchQuery === '' || 
+        invitado.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        invitado.company.toLowerCase().includes(searchQuery.toLowerCase())
+      return cumpleRegistro && cumpleAsistencia && cumpleBusqueda
+    })
+  }
+
+  const datosFiltradosA = useMemo(() => filtrarPorEmpresa(eventData), [eventData, companySeleccionada])
+  const datosFiltradosB = useMemo(() => datosFiltradosA ? filtrarTabla(datosFiltradosA.invitados) : [], [datosFiltradosA, registeredFilter, attendedFilter, searchQuery])
+
+  const paginatedGuests = datosFiltradosB.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+  const totalPages = Math.ceil(datosFiltradosB.length / itemsPerPage)
+
+  const companies = eventData ? ["Todas", ...new Set(eventData.invitados.map(a => a.company).filter(Boolean))] : []
 
   if (loading) {
     return <div>Cargando datos del evento...</div>
   }
 
-  if (!eventData) {
+  if (!eventData || !datosFiltradosA) {
     return <div>No se pudieron cargar los datos del evento.</div>
   }
 
-  const porcentajeRegistrados = datosFiltrados
-    ? (datosFiltrados.totalRegistrados / datosFiltrados.totalInvitados * 100).toFixed(2)
-    : '0.00'
-
-  const porcentajeAsistencia = datosFiltrados
-    ? (datosFiltrados.totalAsistentes / datosFiltrados.totalRegistrados * 100).toFixed(2)
-    : '0.00'
+  const porcentajeRegistrados = (datosFiltradosA.totalRegistrados / datosFiltradosA.totalInvitados * 100).toFixed(2)
+  const porcentajeAsistencia = (datosFiltradosA.totalAsistentes / datosFiltradosA.totalRegistrados * 100).toFixed(2)
 
   return (
     <div className="space-y-6">
-      {/* Filtro de empresas */}
+      {/* Filtro de empresa */}
       <div className="flex justify-between items-center">
         <Select onValueChange={setEmpresaSeleccionada} defaultValue="Todas">
           <SelectTrigger className="w-[180px]">
@@ -174,7 +196,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
             <CardTitle>Total Invitados</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{datosFiltrados?.totalInvitados}</div>
+            <div className="text-2xl font-bold">{datosFiltradosA.totalInvitados}</div>
           </CardContent>
         </Card>
         <Card>
@@ -182,7 +204,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
             <CardTitle>Total Registrados</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{datosFiltrados?.totalRegistrados}</div>
+            <div className="text-2xl font-bold">{datosFiltradosA.totalRegistrados}</div>
             <div className="text-sm text-gray-500">({porcentajeRegistrados}%)</div>
           </CardContent>
         </Card>
@@ -191,7 +213,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
             <CardTitle>Total Asistentes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{datosFiltrados?.totalAsistentes}</div>
+            <div className="text-2xl font-bold">{datosFiltradosA.totalAsistentes}</div>
             <div className="text-sm text-gray-500">({porcentajeAsistencia}%)</div>
           </CardContent>
         </Card>
@@ -200,40 +222,95 @@ export function EventReportTab({ eventId }: { eventId: number }) {
             <CardTitle>Tiempo de Conexión Promedio</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{datosFiltrados?.tiempoConexionPromedio}</div>
+            <div className="text-2xl font-bold">{datosFiltradosA.tiempoConexionPromedio}</div>
           </CardContent>
         </Card>
       </div>
-      <ConnectionTimeDistributionChart asistentes={datosFiltrados?.asistentes || []} />
+      <ConnectionTimeDistributionChart asistentes={datosFiltradosA.invitados.filter(i => i.assisted)} />
 
-      {/* Lista de asistentes */}
+      {/* Lista de invitados */}
       <Card>
         <CardHeader>
-          <CardTitle>Lista de Asistentes</CardTitle>
+          <CardTitle>Lista de Invitados</CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Buscador y filtros */}
+          <div className="flex justify-between items-center space-x-4 mb-4">
+            <Input
+              type="text"
+              placeholder="Buscar invitados..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="max-w-xs"
+            />
+            <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Registrado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Todos">Todos</SelectItem>
+                <SelectItem value="Sí">Sí</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select onValueChange={setAttendedFilter} defaultValue="Todos">
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Asistió" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Todos">Todos</SelectItem>
+                <SelectItem value="Sí">Sí</SelectItem>
+                <SelectItem value="No">No</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Empresa</TableHead>
                 <TableHead>Registrado</TableHead>
-                <TableHead>Asistido</TableHead>
+                <TableHead>Asistió</TableHead>
                 <TableHead>Tiempo de Conexión</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {datosFiltrados?.asistentes.map((asistente, index) => (
+              {paginatedGuests.map((invitado, index) => (
                 <TableRow key={index}>
-                  <TableCell>{asistente.name}</TableCell>
-                  <TableCell>{asistente.company}</TableCell>
-                  <TableCell>{asistente.registered ? 'Sí' : 'No'}</TableCell>
-                  <TableCell>{asistente.assisted ? 'Sí' : 'No'}</TableCell>
-                  <TableCell>{formatTime(asistente.virtual_session_time)}</TableCell>
+                  <TableCell>{invitado.name}</TableCell>
+                  <TableCell>{invitado.company}</TableCell>
+                  <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
+                  <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
+                  <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          {/* Paginación */}
+          <div className="flex items-center justify-between space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Anterior
+            </Button>
+            <span>
+              Página {currentPage} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -241,3 +318,4 @@ export function EventReportTab({ eventId }: { eventId: number }) {
 }
 
 export default EventReportTab
+
