@@ -389,7 +389,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
           rows={4}
         />
       </div>
-      <Button type="submit">{presentationId ? 'Actualizar' : 'Crear'} presentación</Button>
+      <Button type="submit">{presentationId ? 'Actualizar' : 'Agregar Nueva Presentación'}</Button>
     </form>
   )
 }

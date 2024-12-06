@@ -89,6 +89,14 @@ export default function UsuariosPage() {
     return meetings.join(', ')
   }
 
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return ''
+    // Split the date string
+    const [year, month, day] = dateString.split('-')
+    // Rearrange into DD-MM-YYYY format
+    return `${day}-${month}-${year}`
+  }
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -154,7 +162,7 @@ export default function UsuariosPage() {
               <TableCell>{executive.active ? 'Activo' : 'No activo'}</TableCell>
               <TableCell>{formatPhoneNumber(executive.office_phone_cc, executive.office_phone, executive.office_phone_extension)}</TableCell>
               <TableCell>{formatPhoneNumber(executive.mobile_phone_cc, executive.mobile_phone)}</TableCell>
-              <TableCell>{executive.start_date}</TableCell>
+              <TableCell>{convertDateFormat(executive.start_date)}</TableCell>
               <TableCell>{executive.end_date || 'N/A'}</TableCell>
               <TableCell>{formatSaeMeetings(executive.sae_meetings)}</TableCell>
               <TableCell>
