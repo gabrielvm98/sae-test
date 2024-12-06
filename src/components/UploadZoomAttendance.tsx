@@ -27,7 +27,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
       setFile(e.target.files[0]);
     }
   };
-
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function processZoomAttendance(csvFile: File): Promise<any> {
     console.log("Procesando archivo CSV...");
   

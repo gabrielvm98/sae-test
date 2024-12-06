@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, Building, User, Calendar, FileText, Users, Briefcase, IdCard } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 
 type Project = {
   id: number
