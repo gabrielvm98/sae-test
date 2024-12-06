@@ -243,26 +243,34 @@ export function EventReportTab({ eventId }: { eventId: number }) {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="max-w-xs"
             />
-            <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Registrado" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="Sí">Sí</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select onValueChange={setAttendedFilter} defaultValue="Todos">
-              <SelectTrigger className="w-[120px]">
-                <SelectValue placeholder="Asistió" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Todos">Todos</SelectItem>
-                <SelectItem value="Sí">Sí</SelectItem>
-                <SelectItem value="No">No</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-4">
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="registered-filter" className="text-sm font-medium">Se registró</label>
+                <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
+                  <SelectTrigger id="registered-filter" className="w-[120px]">
+                    <SelectValue placeholder="Total" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todos">Total</SelectItem>
+                    <SelectItem value="Sí">Sí</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <label htmlFor="attended-filter" className="text-sm font-medium">Asistió</label>
+                <Select onValueChange={setAttendedFilter} defaultValue="Todos">
+                  <SelectTrigger id="attended-filter" className="w-[120px]">
+                    <SelectValue placeholder="Total" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todos">Total</SelectItem>
+                    <SelectItem value="Sí">Sí</SelectItem>
+                    <SelectItem value="No">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
           <Table>
