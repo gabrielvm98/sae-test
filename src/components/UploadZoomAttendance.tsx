@@ -11,17 +11,16 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   const [isUploading, setIsUploading] = useState(false);
   const [orphanedEmails, setOrphanedEmails] = useState<{email: string, username: string}[]>([]);
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      setFile(e.dataTransfer.files[0])
     }
-  };
+  }
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+  }
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
@@ -263,10 +262,11 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
 
   return (
     <div className="space-y-4">
-      <div
+      <label
+        htmlFor="zoom-csv-upload"
+        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer block"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
       >
         <p>Arrastra y suelta un archivo CSV de asistencia de Zoom aquí, o haz clic para seleccionar un archivo</p>
         <input
@@ -276,10 +276,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           className="hidden"
           id="zoom-csv-upload"
         />
-        <label htmlFor="zoom-csv-upload" className="mt-2 inline-block">
-          <Button variant="outline" type="button">Seleccionar archivo</Button>
-        </label>
-      </div>
+      </label>
       {file && <p>Archivo seleccionado: {file.name}</p>}
       <Button onClick={handleUpload} disabled={!file || isUploading}>
         {isUploading ? 'Subiendo...' : 'Subir asistencia de Zoom'}

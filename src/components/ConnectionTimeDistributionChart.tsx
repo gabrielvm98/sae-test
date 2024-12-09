@@ -1,8 +1,7 @@
 'use client'
 
-import { Bar, BarChart, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import { Bar, BarChart, XAxis, ResponsiveContainer, LabelList  } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 type ReportAttendee = {
   id: string
@@ -36,34 +35,27 @@ export function ConnectionTimeDistributionChart({ asistentes }: Props) {
   chartData.sort((a, b) => parseInt(a.interval) - parseInt(b.interval))
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Distribución de Tiempo de Conexión</CardTitle>
+    <Card className="w-full">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base sm:text-lg">Distribución de Tiempo de Conexión</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            count: {
-              label: "Número de Asistentes",
-              color: "#006F96",
-            },
-          }}
-          className="h-[300px]"
-        >
+        <div className="h-[200px] sm:h-[250px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
               <XAxis 
                 dataKey="interval" 
-                label={{ value: 'Intervalo de Tiempo', position: 'insideBottom', offset: -5 }}
+                tick={{ fontSize: 10 }}
+                interval={0}
+                angle={-45}
+                textAnchor="end"
               />
-              <YAxis 
-                label={{ value: 'Número de Asistentes', angle: -90, position: 'insideLeft' }}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="count" fill="var(--color-count)" />
+              <Bar dataKey="count" fill="#006F96">
+                <LabelList dataKey="count" position="top" fontSize={10} />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   )

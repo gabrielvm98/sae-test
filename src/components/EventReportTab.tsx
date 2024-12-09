@@ -19,9 +19,11 @@ type SupabaseGuest = {
   registered: boolean
   assisted: boolean
   is_client_company: boolean
+  position: string | null
   executive?: {
     name: string
     last_name: string
+    position: string
   } | null
   company?: {
     razon_social: string
@@ -32,6 +34,7 @@ type ReportGuest = {
   id: string
   name: string
   company: string
+  position: string
   registered: boolean
   assisted: boolean
   virtual_session_time: number
@@ -70,8 +73,9 @@ export function EventReportTab({ eventId }: { eventId: number }) {
         is_user,
         registered,
         assisted,
+        position,
         is_client_company,
-        executive:executive_id (name, last_name),
+        executive:executive_id (name, last_name, position),
         company:company_id (razon_social)
       `)
       .eq('event_id', eventId)
@@ -94,6 +98,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
     const formattedGuests: ReportGuest[] = sortedGuests.map((guest: SupabaseGuest) => ({
       id: guest.id,
       name: guest.is_user && guest.executive? `${guest.executive.name} ${guest.executive.last_name}`.trim(): guest.name || '',
+      position: guest.is_user ? guest.executive?.position || '' : guest.position || '',
       company: guest.is_client_company && guest.company ? guest.company.razon_social : guest.company_razon_social || '',
       registered: guest.registered,
       assisted: guest.assisted,
@@ -176,7 +181,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
       {/* Filtro de empresa */}
       <div className="flex justify-between items-center">
         <Select onValueChange={setEmpresaSeleccionada} defaultValue="Todas">
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Selecciona una empresa" />
           </SelectTrigger>
           <SelectContent>
@@ -190,43 +195,46 @@ export function EventReportTab({ eventId }: { eventId: number }) {
       </div>
 
       {/* Métricas principales */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Invitados</CardTitle>
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="col-span-1">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm sm:text-base">Total Invitados</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{datosFiltradosA.totalInvitados}</div>
+          <CardContent className="p-4 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">{datosFiltradosA.totalInvitados}</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Registrados</CardTitle>
+        <Card className="col-span-1">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm sm:text-base">Total Registrados</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{datosFiltradosA.totalRegistrados}</div>
-            <div className="text-sm text-gray-500">({porcentajeRegistrados}%)</div>
+          <CardContent className="p-4 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">{datosFiltradosA.totalRegistrados}</div>
+            <div className="text-xs sm:text-sm text-gray-500">({porcentajeRegistrados}%)</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Asistentes</CardTitle>
+        <Card className="col-span-1">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm sm:text-base">Total Asistentes</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{datosFiltradosA.totalAsistentes}</div>
-            <div className="text-sm text-gray-500">({porcentajeAsistencia}%)</div>
+          <CardContent className="p-4 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">{datosFiltradosA.totalAsistentes}</div>
+            <div className="text-xs sm:text-sm text-gray-500">({porcentajeAsistencia}%)</div>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Tiempo de Conexión Promedio</CardTitle>
+        <Card className="col-span-1">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm sm:text-base">Tiempo Promedio</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{datosFiltradosA.tiempoConexionPromedio}</div>
+          <CardContent className="p-4 pt-0">
+            <div className="text-xl sm:text-2xl font-bold">{datosFiltradosA.tiempoConexionPromedio}</div>
           </CardContent>
         </Card>
       </div>
-      <ConnectionTimeDistributionChart asistentes={datosFiltradosA.invitados.filter(i => i.assisted)} />
+      
+      <div>
+        <ConnectionTimeDistributionChart asistentes={datosFiltradosA.invitados.filter(i => i.assisted)} />
+      </div>
 
       {/* Lista de invitados */}
       <Card>
@@ -235,19 +243,19 @@ export function EventReportTab({ eventId }: { eventId: number }) {
         </CardHeader>
         <CardContent>
           {/* Buscador y filtros */}
-          <div className="flex justify-between items-center space-x-4 mb-4">
+          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 sm:space-x-4 mb-4">
             <Input
               type="text"
               placeholder="Buscar invitados..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="max-w-xs"
+              className="w-full sm:max-w-xs"
             />
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
               <div className="flex flex-col space-y-2">
                 <label htmlFor="registered-filter" className="text-sm font-medium">Se registró</label>
                 <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
-                  <SelectTrigger id="registered-filter" className="w-[120px]">
+                  <SelectTrigger id="registered-filter" className="w-full sm:w-[120px]">
                     <SelectValue placeholder="Total" />
                   </SelectTrigger>
                   <SelectContent>
@@ -260,7 +268,7 @@ export function EventReportTab({ eventId }: { eventId: number }) {
               <div className="flex flex-col space-y-2">
                 <label htmlFor="attended-filter" className="text-sm font-medium">Asistió</label>
                 <Select onValueChange={setAttendedFilter} defaultValue="Todos">
-                  <SelectTrigger id="attended-filter" className="w-[120px]">
+                  <SelectTrigger id="attended-filter" className="w-full sm:w-[120px]">
                     <SelectValue placeholder="Total" />
                   </SelectTrigger>
                   <SelectContent>
@@ -273,51 +281,55 @@ export function EventReportTab({ eventId }: { eventId: number }) {
             </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Empresa</TableHead>
-                <TableHead>Registrado</TableHead>
-                <TableHead>Asistió</TableHead>
-                <TableHead>Tiempo de Conexión</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedGuests.map((invitado, index) => (
-                <TableRow key={index}>
-                  <TableCell>{invitado.name}</TableCell>
-                  <TableCell>{invitado.company}</TableCell>
-                  <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
-                  <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
-                  <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[150px] min-w-[150px]">Nombre</TableHead>
+                  <TableHead className="w-[150px] min-w-[150px]">Empresa</TableHead>
+                  <TableHead className="w-[100px] min-w-[100px]">Registrado</TableHead>
+                  <TableHead className="w-[100px] min-w-[100px]">Asistió</TableHead>
+                  <TableHead className="w-[150px] min-w-[150px]">Tiempo de Conexión</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {paginatedGuests.map((invitado, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{invitado.name}</TableCell>
+                    <TableCell>{invitado.company}</TableCell>
+                    <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
+                    <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
+                    <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
           {/* Paginación */}
-          <div className="flex items-center justify-between space-x-2 py-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Anterior
-            </Button>
-            <span>
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-2 py-4">
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span className="sr-only sm:not-sr-only sm:ml-2">Anterior</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                <span className="sr-only sm:not-sr-only sm:mr-2">Siguiente</span>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <span className="text-sm text-muted-foreground">
               Página {currentPage} de {totalPages}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-            >
-              Siguiente
-              <ChevronRight className="h-4 w-4" />
-            </Button>
           </div>
         </CardContent>
       </Card>
