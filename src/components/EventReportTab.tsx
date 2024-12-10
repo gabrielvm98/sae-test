@@ -48,10 +48,10 @@ type EventData = {
   invitados: ReportGuest[]
 }
 
-export function EventReportTab({ eventId }: { eventId: number }) {
+export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyFilter = true }: { eventId: number, defaultCompany?: string, showCompanyFilter?: boolean }) {
   const [eventData, setEventData] = useState<EventData | null>(null)
   const [loading, setLoading] = useState(true)
-  const [companySeleccionada, setEmpresaSeleccionada] = useState("Todas")
+  const [companySeleccionada, setEmpresaSeleccionada] = useState(defaultCompany)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState('')
   const [registeredFilter, setRegisteredFilter] = useState("Todos")
@@ -61,6 +61,10 @@ export function EventReportTab({ eventId }: { eventId: number }) {
   useEffect(() => {
     fetchEventData()
   }, [eventId])
+
+  useEffect(() => {
+    setEmpresaSeleccionada(defaultCompany);
+  }, [defaultCompany]);
 
   async function fetchEventData() {
     const { data: guests, error } = await supabase
@@ -179,20 +183,22 @@ export function EventReportTab({ eventId }: { eventId: number }) {
   return (
     <div className="space-y-6">
       {/* Filtro de empresa */}
-      <div className="flex justify-between items-center">
-        <Select onValueChange={setEmpresaSeleccionada} defaultValue="Todas">
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company, index) => (
-              <SelectItem key={index} value={company}>
-                {company}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      { showCompanyFilter && 
+          <div className="flex justify-between items-center">
+          <Select onValueChange={setEmpresaSeleccionada} defaultValue="Todas">
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Selecciona una empresa" />
+            </SelectTrigger>
+            <SelectContent>
+              {companies.map((company, index) => (
+                <SelectItem key={index} value={company}>
+                  {company}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      }
 
       {/* Métricas principales */}
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">

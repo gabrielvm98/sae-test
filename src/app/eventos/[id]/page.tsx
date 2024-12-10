@@ -69,7 +69,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           <p><strong>Fecha y hora:</strong> {formatDateHour(event.date_hour)}</p>
         </div>
         <div>
-          <p><strong>Lugar:</strong> {event.place}</p>
+          <p><strong>Lugar:</strong> {event.place}</p><p>
+          <strong>Link a reporte: </strong> 
+             https://sae-crm.vercel.app/eventos/{event.id}?tab=reporte
+        </p>
         </div>
       </div>
       
