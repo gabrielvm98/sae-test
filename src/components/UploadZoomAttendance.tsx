@@ -118,7 +118,6 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           const consolidated = rows.reduce((acc, row, rowIndex) => {
             if (row.length !== headers.length) {
               console.warn(`Fila ${rowIndex + 1} tiene un número incorrecto de columnas:`, row);
-              return acc;
             }
   
             const attended = row[attendedIndex]?.toLowerCase().trim();
