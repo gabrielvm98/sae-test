@@ -67,6 +67,13 @@ export default function EventosPage() {
             className="w-full p-2 border rounded"
           />
         </div>
+        <div className="mt-4">
+        <Button asChild>
+            <Link href="/eventos/reportes">
+              <Eye className="mr-2 h-4 w-4" /> Ver reportes
+            </Link>
+          </Button>
+          </div>
       </div>
       <Table>
         <TableHeader>
