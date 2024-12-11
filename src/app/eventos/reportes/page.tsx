@@ -7,7 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from '@/lib/supabase'
 import { GuestsTable } from '@/components/ConsolidatedGuestTable'
 import { CompanySelect } from '@/components/ReportCompanySelect'
-
+interface Guest {
+  name: string;
+  company: string;
+  email: string;
+  registered: boolean;
+  assisted: boolean;
+  virtual_session_time: number;
+}
 type ConsolidatedData = {
   totalInvitados: number
   totalRegistrados: number
@@ -84,15 +91,44 @@ export default function CompareEventsPage() {
 
     const query = supabase
       .from('event_guest')
-      .select('registered, assisted, company_razon_social, company:company_id(razon_social), executive:executive_id(name), name, virtual_session_time')
+      .select('email, registered, assisted, company_razon_social, company:company_id(razon_social), executive:executive_id(name), name, virtual_session_time')
       .or(`event_id.eq.${event1Id},event_id.eq.${event2Id}`)
 
-    const { data: guests, error } = await query
+      const { data: rawGuests, error } = await query;
 
-    if (error) {
-      console.error('Error fetching consolidated data:', error)
-      return
-    }
+      console.log('Raw guests:', rawGuests);
+
+      if (error) {
+        console.error('Error fetching guests:', error);
+      }
+        // Transformar los datos
+
+        // @ts-expect-error supabase types are not updated
+        const guests: Guest[] = rawGuests.reduce((acc: Guest[], guest) => {
+          const existingGuest = acc.find(g => g.email === guest.email);
+        
+          if (existingGuest) {
+            // Actualizar el registro existente
+            existingGuest.registered = existingGuest.registered || guest.registered; // OR lógico para 'registered'
+            existingGuest.assisted = existingGuest.assisted || guest.assisted; // OR lógico para 'assisted'
+            existingGuest.virtual_session_time += guest.virtual_session_time || 0; // Suma considerando nulos
+          } else {
+            // Agregar nuevo registro único
+            acc.push({
+              name: guest.name,
+              company: guest.company_razon_social,
+              email: guest.email,
+              registered: guest.registered || false,
+              assisted: guest.assisted || false,
+              virtual_session_time: guest.virtual_session_time || 0,
+            });
+          }
+        
+          return acc;
+        }, []);
+      
+        console.log('Processed guests:', guests);
+
 
     const consolidated = guests.reduce((acc, guest) => {
         
@@ -111,6 +147,8 @@ export default function CompareEventsPage() {
       const guestCompany = guest.company?.razon_social || guest.company_razon_social;
       return selectedCompany === "Todas" || guestCompany === selectedCompany;
     });
+
+    console.log(filteredGuests)
 
     setConsolidatedData(consolidated)
     setConsolidatedGuests(filteredGuests)
