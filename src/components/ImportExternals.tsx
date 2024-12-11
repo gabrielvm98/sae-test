@@ -30,7 +30,7 @@ export function ImportExternals({ eventId }: { eventId: number }) {
   // Función para descargar la plantilla
   const downloadTemplate = () => {
     const headers = [
-      ['Empresa', 'Nombre y apellido', 'Correo', 'Cargo', 'Se registró (si/no)'],
+      ['Empresa', 'Nombre', 'Apellido', 'Correo', 'Cargo', 'Se registró (si/no)'],
     ]
 
     const workbook = XLSX.utils.book_new()
@@ -59,7 +59,8 @@ export function ImportExternals({ eventId }: { eventId: number }) {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]]
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as Array<{
         Empresa: string
-        'Nombre y apellido': string
+        Nombre: string
+        Apellido: string
         Correo: string
         Cargo: string
         'Se registró (si/no)': string
@@ -68,7 +69,7 @@ export function ImportExternals({ eventId }: { eventId: number }) {
       const eventGuests = jsonData.map((row) => ({
         event_id: eventId,
         company_razon_social: row.Empresa,
-        name: row['Nombre y apellido'],
+        name: row.Nombre.trim() + ' ' + row.Apellido.trim(),
         email: row.Correo.toLowerCase().trim(),
         position: row.Cargo,
         registered: row['Se registró (si/no)'].toLowerCase() === 'si' || row['Se registró (si/no)'].toLowerCase() === 'sí',
