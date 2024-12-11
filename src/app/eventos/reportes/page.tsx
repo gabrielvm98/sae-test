@@ -5,6 +5,8 @@ import { EventReportTab } from '@/components/EventReportTab'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { supabase } from '@/lib/supabase'
+import { GuestsTable } from '@/components/ConsolidatedGuestTable'
+import { CompanySelect } from '@/components/ReportCompanySelect'
 
 type ConsolidatedData = {
   totalInvitados: number
@@ -19,6 +21,8 @@ export default function CompareEventsPage() {
   const [companies, setCompanies] = useState<string[]>([])
   const [selectedCompany, setSelectedCompany] = useState<string>("Todas")
   const [consolidatedData, setConsolidatedData] = useState<ConsolidatedData | null>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [consolidatedGuests, setConsolidatedGuests] = useState<any[]>([])
 
   useEffect(() => {
     fetchEvents()
@@ -80,7 +84,7 @@ export default function CompareEventsPage() {
 
     const query = supabase
       .from('event_guest')
-      .select('registered, assisted, company_razon_social, company:company_id(razon_social)')
+      .select('registered, assisted, company_razon_social, company:company_id(razon_social), executive:executive_id(name), name, virtual_session_time')
       .or(`event_id.eq.${event1Id},event_id.eq.${event2Id}`)
 
     const { data: guests, error } = await query
@@ -102,7 +106,14 @@ export default function CompareEventsPage() {
       return acc
     }, { totalInvitados: 0, totalRegistrados: 0, totalAsistentes: 0 })
 
+    const filteredGuests = guests.filter((guest) => {
+      //@ts-expect-error supabase types are not updated
+      const guestCompany = guest.company?.razon_social || guest.company_razon_social;
+      return selectedCompany === "Todas" || guestCompany === selectedCompany;
+    });
+
     setConsolidatedData(consolidated)
+    setConsolidatedGuests(filteredGuests)
   }
 
   return (
@@ -152,18 +163,11 @@ export default function CompareEventsPage() {
             <CardTitle>Filtrar por Empresa</CardTitle>
           </CardHeader>
           <CardContent>
-            <Select onValueChange={setSelectedCompany} value={selectedCompany}>
-              <SelectTrigger>
-                <SelectValue placeholder="Selecciona una empresa" />
-              </SelectTrigger>
-              <SelectContent>
-                {companies.map((company, index) => (
-                  <SelectItem key={index} value={company}>
-                    {company}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <CompanySelect
+            companies={companies}
+            onValueChange={setSelectedCompany}
+            defaultValue="Todas"
+          />
           </CardContent>
         </Card>
       </div>
@@ -210,16 +214,19 @@ export default function CompareEventsPage() {
         {event1Id && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Reporte del Evento 1</h2>
-            <EventReportTab eventId={event1Id} defaultCompany={selectedCompany} showCompanyFilter={false} />
+            <EventReportTab eventId={event1Id} defaultCompany={selectedCompany} showCompanyFilter={false} showGuestsTable={false} />
           </div>
         )}
         {event2Id && (
           <div>
             <h2 className="text-xl font-semibold mb-4">Reporte del Evento 2</h2>
-            <EventReportTab eventId={event2Id} defaultCompany={selectedCompany} showCompanyFilter={false} />
+            <EventReportTab eventId={event2Id} defaultCompany={selectedCompany} showCompanyFilter={false} showGuestsTable={false}/>
           </div>
         )}
       </div>
+
+      
+    <GuestsTable guests={consolidatedGuests} />
     </div>
   )
 }

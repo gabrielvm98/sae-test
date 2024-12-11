@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ConnectionTimeDistributionChart } from './ConnectionTimeDistributionChart'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { CompanySelect } from './ReportCompanySelect'
 
 type SupabaseGuest = {
   id: string
@@ -48,7 +49,7 @@ type EventData = {
   invitados: ReportGuest[]
 }
 
-export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyFilter = true }: { eventId: number, defaultCompany?: string, showCompanyFilter?: boolean }) {
+export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyFilter = true, showGuestsTable = true }: { eventId: number, defaultCompany?: string, showCompanyFilter?: boolean, showGuestsTable?: boolean }) {
   const [eventData, setEventData] = useState<EventData | null>(null)
   const [loading, setLoading] = useState(true)
   const [companySeleccionada, setEmpresaSeleccionada] = useState(defaultCompany)
@@ -185,18 +186,11 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
       {/* Filtro de empresa */}
       { showCompanyFilter && 
           <div className="flex justify-between items-center">
-          <Select onValueChange={setEmpresaSeleccionada} defaultValue="Todas">
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Selecciona una empresa" />
-            </SelectTrigger>
-            <SelectContent>
-              {companies.map((company, index) => (
-                <SelectItem key={index} value={company}>
-                  {company}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CompanySelect
+            companies={companies}
+            onValueChange={setEmpresaSeleccionada}
+            defaultValue="Todas"
+          />
         </div>
       }
 
@@ -243,102 +237,104 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
       </div>
 
       {/* Lista de invitados */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Invitados</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Buscador y filtros */}
-          <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 sm:space-x-4 mb-4">
-            <Input
-              type="text"
-              placeholder="Buscar invitados..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:max-w-xs"
-            />
-            <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="registered-filter" className="text-sm font-medium">Se registró</label>
-                <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
-                  <SelectTrigger id="registered-filter" className="w-full sm:w-[120px]">
-                    <SelectValue placeholder="Total" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Todos">Total</SelectItem>
-                    <SelectItem value="Sí">Sí</SelectItem>
-                    <SelectItem value="No">No</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col space-y-2">
-                <label htmlFor="attended-filter" className="text-sm font-medium">Asistió</label>
-                <Select onValueChange={setAttendedFilter} defaultValue="Todos">
-                  <SelectTrigger id="attended-filter" className="w-full sm:w-[120px]">
-                    <SelectValue placeholder="Total" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Todos">Total</SelectItem>
-                    <SelectItem value="Sí">Sí</SelectItem>
-                    <SelectItem value="No">No</SelectItem>
-                  </SelectContent>
-                </Select>
+      { showGuestsTable && 
+        <Card>
+          <CardHeader>
+            <CardTitle>Lista de Invitados</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Buscador y filtros */}
+            <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 sm:space-x-4 mb-4">
+              <Input
+                type="text"
+                placeholder="Buscar invitados..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full sm:max-w-xs"
+              />
+              <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="registered-filter" className="text-sm font-medium">Se registró</label>
+                  <Select onValueChange={setRegisteredFilter} defaultValue="Todos">
+                    <SelectTrigger id="registered-filter" className="w-full sm:w-[120px]">
+                      <SelectValue placeholder="Total" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todos">Total</SelectItem>
+                      <SelectItem value="Sí">Sí</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <label htmlFor="attended-filter" className="text-sm font-medium">Asistió</label>
+                  <Select onValueChange={setAttendedFilter} defaultValue="Todos">
+                    <SelectTrigger id="attended-filter" className="w-full sm:w-[120px]">
+                      <SelectValue placeholder="Total" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todos">Total</SelectItem>
+                      <SelectItem value="Sí">Sí</SelectItem>
+                      <SelectItem value="No">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[150px] min-w-[150px]">Nombre</TableHead>
-                  <TableHead className="w-[150px] min-w-[150px]">Empresa</TableHead>
-                  <TableHead className="w-[100px] min-w-[100px]">Registrado</TableHead>
-                  <TableHead className="w-[100px] min-w-[100px]">Asistió</TableHead>
-                  <TableHead className="w-[150px] min-w-[150px]">Tiempo de Conexión</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedGuests.map((invitado, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{invitado.name}</TableCell>
-                    <TableCell>{invitado.company}</TableCell>
-                    <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
-                    <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
-                    <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[150px] min-w-[150px]">Nombre</TableHead>
+                    <TableHead className="w-[150px] min-w-[150px]">Empresa</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Registrado</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Asistió</TableHead>
+                    <TableHead className="w-[150px] min-w-[150px]">Tiempo de Conexión</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          {/* Paginación */}
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-2 py-4">
-            <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only sm:ml-2">Anterior</span>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                <span className="sr-only sm:not-sr-only sm:mr-2">Siguiente</span>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                </TableHeader>
+                <TableBody>
+                  {paginatedGuests.map((invitado, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{invitado.name}</TableCell>
+                      <TableCell>{invitado.company}</TableCell>
+                      <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
+                      <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
+                      <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-            <span className="text-sm text-muted-foreground">
-              Página {currentPage} de {totalPages}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+            {/* Paginación */}
+            <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-2 py-4">
+              <div className="flex space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  <span className="sr-only sm:not-sr-only sm:ml-2">Anterior</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  <span className="sr-only sm:not-sr-only sm:mr-2">Siguiente</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                Página {currentPage} de {totalPages}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      }
     </div>
   )
 }
