@@ -27,10 +27,13 @@ type Assistant = {
 export default function SecretariasPage() {
   const [assistants, setAssistants] = useState<Assistant[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 1
 
   useEffect(() => {
     fetchAssistants()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchAssistants() {
     let query = supabase
@@ -38,18 +41,27 @@ export default function SecretariasPage() {
       .select(`
         *,
         company:company_id (razon_social)
-      `)
+      `, {count: 'exact'})
+      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
     if (searchQuery && searchQuery.trim() !== '') {
       query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching assistants:', error)
     } else {
       setAssistants(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
+    }
+  }
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
     }
   }
 
@@ -60,6 +72,30 @@ export default function SecretariasPage() {
     }
     return formattedPhone
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
 
   return (
     <div className="container mx-auto py-10">
@@ -82,6 +118,7 @@ export default function SecretariasPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -129,6 +166,7 @@ export default function SecretariasPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }
