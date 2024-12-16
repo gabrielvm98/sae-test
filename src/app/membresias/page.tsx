@@ -43,10 +43,13 @@ type Membership = {
 export default function MembershipsPage() {
   const [memberships, setMemberships] = useState<Membership[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 1
 
   useEffect(() => {
     fetchMemberships()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchMemberships() {
     let query = supabase
@@ -54,20 +57,30 @@ export default function MembershipsPage() {
       .select(`
         *,
         company:company_id (razon_social)
-      `)
+      `, { count: 'exact' })
+      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
     if (searchQuery && searchQuery.trim() !== '') {
       query = query.or(`name.ilike.%${searchQuery}%`)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching memberships:', error)
     } else {
       setMemberships(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
     }
   }
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+  
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
     // Split the date string
@@ -75,6 +88,32 @@ export default function MembershipsPage() {
     // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+
+  
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -96,6 +135,7 @@ export default function MembershipsPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -149,6 +189,7 @@ export default function MembershipsPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }

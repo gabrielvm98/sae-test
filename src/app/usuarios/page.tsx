@@ -46,10 +46,14 @@ type Executive = {
 export default function UsuariosPage() {
   const [executives, setExecutives] = useState<Executive[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 2
+
 
   useEffect(() => {
     fetchExecutives()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchExecutives() {
     let query = supabase
@@ -59,20 +63,31 @@ export default function UsuariosPage() {
         company:company_id (razon_social),
         assistant:assistant_id (name, last_name),
         membership:membership_id (name)
-      `)
+      `,  { count: 'exact' })
+      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
     if (searchQuery && searchQuery.trim() !== '') {
       query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching executives:', error)
     } else {
       setExecutives(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
     }
   }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+  
 
   function formatPhoneNumber(cc: string, phone: string, extension?: string) {
     let formattedPhone = `${cc} ${phone}`
@@ -97,6 +112,31 @@ export default function UsuariosPage() {
     return `${day}-${month}-${year}`
   }
 
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+  
+
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -118,6 +158,7 @@ export default function UsuariosPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -189,6 +230,7 @@ export default function UsuariosPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }
