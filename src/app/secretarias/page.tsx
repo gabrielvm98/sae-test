@@ -139,7 +139,7 @@ export default function SecretariasPage() {
               <TableCell>{assistant.name}</TableCell>
               <TableCell>{assistant.last_name}</TableCell>
               <TableCell>{assistant.email}</TableCell>
-              <TableCell>{assistant.company.razon_social}</TableCell>
+              <TableCell>{assistant.company_id ? assistant.company.razon_social : 'No asignado'}</TableCell>
               <TableCell>{formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</TableCell>
               <TableCell>{formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</TableCell>
               <TableCell>
