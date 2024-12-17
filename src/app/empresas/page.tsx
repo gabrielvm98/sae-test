@@ -31,7 +31,7 @@ export default function EmpresasPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const itemsPerPage = 2
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchCompanies()
