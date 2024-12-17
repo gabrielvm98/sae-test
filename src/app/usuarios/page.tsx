@@ -99,7 +99,7 @@ export default function UsuariosPage() {
   
   function formatSaeMeetings(meetings: string[] | null): string {
     if (!meetings || meetings.length === 0) {
-      return 'No asignado'
+      return ''
     }
     return meetings.join(', ')
   }
@@ -190,9 +190,9 @@ export default function UsuariosPage() {
               <TableCell>{executive.dni}</TableCell>
               <TableCell>{executive.name}</TableCell>
               <TableCell>{executive.last_name}</TableCell>
-              <TableCell>{executive.company_id ? executive.company.razon_social : 'No asignado'}</TableCell>
-              <TableCell>{executive.membership ? executive.membership.name : 'No asignado'}</TableCell>
-              <TableCell>{executive.assistant_id ? executive.assistant.name : 'No asignado'} </TableCell>
+              <TableCell>{executive.company_id ? executive.company.razon_social : ''}</TableCell>
+              <TableCell>{executive.membership ? executive.membership.name : ''}</TableCell>
+              <TableCell>{executive.assistant_id ? executive.assistant.name : ''} </TableCell>
               <TableCell>{executive.tareco}</TableCell>
               <TableCell>{executive.birth_date}</TableCell>
               <TableCell>{executive.country}</TableCell>
