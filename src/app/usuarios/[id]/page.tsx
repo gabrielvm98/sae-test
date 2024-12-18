@@ -189,13 +189,15 @@ export default function ExecutiveDetailsPage() {
               Email: {executive.email}
               </p>
               <p className="flex items-center">
-              Secretaria: {`${executive.assistant.name} ${executive.assistant.last_name}`}
+              Secretaria: {executive.assistant_id !== null
+                ? `${executive.assistant.name} ${executive.assistant.last_name}`
+                : ""}
               </p>
               <p className="flex items-center">
-              Teléfono de secretaria: {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}
+              Teléfono de secretaria: {formatPhoneNumber(executive.assistant?.cc_office_phone, executive.assistant?.office_phone, executive.assistant?.office_phone_extension)}
               </p>
               <p className="flex items-center">
-              Celular de secretaria: {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}
+              Celular de secretaria: {formatPhoneNumber(executive.assistant?.cc_mobile_phone, executive.assistant?.mobile_phone)}
               </p>
             </div>
             <div className="space-y-2">
