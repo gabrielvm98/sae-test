@@ -129,7 +129,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
       other_email: otherExecutive ? otherEmail : null,
       assignee: selectedAssignees,
       start_date: startDate,
-      end_date: endDate,
+      end_date: endDate ? endDate : null,
       status,
       comments,
       project_code: projectCode // Updated: Add project_code to the project object
