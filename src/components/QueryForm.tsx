@@ -130,7 +130,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
       executive_id: executiveId === '0' ? null : parseInt(executiveId),
       assignee: selectedAssignees,
       description,
-      solved_date: solvedDate,
+      solved_date: solvedDate ? solvedDate : null,
       other_executive: otherExecutive,
       other_fullname: otherExecutive ? otherFullname : null,
       other_email: otherExecutive ? otherEmail : null
