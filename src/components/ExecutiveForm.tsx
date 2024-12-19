@@ -59,8 +59,20 @@ const countries: CountryOption[] = [
   // Add more countries as needed
 ]
 
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
-  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
+const userTypes = [
+  "Titular",
+  "Cupo de cortesía",
+  "Titular adicional",
+  "Titular Axpen",
+  "Titular vitalicio",
+  "Titular indefinido",
+  "Titular cortesía",
+  "Familiar invitado",
+  "Invitado por transición laboral",
+  "Cliente beca",
+  "Cliente potencial",
+  "Otros",
+]
 
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')

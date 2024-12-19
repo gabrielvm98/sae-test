@@ -41,45 +41,67 @@ type Membership = {
 }
 
 export default function MembershipsPage() {
-  const [memberships, setMemberships] = useState<Membership[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const itemsPerPage = 10
+  const [allMemberships, setAllMemberships] = useState<Membership[]>([]);
+  const [filteredMemberships, setFilteredMemberships] = useState<Membership[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
+  // Cargar todos los datos al inicio
   useEffect(() => {
-    fetchMemberships()
-  }, [searchQuery, currentPage])
+    fetchAllMemberships();
+  }, []);
 
-  async function fetchMemberships() {
-    let query = supabase
+  // Actualizar resultados al cambiar la búsqueda o la página
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, currentPage]);
+
+  async function fetchAllMemberships() {
+    const { data, error } = await supabase
       .from('membership')
       .select(`
         *,
         company:company_id (razon_social)
-      `, { count: 'exact' })
-      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
-
-    if (searchQuery && searchQuery.trim() !== '') {
-      query = query.or(`name.ilike.%${searchQuery}%`)
-    }
-
-    const { data, error, count } = await query
+      `);
 
     if (error) {
-      console.error('Error fetching memberships:', error)
+      console.error('Error fetching memberships:', error);
     } else {
-      setMemberships(data || [])
-      if (count !== null) {
-        setTotalPages(Math.ceil(count / itemsPerPage))
-      }
+      setAllMemberships(data || []);
+      setFilteredMemberships(data || []); // Inicialmente, todos los datos están filtrados
+      setTotalPages(Math.ceil((data || []).length / itemsPerPage));
     }
   }
+
+  function applyFilters() {
+    let filtered = allMemberships;
+
+    // Filtrar por búsqueda
+    if (searchQuery.trim() !== '') {
+      const lowerSearch = searchQuery.toLowerCase();
+      filtered = allMemberships.filter((membership) =>
+        membership.name?.toLowerCase().includes(lowerSearch) ||
+        membership.company?.razon_social?.toLowerCase().includes(lowerSearch)
+      );
+    }
+
+    // Actualizar la cantidad de páginas
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+
+    // Aplicar paginación
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+    setFilteredMemberships(paginated);
+  }
+
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
-      setCurrentPage(newPage)
+      setCurrentPage(newPage);
     }
-  }
+  };
   
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
@@ -153,12 +175,12 @@ export default function MembershipsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {memberships.map((membership) => (
+          {filteredMemberships.map((membership) => (
             <TableRow key={membership.id}>
               <TableCell>{membership.name}</TableCell>
-              <TableCell>{membership.company.razon_social}</TableCell>
+              <TableCell>{membership.company?.razon_social}</TableCell>
               <TableCell>{membership.membership_type}</TableCell>
-              <TableCell>{membership.area_scope ? membership.area : 'General'}</TableCell>
+              <TableCell>{membership.area_scope ? membership.area : ''}</TableCell>
               <TableCell>{membership.titulares}</TableCell>
               <TableCell>{membership.cupos_adicionales}</TableCell>
               <TableCell>{convertDateFormat(membership.fecha_renovacion)}</TableCell>

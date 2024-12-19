@@ -31,6 +31,14 @@ export function SearchableSelect({ onSelect, placeholder, label, initialValue }:
   }, [search])
 
   useEffect(() => {
+    console.log(initialValue, companies);
+    if (initialValue && !companies.some((company) => company.id === initialValue.id)) {
+      setCompanies((prevCompanies) => [initialValue, ...prevCompanies]);
+    }
+    setSelectedCompany(initialValue);
+  }, [initialValue]);
+
+  useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
@@ -61,6 +69,7 @@ export function SearchableSelect({ onSelect, placeholder, label, initialValue }:
       console.error('Error fetching companies:', error)
     } else {
       setCompanies(data || [])
+      console.log(data);
     }
   }
 

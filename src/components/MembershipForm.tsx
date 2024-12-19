@@ -15,14 +15,30 @@ type MembershipFormProps = {
   membershipId?: number
 }
 
+type Company = {
+  id: number
+  razon_social: string
+}
+
 const membershipTypes = [
   "SAE Ejecutivo",
   "SAE Reuniones",
   "SAE Virtual",
+  "SAE Virtual Nuevo",
+  "SAE Virtual Power",
   "SAE Básico",
+  "SAE Básico Nuevo",
+  "SAE Básico reuniones",
   "SAE Completo",
   "SAE Especial",
-  "Titular Adicional"
+  "AC",
+  "Beca",
+  "Cortesía de reuniones regular",
+  "Cortesía de reuniones temporal",
+  "Cortesía de reuniones familiar",
+  "Free Trial",
+  "Vitalicio",
+  "Titular Adicional",
 ]
 
 const paymentMethods = [
@@ -67,6 +83,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
   const [signerEmail, setSignerEmail] = useState('')
   const [signerPhone, setSignerPhone] = useState('')
   const [comments, setComments] = useState('')
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
 
   const router = useRouter()
 
@@ -80,13 +97,14 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
     if (!membershipId) return
     const { data, error } = await supabase
       .from('membership')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', membershipId)
       .single()
 
     if (error) {
       console.error('Error fetching membership:', error)
     } else if (data) {
+      setInitialCompany(data.company)
       setName(data.name)
       setCompanyId(data.company_id.toString())
       setMembershipType(data.membership_type)
@@ -183,6 +201,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
     }
   }
 
+  const handleCompanyChange = (value: string) => {
+    setCompanyId(value)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
@@ -198,9 +220,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
       <div>
         <Label htmlFor="companyId">Empresa</Label>
         <SearchableSelect
-          onSelect={(value) => setCompanyId(value)}
+          onSelect={handleCompanyChange}
           placeholder="Selecciona una empresa"
           label="empresa"
+          initialValue={initialCompany}
         />
       </div>
 

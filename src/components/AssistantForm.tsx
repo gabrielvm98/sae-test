@@ -59,9 +59,12 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       .eq('id', assistantId)
       .single()
 
+    console.log(data);
+
     if (error) {
       console.error('Error fetching assistant:', error)
     } else if (data) {
+      setInitialCompany(data.company)
       setDni(data.dni)
       setName(data.name)
       setLastName(data.last_name)

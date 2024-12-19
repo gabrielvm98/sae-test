@@ -39,6 +39,7 @@ type Executive = {
   membership_id: number | null
   membership: {
     name: string
+    membership_type: string
   } | null
   sae_meetings: string[] | null
 }
@@ -62,13 +63,29 @@ export default function UsuariosPage() {
         *,
         company:company_id (razon_social),
         assistant:assistant_id (name, last_name),
-        membership:membership_id (name)
+        membership:membership_id (name, membership_type)
       `,  { count: 'exact' })
       .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
-    if (searchQuery && searchQuery.trim() !== '') {
-      query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
-    }
+      if (searchQuery && searchQuery.trim() !== '') {
+        const terms = searchQuery.trim().split(' '); // Divide el query en palabras
+        // @ts-expect-error no se
+        const filters = [];
+      
+        terms.forEach(term => {
+          // Construye los filtros para cada palabra
+          filters.push(`name.ilike.%${term}%`);
+          filters.push(`last_name.ilike.%${term}%`);
+        });
+      
+        // Une los filtros con `or`
+        // @ts-expect-error no se
+        const filterQuery = filters.join(',');
+      
+        // Aplica la consulta con los filtros dinámicos
+        query = query.or(filterQuery);
+      }
+      
 
     const { data, error, count } = await query
 
@@ -89,13 +106,18 @@ export default function UsuariosPage() {
   }
   
 
-  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
-    let formattedPhone = `${cc} ${phone}`
-    if (extension) {
-      formattedPhone += ` (${extension})`
+  function formatPhoneNumber(cc: string | null = '', phone: string | null = '', extension?: string | null): string {
+    const cleanedCc = (cc ?? '').trim(); // Usa '' si cc es null o undefined
+    const cleanedPhone = (phone ?? '').trim(); // Usa '' si phone es null o undefined
+    const cleanedExtension = (extension ?? '').trim(); // Usa '' si extension es null o undefined
+    // Formatear el número telefónico
+    let formattedPhone = `${cleanedCc} ${cleanedPhone}`.trim(); // Elimina espacios innecesarios
+    if (cleanedExtension) {
+      formattedPhone += ` (${cleanedExtension})`;
     }
-    return formattedPhone
+    return formattedPhone;
   }
+  
   
   function formatSaeMeetings(meetings: string[] | null): string {
     if (!meetings || meetings.length === 0) {
@@ -191,7 +213,7 @@ export default function UsuariosPage() {
               <TableCell>{executive.name}</TableCell>
               <TableCell>{executive.last_name}</TableCell>
               <TableCell>{executive.company_id ? executive.company.razon_social : ''}</TableCell>
-              <TableCell>{executive.membership ? executive.membership.name : ''}</TableCell>
+              <TableCell>{executive.membership ? executive.membership.membership_type : ''}</TableCell>
               <TableCell>{executive.assistant_id ? executive.assistant.name : ''} </TableCell>
               <TableCell>{executive.tareco}</TableCell>
               <TableCell>{executive.birth_date}</TableCell>
