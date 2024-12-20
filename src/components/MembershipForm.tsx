@@ -32,13 +32,6 @@ const membershipTypes = [
   "SAE Completo",
   "SAE Especial",
   "AC",
-  "Beca",
-  "Cortesía de reuniones regular",
-  "Cortesía de reuniones temporal",
-  "Cortesía de reuniones familiar",
-  "Free Trial",
-  "Vitalicio",
-  "Titular Adicional",
 ]
 
 const paymentMethods = [

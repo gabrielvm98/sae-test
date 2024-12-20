@@ -183,7 +183,11 @@ export default function PresentationsPage() {
               {presentation.other_executive ? (
                 <TableCell>{presentation.other_fullname}</TableCell>
               ) : (
-                <TableCell>{`${presentation.executive.name} ${presentation.executive.last_name}`}</TableCell>
+                  <TableCell>
+                    {presentation.executive
+                      ? `${presentation.executive.name || ''} ${presentation.executive.last_name || ''}`.trim()
+                      : ''}
+                  </TableCell>
               )}
               <TableCell>{formatListOfStrings(presentation.elaboration_assignee)}</TableCell>
               <TableCell>{formatListOfStrings(presentation.presentation_assignee)}</TableCell>
