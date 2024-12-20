@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, User, Calendar, FileText, DollarSign, Check, X } from 'lucide-react'
+import { ArrowLeft, Pencil,Check, X } from 'lucide-react'
 
 type Membership = {
   id: number

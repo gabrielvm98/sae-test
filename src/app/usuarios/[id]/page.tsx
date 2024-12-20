@@ -4,10 +4,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent} from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, Building, User, Mail, Phone, Calendar } from 'lucide-react'
+import { ArrowLeft, Pencil, User } from 'lucide-react'
 
 type Executive = {
   id: number
