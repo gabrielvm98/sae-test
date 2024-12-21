@@ -36,6 +36,7 @@ export function CreateGuestForm({ eventId, onComplete }: CreateGuestFormProps) {
   const [dni, setDni] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [position, setPosition] = useState('')
   const [assistantName, setAssistantName] = useState('')
   const [assistantEmail, setAssistantEmail] = useState('')
   const [substitute, setSubstitute] = useState(false)
@@ -86,6 +87,7 @@ export function CreateGuestForm({ eventId, onComplete }: CreateGuestFormProps) {
       dni,
       email,
       phone,
+      position,
       assistant_name: !isUser ? assistantName : null,
       assistant_email: !isUser ? assistantEmail : null,
       substitute,
@@ -222,6 +224,14 @@ export function CreateGuestForm({ eventId, onComplete }: CreateGuestFormProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+            />
+          </div>
+          <div>
+            <Label htmlFor="position">Cargo</Label>
+            <Input
+              id="position"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
             />
           </div>
           <div>

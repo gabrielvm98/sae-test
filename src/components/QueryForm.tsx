@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { assignees } from "@/components/common/Assignees"
+import { SearchableSelect } from './SearchableSelect'
 
 type QueryFormProps = {
   queryId?: number
@@ -33,25 +34,13 @@ export function QueryForm({ queryId }: QueryFormProps) {
   const [selectedAssignees, setSelectedAssignees] = useState<string[]>([])
   const [description, setDescription] = useState('')
   const [solvedDate, setSolvedDate] = useState('')
-  const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
   const [loading, setLoading] = useState(true)
   const [otherExecutive, setOtherExecutive] = useState(false)
   const [otherFullname, setOtherFullname] = useState('')
   const [otherEmail, setOtherEmail] = useState('')
   const router = useRouter()
-
-  const fetchCompanies = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('company')
-      .select('id, razon_social')
-
-    if (error) {
-      console.error('Error fetching companies:', error)
-    } else {
-      setCompanies(data || [])
-    }
-  }, [])
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
 
   const fetchExecutives = useCallback(async (companyId: number) => {
     const { data, error } = await supabase
@@ -71,7 +60,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
 
     const { data, error } = await supabase
       .from('query')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', queryId)
       .single()
 
@@ -79,6 +68,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
       console.error('Error fetching query:', error)
     } else if (data) {
       setCompanyId(data.company_id.toString())
+      setInitialCompany(data.company)
       setExecutiveId(data.executive_id ? data.executive_id.toString() : '0')
       setSelectedAssignees(data.assignee)
       setDescription(data.description)
@@ -93,13 +83,12 @@ export function QueryForm({ queryId }: QueryFormProps) {
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true)
-      await fetchCompanies()
       await fetchQuery()
       setLoading(false)
     }
 
     loadInitialData()
-  }, [fetchCompanies, fetchQuery])
+  }, [fetchQuery])
 
   useEffect(() => {
     if (companyId) {
@@ -141,7 +130,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
       executive_id: executiveId === '0' ? null : parseInt(executiveId),
       assignee: selectedAssignees,
       description,
-      solved_date: solvedDate,
+      solved_date: solvedDate ? solvedDate : null,
       other_executive: otherExecutive,
       other_fullname: otherExecutive ? otherFullname : null,
       other_email: otherExecutive ? otherEmail : null
@@ -173,18 +162,12 @@ export function QueryForm({ queryId }: QueryFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="companyId">Empresa</Label>
-        <Select value={companyId} onValueChange={handleCompanyChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          onSelect={handleCompanyChange}
+          placeholder="Selecciona una empresa"
+          label="empresa"
+          initialValue={initialCompany}
+        />
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>

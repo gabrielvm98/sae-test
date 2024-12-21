@@ -11,120 +11,150 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
   const [isUploading, setIsUploading] = useState(false);
   const [orphanedEmails, setOrphanedEmails] = useState<{email: string, username: string}[]>([]);
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      setFile(e.dataTransfer.files[0])
     }
-  };
+  }
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault()
+  }
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
   };
-
-  async function processZoomAttendance(csvFile: File) {
-    console.log('Procesando archivo CSV con PapaParse...');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function processZoomAttendance(csvFile: File): Promise<any> {
+    console.log("Procesando archivo CSV...");
+  
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
   
       reader.onload = () => {
-        const fileContent = reader.result as string;
+        const rawContent = reader.result as ArrayBuffer; // Leer como ArrayBuffer para manejar los bytes
   
-        // Dividir líneas y encontrar el inicio de "Detalles de asistente"
-        const lines = fileContent.split('\n').map((line) => line.trim());
-        const assistantIndex = lines.findIndex((line) => line.includes('Detalles de asistente'));
+        try {
+          // Convertir a bytes
+          const rawBytes = new Uint8Array(rawContent);
   
-        if (assistantIndex === -1) {
-          console.error('No se encontró la sección "Detalles de asistente".');
-          return reject('El archivo no contiene datos relevantes.');
-        }
-  
-        console.log(`"Detalles de asistente" encontrado en la línea ${assistantIndex + 1}`);
-  
-        // Procesar desde la línea siguiente
-        const relevantLines = lines.slice(assistantIndex + 1).filter((line) => line !== '');
-        if (relevantLines.length < 2) {
-          console.error('No hay suficientes líneas después de "Detalles de asistente".');
-          return reject('El archivo no contiene datos suficientes para procesar.');
-        }
-  
-        // Parsear cabeceras
-        const headers = Papa.parse(relevantLines[0], { delimiter: ',', quoteChar: '"' }).data[0] as string[];
-        console.log('Cabeceras detectadas:', headers);
-  
-        // Validar cabeceras necesarias
-        const attendedIndex = headers.indexOf('Asistió');
-        const emailIndex = headers.indexOf('Correo electrónico');
-        const usernameIndex = headers.indexOf('Nombre de usuario (nombre original)');
-        const timeIndex = headers.indexOf('Tiempo en la sesión (minutos)');
-  
-        if (attendedIndex === -1 || emailIndex === -1 || timeIndex === -1) {
-          console.error('Faltan columnas requeridas.');
-          return reject('Faltan columnas requeridas: Asistió, Correo electrónico, o Tiempo en la sesión (minutos)');
-        }
-  
-        // Parsear filas DOS VECES
-        const rows = relevantLines.slice(1).map((line) => {
-          // Primer parseo: convertir la línea en un array de strings
-          const parsedRow = Papa.parse(line, { delimiter: ',', quoteChar: '"' }).data;
-        
-          if (!Array.isArray(parsedRow) || !Array.isArray(parsedRow[0])) {
-            throw new Error("El primer parseo no devolvió un array de strings.");
+          // Detectar codificación: UTF-8 o ISO-8859-1
+          let fileContent = "";
+          if (rawBytes[0] === 0xef && rawBytes[1] === 0xbb && rawBytes[2] === 0xbf) {
+            console.log("Formato detectado: UTF-8 con BOM.");
+            fileContent = new TextDecoder("utf-8").decode(rawBytes.subarray(3)); // Omitir BOM
+          } else if (/[\x80-\xFF]/.test(String.fromCharCode(...rawBytes))) {
+            console.log("Formato detectado: ISO-8859-1.");
+            fileContent = new TextDecoder("iso-8859-1").decode(rawBytes);
+          } else {
+            console.log("Formato detectado: UTF-8 sin BOM.");
+            fileContent = new TextDecoder("utf-8").decode(rawBytes);
           }
+  
+          // Dividir líneas y encontrar el inicio de "Detalles de asistente"
+          const lines = fileContent.split("\n").map((line) => line.trim());
+          const assistantIndex = lines.findIndex((line) => line.includes("Detalles de asistente"));
+  
+          if (assistantIndex === -1) {
+            console.error('No se encontró la sección "Detalles de asistente".');
+            return reject("El archivo no contiene datos relevantes.");
+          }
+  
+          console.log(`"Detalles de asistente" encontrado en la línea ${assistantIndex + 1}`);
+  
+          // Procesar desde la línea siguiente
+          const relevantLines = lines.slice(assistantIndex + 1).filter((line) => line !== "");
+          if (relevantLines.length < 2) {
+            console.error("No hay suficientes líneas después de 'Detalles de asistente'.");
+            return reject("El archivo no contiene datos suficientes para procesar.");
+          }
+  
+          // Parsear cabeceras
+          const headers = Papa.parse(relevantLines[0], { delimiter: ",", quoteChar: '"' }).data[0] as string[];
+          console.log("Cabeceras detectadas:", headers);
+  
+          // Validar cabeceras necesarias
+          const attendedIndex = headers.indexOf("Asistió");
+          const emailIndex = headers.indexOf("Correo electrónico");
+          const usernameIndex = headers.indexOf("Nombre de usuario (nombre original)");
+          const timeIndex = headers.indexOf("Tiempo en la sesión (minutos)");
+  
+          if (attendedIndex === -1 || emailIndex === -1 || timeIndex === -1) {
+            console.error("Faltan columnas requeridas.");
+            return reject("Faltan columnas requeridas: Asistió, Correo electrónico, o Tiempo en la sesión (minutos).");
+          }
+  
+          // Parsear filas
+          const rows = relevantLines.slice(1).map((line) => {
+            // Intentar parsear con PapaParse
+            const initialParse = Papa.parse(line, {
+              delimiter: ",",
+              quoteChar: '"',
+            }).data[0] as string[];
           
+            if (initialParse.length === 1) {
+              // Si el resultado es un solo string largo, intentar un segundo parseo
+              console.warn("Fila mal formateada detectada, aplicando doble parseo:", line);
           
-          // Segundo parseo del primer elemento
-          const reParsedRow = Papa.parse(parsedRow[0][0], { delimiter: ',', quoteChar: '"' }).data;
-        
-          if (!Array.isArray(reParsedRow) || !Array.isArray(reParsedRow[0])) {
-            throw new Error("El segundo parseo no devolvió un array de strings.");
-          }
-        
-          return reParsedRow[0]; // Devuelve la fila parseada correctamente
-        });
-  
-        console.log('Filas procesadas (dos veces parseadas):', rows);
-  
-        // Consolidar datos
-        const consolidated = rows.reduce((acc, row, rowIndex) => {
-          if (row.length !== headers.length) {
-            console.warn(`Fila ${rowIndex + 1} tiene un número incorrecto de columnas:`, row);
-          }
-  
-          const attended = row[attendedIndex]?.toLowerCase().trim();
-          const email = row[emailIndex]?.trim().toLowerCase();
-          const time = parseInt(row[timeIndex], 10) || 0;
-          const username = row[usernameIndex]?.trim() || '';
-          console.log('Fila procesada:', { attended, email, time, username });
-  
-          if (attended === 'sí' && email) {
-            if (!acc[email]) {
-              acc[email] = { email, totalTime: 0, username: username || '' };
+              const secondaryParse = Papa.parse(initialParse[0], {
+                delimiter: ",",
+                quoteChar: '"',
+              }).data[0] as string[];
+          
+              if (!secondaryParse) {
+                console.warn("El segundo parseo falló para la línea:", line);
+                return [];
+              }
+          
+              return secondaryParse; // Devuelve la fila correctamente parseada tras el segundo intento
             }
-            acc[email].totalTime += time;
-          }
-          return acc;
-        }, {} as Record<string, { email: string; totalTime: number; username: string }>);
+          
+            return initialParse; // Devuelve la fila parseada normalmente
+          });
   
-        const result = Object.values(consolidated);
-        console.log('Asistencia consolidada:', result);
-        resolve(result);
+          // Consolidar datos
+          const consolidated = rows.reduce((acc, row, rowIndex) => {
+            if (row.length !== headers.length) {
+              console.warn(`Fila ${rowIndex + 1} tiene un número incorrecto de columnas:`, row);
+            }
+  
+            const attended = row[attendedIndex]?.toLowerCase().trim();
+            const email = row[emailIndex]?.trim().toLowerCase();
+            const time = parseInt(row[timeIndex], 10) || 0;
+            const username = row[usernameIndex]?.trim() || "";
+  
+            if (attended === "sí" && email) {
+              if (!acc[email]) {
+                acc[email] = { email, totalTime: 0, username: username || "" };
+              }
+              acc[email].totalTime += time;
+            }
+  
+            return acc;
+          }, {} as Record<string, { email: string; totalTime: number; username: string }>);
+  
+          const result = Object.values(consolidated);
+          console.log("Asistencia consolidada:", result);
+          resolve(result);
+        } catch (error) {
+          console.error("Error al procesar el archivo:", error);
+          reject("Error al procesar el archivo.");
+        }
       };
   
       reader.onerror = () => {
-        console.error('Error al leer el archivo CSV.');
-        reject('No se pudo leer el archivo CSV.');
+        console.error("Error al leer el archivo CSV.");
+        reject("No se pudo leer el archivo CSV.");
       };
   
-      reader.readAsText(csvFile);
+      reader.readAsArrayBuffer(csvFile); // Leer como ArrayBuffer para manejar bytes
     });
   }
+  
+  
+  
   
   
 
@@ -231,10 +261,11 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
 
   return (
     <div className="space-y-4">
-      <div
+      <label
+        htmlFor="zoom-csv-upload"
+        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer block"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
       >
         <p>Arrastra y suelta un archivo CSV de asistencia de Zoom aquí, o haz clic para seleccionar un archivo</p>
         <input
@@ -244,10 +275,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
           className="hidden"
           id="zoom-csv-upload"
         />
-        <label htmlFor="zoom-csv-upload" className="mt-2 inline-block">
-          <Button variant="outline" type="button">Seleccionar archivo</Button>
-        </label>
-      </div>
+      </label>
       {file && <p>Archivo seleccionado: {file.name}</p>}
       <Button onClick={handleUpload} disabled={!file || isUploading}>
         {isUploading ? 'Subiendo...' : 'Subir asistencia de Zoom'}

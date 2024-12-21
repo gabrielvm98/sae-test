@@ -101,7 +101,7 @@ export default function MembershipDetailsPage() {
               </p>
               <p className="flex items-center">
                 <span className="mr-2">Membresía por área:</span>
-                {membership.area_scope ? membership.area : 'General'}
+                {membership.area_scope ? membership.area : ''}
               </p>
             </div>
 

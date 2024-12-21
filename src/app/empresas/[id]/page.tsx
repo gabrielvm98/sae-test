@@ -35,6 +35,8 @@ type Executive = {
   last_name: string
   membership_id: number | null
   assistant_id: number | null
+  user_type: string
+  email: string
 }
 
 type Assistant = {
@@ -48,6 +50,7 @@ type Assistant = {
 type Membership = {
   id: number
   name: string
+  membership_type: string
 }
 
 export default function CompanyDetailsPage() {
@@ -76,7 +79,7 @@ export default function CompanyDetailsPage() {
     if (typeof params.id !== 'string') return
     const { data, error } = await supabase
       .from('executive')
-      .select('id, dni, name, last_name, membership_id, assistant_id')
+      .select('id, dni, name, last_name, membership_id, assistant_id, user_type, email')
       .eq('company_id', params.id)
 
     if (error) {
@@ -104,12 +107,13 @@ export default function CompanyDetailsPage() {
     if (typeof params.id !== 'string') return
     const { data, error } = await supabase
       .from('membership')
-      .select('id, name')
+      .select('id, name, membership_type')
       .eq('company_id', params.id)
 
     if (error) {
       console.error('Error fetching memberships:', error)
     } else {
+      console.log(data);
       setMemberships(data || [])
     }
   }, [params.id])
@@ -243,6 +247,8 @@ export default function CompanyDetailsPage() {
                       <TableHead>DNI</TableHead>
                       <TableHead>Nombre</TableHead>
                       <TableHead>Apellido</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Tipo</TableHead>
                       <TableHead>Membresía</TableHead>
                       <TableHead>Secretaria</TableHead>
                       <TableHead>Acciones</TableHead>
@@ -254,8 +260,10 @@ export default function CompanyDetailsPage() {
                         <TableCell>{executive.dni}</TableCell>
                         <TableCell>{executive.name}</TableCell>
                         <TableCell>{executive.last_name}</TableCell>
+                        <TableCell>{executive.email}</TableCell>
+                        <TableCell>{executive.user_type}</TableCell>
                         <TableCell>
-                          {memberships.find(m => m.id === executive.membership_id)?.name || 'No asignado'}
+                          {memberships.find(m => m.id === executive.membership_id)?.membership_type || 'No asignado'}
                         </TableCell>
                         <TableCell>
                           {assistants.find(a => a.id === executive.assistant_id)?.name || 'No asignado'}
@@ -306,7 +314,7 @@ export default function CompanyDetailsPage() {
                   <TableBody>
                     {memberships.map((membership) => (
                       <TableRow key={membership.id}>
-                        <TableCell>{membership.name}</TableCell>
+                        <TableCell>{membership.membership_type}</TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             <Button variant="outline" size="sm" asChild>

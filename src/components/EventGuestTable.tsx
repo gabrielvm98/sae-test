@@ -29,6 +29,7 @@ type EventGuest = {
   virtual_session_time: number | null
   registered: boolean
   assisted: boolean
+  position: string | null
   company?: {
     razon_social: string
   }
@@ -37,6 +38,7 @@ type EventGuest = {
     last_name: string
     email: string
     office_phone: string
+    position: string
   }
 }
 
@@ -59,7 +61,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       .select(`
         *,
         company:company_id (razon_social),
-        executive:executive_id (name, last_name, email, office_phone)
+        executive:executive_id (name, last_name, email, office_phone, position)
       `, { count: 'exact' })
       .eq('event_id', eventId)
       .ilike('name', `%${searchQuery}%`)
@@ -149,6 +151,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
           <TableRow>
             <TableHead>Nombre</TableHead>
             <TableHead>Empresa</TableHead>
+            <TableHead>Cargo</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Email del evento</TableHead>
             <TableHead>Teléfono</TableHead>
@@ -173,6 +176,11 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
                   {guest.is_client_company
                     ? guest.company?.razon_social
                     : guest.company_razon_social}
+                </TableCell>
+                <TableCell>
+                  {guest.is_user 
+                    ? guest.executive?.position ?? '' 
+                    : guest.position ?? ''}
                 </TableCell>
                 <TableCell>{guest.is_user ? guest.executive?.email : guest.email}</TableCell>
                 <TableCell>{guest.email}</TableCell>

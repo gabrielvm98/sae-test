@@ -41,33 +41,68 @@ type Membership = {
 }
 
 export default function MembershipsPage() {
-  const [memberships, setMemberships] = useState<Membership[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
+  const [allMemberships, setAllMemberships] = useState<Membership[]>([]);
+  const [filteredMemberships, setFilteredMemberships] = useState<Membership[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 10;
 
+  // Cargar todos los datos al inicio
   useEffect(() => {
-    fetchMemberships()
-  }, [searchQuery])
+    fetchAllMemberships();
+  }, []);
 
-  async function fetchMemberships() {
-    let query = supabase
+  // Actualizar resultados al cambiar la búsqueda o la página
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, currentPage]);
+
+  async function fetchAllMemberships() {
+    const { data, error } = await supabase
       .from('membership')
       .select(`
         *,
         company:company_id (razon_social)
-      `)
-
-    if (searchQuery && searchQuery.trim() !== '') {
-      query = query.or(`name.ilike.%${searchQuery}%`)
-    }
-
-    const { data, error } = await query
+      `);
 
     if (error) {
-      console.error('Error fetching memberships:', error)
+      console.error('Error fetching memberships:', error);
     } else {
-      setMemberships(data || [])
+      setAllMemberships(data || []);
+      setFilteredMemberships(data || []); // Inicialmente, todos los datos están filtrados
+      setTotalPages(Math.ceil((data || []).length / itemsPerPage));
     }
   }
+
+  function applyFilters() {
+    let filtered = allMemberships;
+
+    // Filtrar por búsqueda
+    if (searchQuery.trim() !== '') {
+      const lowerSearch = searchQuery.toLowerCase();
+      filtered = allMemberships.filter((membership) =>
+        membership.name?.toLowerCase().includes(lowerSearch) ||
+        membership.company?.razon_social?.toLowerCase().includes(lowerSearch)
+      );
+    }
+
+    // Actualizar la cantidad de páginas
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
+
+    // Aplicar paginación
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+    setFilteredMemberships(paginated);
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+  
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
     // Split the date string
@@ -75,6 +110,32 @@ export default function MembershipsPage() {
     // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+
+  
   return (
     <div className="container mx-auto py-10">
       <div className="mb-8">
@@ -96,6 +157,7 @@ export default function MembershipsPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -113,12 +175,12 @@ export default function MembershipsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {memberships.map((membership) => (
+          {filteredMemberships.map((membership) => (
             <TableRow key={membership.id}>
               <TableCell>{membership.name}</TableCell>
-              <TableCell>{membership.company.razon_social}</TableCell>
+              <TableCell>{membership.company?.razon_social}</TableCell>
               <TableCell>{membership.membership_type}</TableCell>
-              <TableCell>{membership.area_scope ? membership.area : 'General'}</TableCell>
+              <TableCell>{membership.area_scope ? membership.area : ''}</TableCell>
               <TableCell>{membership.titulares}</TableCell>
               <TableCell>{membership.cupos_adicionales}</TableCell>
               <TableCell>{convertDateFormat(membership.fecha_renovacion)}</TableCell>
@@ -149,6 +211,7 @@ export default function MembershipsPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }

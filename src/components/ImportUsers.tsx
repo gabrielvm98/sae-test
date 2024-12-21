@@ -50,14 +50,32 @@ const membershipTypes = [
   "SAE Ejecutivo",
   "SAE Reuniones",
   "SAE Virtual",
+  "SAE Virtual Nuevo",
+  "SAE Virtual Power",
   "SAE Básico",
+  "SAE Básico Nuevo",
+  "SAE Básico reuniones",
   "SAE Completo",
   "SAE Especial",
-  "Titular Adicional"
+  "AC",
 ]
 
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
-  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
+const userTypes = [
+  "Titular",
+  "Cupo de cortesía",
+  "Cortesía de reportes",
+  "Titular adicional",
+  "Titular virtual",
+  "Cliente potencial",
+  "Titular Axpen",
+  "Titular Vitalicio",
+  "Titular indefinido",
+  "Invitado por transición laboral",
+  "Cliente beca",
+  "Reemplazo",
+  "AC",
+  "Otros",
+]
 
 const saeMeetingsOptions = [
   "Encuentro mensual presencial",
