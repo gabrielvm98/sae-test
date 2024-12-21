@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil, User, Calendar, FileText, DollarSign, Check, X } from 'lucide-react'
+import { ArrowLeft, Pencil,Check, X } from 'lucide-react'
 
 type Membership = {
   id: number
@@ -195,7 +195,7 @@ export default function MembershipDetailsPage() {
           <div className="space-y-2">
             <h3 className="text-xl font-semibold">Información de Pago</h3>
             <p className="flex items-center">
-              <Calendar className="w-5 h-5 mr-2 text-gray-500" />
+              
               <span >Fecha de renovación:</span>
               {membership.fecha_renovacion}
             </p>
@@ -204,7 +204,7 @@ export default function MembershipDetailsPage() {
               {membership.payment_method}
             </p>
             <p className="flex items-center">
-              <DollarSign className="w-5 h-5 mr-2 text-gray-500" />
+              
               <span >Tarifa:</span>
               {`${membership.payment_currency} ${membership.payment_amount}`}
             </p>
@@ -229,7 +229,7 @@ export default function MembershipDetailsPage() {
           <div className="space-y-2">
             <h3 className="text-xl font-semibold">Información del Firmante</h3>
             <p className="flex items-center">
-              <User className="w-5 h-5 mr-2 text-gray-500" />
+              
               <span>Nombre:</span>
               {membership.signer_name}
             </p>
@@ -246,7 +246,7 @@ export default function MembershipDetailsPage() {
           <div className="space-y-2">
             <h3 className="text-xl font-semibold">Comentarios</h3>
             <p className="flex items-start">
-              <FileText className="w-5 h-5 mr-2 mt-1 text-gray-500" />
+              
               {membership.comments}
             </p>
           </div>
