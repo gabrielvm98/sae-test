@@ -27,10 +27,13 @@ type Assistant = {
 export default function SecretariasPage() {
   const [assistants, setAssistants] = useState<Assistant[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchAssistants()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchAssistants() {
     let query = supabase
@@ -38,28 +41,65 @@ export default function SecretariasPage() {
       .select(`
         *,
         company:company_id (razon_social)
-      `)
+      `, {count: 'exact'})
+      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
     if (searchQuery && searchQuery.trim() !== '') {
       query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching assistants:', error)
     } else {
       setAssistants(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
+    }
+  }
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
     }
   }
 
-  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
-    let formattedPhone = `${cc} ${phone}`
-    if (extension) {
-      formattedPhone += ` (${extension})`
+  function formatPhoneNumber(cc: string | null = '', phone: string | null = '', extension?: string | null): string {
+    const cleanedCc = (cc ?? '').trim(); // Usa '' si cc es null o undefined
+    const cleanedPhone = (phone ?? '').trim(); // Usa '' si phone es null o undefined
+    const cleanedExtension = (extension ?? '').trim(); // Usa '' si extension es null o undefined
+    // Formatear el número telefónico
+    let formattedPhone = `${cleanedCc} ${cleanedPhone}`.trim(); // Elimina espacios innecesarios
+    if (cleanedExtension) {
+      formattedPhone += ` (${cleanedExtension})`;
     }
-    return formattedPhone
+    return formattedPhone;
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
 
   return (
     <div className="container mx-auto py-10">
@@ -82,6 +122,7 @@ export default function SecretariasPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -102,7 +143,7 @@ export default function SecretariasPage() {
               <TableCell>{assistant.name}</TableCell>
               <TableCell>{assistant.last_name}</TableCell>
               <TableCell>{assistant.email}</TableCell>
-              <TableCell>{assistant.company.razon_social}</TableCell>
+              <TableCell>{assistant.company_id ? assistant.company.razon_social : 'No asignado'}</TableCell>
               <TableCell>{formatPhoneNumber(assistant.cc_office_phone, assistant.office_phone, assistant.office_phone_extension)}</TableCell>
               <TableCell>{formatPhoneNumber(assistant.cc_mobile_phone, assistant.mobile_phone)}</TableCell>
               <TableCell>
@@ -129,6 +170,7 @@ export default function SecretariasPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }

@@ -9,14 +9,15 @@ import { toast } from "@/hooks/use-toast"
 export function ImportExternals({ eventId }: { eventId: number }) {
   const [file, setFile] = useState<File | null>(null)
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  // Manejadores para drag and drop
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setFile(e.dataTransfer.files[0])
     }
   }
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
     e.preventDefault()
   }
 
@@ -26,9 +27,10 @@ export function ImportExternals({ eventId }: { eventId: number }) {
     }
   }
 
+  // Función para descargar la plantilla
   const downloadTemplate = () => {
     const headers = [
-      ['Empresa', 'Nombre', 'DNI', 'Correo', 'Teléfono', 'Nombre de secretaria', 'Correo de secretaria']
+      ['Empresa', 'Nombre', 'Apellido', 'Correo', 'Cargo', 'Se registró (si/no)'],
     ]
 
     const workbook = XLSX.utils.book_new()
@@ -38,6 +40,7 @@ export function ImportExternals({ eventId }: { eventId: number }) {
     XLSX.writeFile(workbook, 'plantilla_invitados_externos.xlsx')
   }
 
+  // Función para cargar el archivo a Supabase
   const handleFileUpload = async () => {
     if (!file) {
       toast({
@@ -57,22 +60,19 @@ export function ImportExternals({ eventId }: { eventId: number }) {
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as Array<{
         Empresa: string
         Nombre: string
-        DNI: string
+        Apellido: string
         Correo: string
-        Teléfono: string
-        'Nombre de secretaria': string
-        'Correo de secretaria': string
+        Cargo: string
+        'Se registró (si/no)': string
       }>
 
       const eventGuests = jsonData.map((row) => ({
         event_id: eventId,
         company_razon_social: row.Empresa,
-        name: row.Nombre,
-        dni: row.DNI,
-        email: row.Correo,
-        phone: row.Teléfono,
-        assistant_name: row['Nombre de secretaria'],
-        assistant_email: row['Correo de secretaria'],
+        name: row.Nombre.trim() + ' ' + row.Apellido.trim(),
+        email: row.Correo.toLowerCase().trim(),
+        position: row.Cargo,
+        registered: row['Se registró (si/no)'].toLowerCase() === 'si' || row['Se registró (si/no)'].toLowerCase() === 'sí',
         is_user: false,
         is_client_company: false
       }))
@@ -104,10 +104,13 @@ export function ImportExternals({ eventId }: { eventId: number }) {
   return (
     <div className="space-y-4">
       <Button onClick={downloadTemplate}>Descargar Plantilla Excel</Button>
-      <div
+
+      {/* Envolvemos el área de drag-and-drop en un label */}
+      <label
+        htmlFor="excel-upload"
+        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer block"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer"
       >
         <p>Arrastra y suelta un archivo Excel aquí, o haz clic para seleccionar un archivo</p>
         <input
@@ -117,12 +120,13 @@ export function ImportExternals({ eventId }: { eventId: number }) {
           className="hidden"
           id="excel-upload"
         />
-        <label htmlFor="excel-upload" className="mt-2 inline-block">
-          <Button variant="outline" type="button">Seleccionar archivo</Button>
-        </label>
-      </div>
+      </label>
+
       {file && <p>Archivo seleccionado: {file.name}</p>}
-      <Button onClick={handleFileUpload} disabled={!file}>Importar Excel</Button>
+
+      <Button onClick={handleFileUpload} disabled={!file}>
+        Importar Excel
+      </Button>
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from 'next/link'
 import { ArrowLeft, Pencil, User } from 'lucide-react'
@@ -45,6 +45,7 @@ type Executive = {
   }
   membership: {
     name: string
+    membership_type: string
   } | null
   reemplaza_a: number | null
   reemplazado_executive?: {
@@ -74,7 +75,7 @@ export default function ExecutiveDetailsPage() {
           cc_mobile_phone,
           mobile_phone
         ),
-        membership:membership_id (name),
+        membership:membership_id (name, membership_type),
         reemplazado_executive:reemplaza_a (name, last_name)
       `)
       .eq('id', params.id)
@@ -93,13 +94,18 @@ export default function ExecutiveDetailsPage() {
 
   if (!executive) return <div>Loading...</div>
 
-  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
-    let formattedPhone = `${cc} ${phone}`
-    if (extension) {
-      formattedPhone += ` (${extension})`
+  function formatPhoneNumber(cc: string | null = '', phone: string | null = '', extension?: string | null): string {
+    const cleanedCc = (cc ?? '').trim(); // Usa '' si cc es null o undefined
+    const cleanedPhone = (phone ?? '').trim(); // Usa '' si phone es null o undefined
+    const cleanedExtension = (extension ?? '').trim(); // Usa '' si extension es null o undefined
+    // Formatear el número telefónico
+    let formattedPhone = `${cleanedCc} ${cleanedPhone}`.trim(); // Elimina espacios innecesarios
+    if (cleanedExtension) {
+      formattedPhone += ` (${cleanedExtension})`;
     }
-    return formattedPhone
+    return formattedPhone;
   }
+  
 
   function formatSaeMeetings(meetings: string[] | null): string {
     if (!meetings || meetings.length === 0) {
@@ -156,7 +162,7 @@ export default function ExecutiveDetailsPage() {
                 Empresa: {executive.company.razon_social}
               </p>
               <p className="flex items-center">
-                Membresía: {executive.membership ? executive.membership.name : 'No asignado'}
+                Membresía: {executive.membership ? executive.membership.membership_type : 'No asignado'}
               </p>
               <p className="flex items-center">
                 Cargo: {executive.position}
@@ -189,13 +195,15 @@ export default function ExecutiveDetailsPage() {
               Email: {executive.email}
               </p>
               <p className="flex items-center">
-              Secretaria: {`${executive.assistant.name} ${executive.assistant.last_name}`}
+              Secretaria: {executive.assistant_id !== null
+                ? `${executive.assistant.name} ${executive.assistant.last_name}`
+                : ""}
               </p>
               <p className="flex items-center">
-              Teléfono de secretaria: {formatPhoneNumber(executive.assistant.cc_office_phone, executive.assistant.office_phone, executive.assistant.office_phone_extension)}
+              Teléfono de secretaria: {formatPhoneNumber(executive.assistant?.cc_office_phone, executive.assistant?.office_phone, executive.assistant?.office_phone_extension)}
               </p>
               <p className="flex items-center">
-              Celular de secretaria: {formatPhoneNumber(executive.assistant.cc_mobile_phone, executive.assistant.mobile_phone)}
+              Celular de secretaria: {formatPhoneNumber(executive.assistant?.cc_mobile_phone, executive.assistant?.mobile_phone)}
               </p>
             </div>
             <div className="space-y-2">

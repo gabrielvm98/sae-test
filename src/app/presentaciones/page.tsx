@@ -35,11 +35,20 @@ type Presentation = {
 }
 
 export default function PresentationsPage() {
-  const [presentations, setPresentations] = useState<Presentation[]>([])
+  const [allPresentations, setAllPresentations] = useState<Presentation[]>([])
+  const [filteredPresentations, setFilteredPresentations] = useState<Presentation[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchPresentations()
   }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [searchQuery, currentPage, allPresentations])
 
   async function fetchPresentations() {
     const { data, error } = await supabase
@@ -49,11 +58,40 @@ export default function PresentationsPage() {
         company:company_id (razon_social),
         executive:executive_id (name, last_name)
       `)
-    
+
     if (error) {
       console.error('Error fetching presentations:', error)
     } else {
-      setPresentations(data || [])
+      setAllPresentations(data || [])
+      setFilteredPresentations(data || [])
+      setTotalPages(Math.ceil((data || []).length / itemsPerPage))
+    }
+  }
+
+  function applyFilters() {
+    let filtered = allPresentations
+
+    // Filtrar por búsqueda (razón social)
+    if (searchQuery.trim() !== '') {
+      const lowerSearch = searchQuery.toLowerCase()
+      filtered = allPresentations.filter((presentation) =>
+        presentation.company?.razon_social?.toLowerCase().includes(lowerSearch)
+      )
+    }
+
+    // Actualizar cantidad de páginas
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage))
+
+    // Paginación
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage)
+
+    setFilteredPresentations(paginated)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
     }
   }
 
@@ -67,13 +105,37 @@ export default function PresentationsPage() {
     }
     return 'No facturable'
   }
+
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
-    // Split the date string
     const [year, month, day] = dateString.split('-')
-    // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
@@ -84,6 +146,19 @@ export default function PresentationsPage() {
           </Link>
         </Button>
       </div>
+
+      <div className="mt-4 mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por razón social..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+
+      <PaginationControls />
+
       <Table>
         <TableHeader>
           <TableRow>
@@ -102,13 +177,17 @@ export default function PresentationsPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {presentations.map((presentation) => (
+          {filteredPresentations.map((presentation) => (
             <TableRow key={presentation.id}>
               <TableCell>{presentation.company.razon_social}</TableCell>
-              { presentation.other_executive ? (
+              {presentation.other_executive ? (
                 <TableCell>{presentation.other_fullname}</TableCell>
               ) : (
-                <TableCell>{`${presentation.executive.name} ${presentation.executive.last_name}`}</TableCell>
+                  <TableCell>
+                    {presentation.executive
+                      ? `${presentation.executive.name || ''} ${presentation.executive.last_name || ''}`.trim()
+                      : ''}
+                  </TableCell>
               )}
               <TableCell>{formatListOfStrings(presentation.elaboration_assignee)}</TableCell>
               <TableCell>{formatListOfStrings(presentation.presentation_assignee)}</TableCell>
@@ -143,6 +222,8 @@ export default function PresentationsPage() {
           ))}
         </TableBody>
       </Table>
+
+      <PaginationControls />
     </div>
   )
 }

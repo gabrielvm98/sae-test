@@ -20,46 +20,98 @@ type Query = {
   company: {
     razon_social: string
   }
-  executive: {
-    name: string
-    last_name: string
-  }
 }
 
 export default function ConsultasPage() {
-  const [queries, setQueries] = useState<Query[]>([])
+  const [allQueries, setAllQueries] = useState<Query[]>([])
+  const [filteredQueries, setFilteredQueries] = useState<Query[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchQueries()
   }, [])
 
+  useEffect(() => {
+    applyFilters()
+  }, [searchQuery, currentPage, allQueries])
+
   async function fetchQueries() {
-    const query = supabase
+    const { data, error } = await supabase
       .from('query')
       .select(`
         *,
-        company:company_id (razon_social),
-        executive:executive_id (name, last_name)
+        company:company_id (razon_social)
       `)
-    
-    const { data, error } = await query
-
-    console.log(data);
 
     if (error) {
       console.error('Error fetching queries:', error)
     } else {
-      setQueries(data || [])
+      setAllQueries(data || [])
+      setFilteredQueries(data || [])
+      setTotalPages(Math.ceil((data || []).length / itemsPerPage))
     }
   }
+
+  function applyFilters() {
+    let filtered = allQueries
+
+    // Filtrar por búsqueda (razón social)
+    if (searchQuery.trim() !== '') {
+      const lowerSearch = searchQuery.toLowerCase()
+      filtered = allQueries.filter((q) =>
+        q.company?.razon_social?.toLowerCase().includes(lowerSearch)
+      )
+    }
+
+    // Actualizar cantidad de páginas
+    setTotalPages(Math.ceil(filtered.length / itemsPerPage))
+
+    // Paginación
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const paginated = filtered.slice(startIndex, startIndex + itemsPerPage)
+
+    setFilteredQueries(paginated)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
-    if(dateString === 'Pendiente') return 'Pendiente'
-    // Split the date string
+    if (dateString === 'Pendiente') return 'Pendiente'
     const [year, month, day] = dateString.split('-')
-    // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
 
   return (
     <div className="container mx-auto py-10">
@@ -71,11 +123,23 @@ export default function ConsultasPage() {
           </Link>
         </Button>
       </div>
+
+      <div className="mt-4 mb-4">
+        <input
+          type="text"
+          placeholder="Buscar por razón social..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+
+      <PaginationControls />
+
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Empresa</TableHead>
-            <TableHead>Solicitante</TableHead>
             <TableHead>Encargado</TableHead>
             <TableHead>Descripción</TableHead>
             <TableHead>Fecha de resolución</TableHead>
@@ -83,14 +147,9 @@ export default function ConsultasPage() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {queries.map((query) => (
+          {filteredQueries.map((query) => (
             <TableRow key={query.id}>
               <TableCell>{query.company.razon_social}</TableCell>
-              {query.other_executive ? (
-                <TableCell>{query.other_fullname}</TableCell>
-              ) : (
-                <TableCell>{`${query.executive.name} ${query.executive.last_name}`}</TableCell>
-              )}
               <TableCell>{query.assignee.join(', ')}</TableCell>
               <TableCell>{query.description.substring(0, 50)}...</TableCell>
               <TableCell>{convertDateFormat(query.solved_date || 'Pendiente')}</TableCell>
@@ -118,6 +177,8 @@ export default function ConsultasPage() {
           ))}
         </TableBody>
       </Table>
+
+      <PaginationControls />
     </div>
   )
 }

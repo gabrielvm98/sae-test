@@ -39,6 +39,7 @@ type Executive = {
   membership_id: number | null
   membership: {
     name: string
+    membership_type: string
   } | null
   sae_meetings: string[] | null
 }
@@ -46,10 +47,14 @@ type Executive = {
 export default function UsuariosPage() {
   const [executives, setExecutives] = useState<Executive[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
+
 
   useEffect(() => {
     fetchExecutives()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchExecutives() {
     let query = supabase
@@ -58,33 +63,65 @@ export default function UsuariosPage() {
         *,
         company:company_id (razon_social),
         assistant:assistant_id (name, last_name),
-        membership:membership_id (name)
-      `)
+        membership:membership_id (name, membership_type)
+      `,  { count: 'exact' })
+      .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
-    if (searchQuery && searchQuery.trim() !== '') {
-      query = query.or(`name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
-    }
+      if (searchQuery && searchQuery.trim() !== '') {
+        const terms = searchQuery.trim().split(' '); // Divide el query en palabras
+        // @ts-expect-error no se
+        const filters = [];
+      
+        terms.forEach(term => {
+          // Construye los filtros para cada palabra
+          filters.push(`name.ilike.%${term}%`);
+          filters.push(`last_name.ilike.%${term}%`);
+        });
+      
+        // Une los filtros con `or`
+        // @ts-expect-error no se
+        const filterQuery = filters.join(',');
+      
+        // Aplica la consulta con los filtros dinámicos
+        query = query.or(filterQuery);
+      }
+      
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching executives:', error)
     } else {
       setExecutives(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
     }
   }
 
-  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
-    let formattedPhone = `${cc} ${phone}`
-    if (extension) {
-      formattedPhone += ` (${extension})`
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
     }
-    return formattedPhone
   }
+  
+
+  function formatPhoneNumber(cc: string | null = '', phone: string | null = '', extension?: string | null): string {
+    const cleanedCc = (cc ?? '').trim(); // Usa '' si cc es null o undefined
+    const cleanedPhone = (phone ?? '').trim(); // Usa '' si phone es null o undefined
+    const cleanedExtension = (extension ?? '').trim(); // Usa '' si extension es null o undefined
+    // Formatear el número telefónico
+    let formattedPhone = `${cleanedCc} ${cleanedPhone}`.trim(); // Elimina espacios innecesarios
+    if (cleanedExtension) {
+      formattedPhone += ` (${cleanedExtension})`;
+    }
+    return formattedPhone;
+  }
+  
   
   function formatSaeMeetings(meetings: string[] | null): string {
     if (!meetings || meetings.length === 0) {
-      return 'No asignado'
+      return ''
     }
     return meetings.join(', ')
   }
@@ -96,6 +133,31 @@ export default function UsuariosPage() {
     // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+  
 
   return (
     <div className="container mx-auto py-10">
@@ -118,6 +180,7 @@ export default function UsuariosPage() {
           />
         </div>
       </div>
+      <PaginationControls/>
       <Table>
         <TableHeader>
           <TableRow>
@@ -149,9 +212,9 @@ export default function UsuariosPage() {
               <TableCell>{executive.dni}</TableCell>
               <TableCell>{executive.name}</TableCell>
               <TableCell>{executive.last_name}</TableCell>
-              <TableCell>{executive.company.razon_social}</TableCell>
-              <TableCell>{executive.membership ? executive.membership.name : 'No asignado'}</TableCell>
-              <TableCell>{`${executive.assistant.name} ${executive.assistant.last_name}`}</TableCell>
+              <TableCell>{executive.company_id ? executive.company.razon_social : ''}</TableCell>
+              <TableCell>{executive.membership ? executive.membership.membership_type : ''}</TableCell>
+              <TableCell>{executive.assistant_id ? executive.assistant.name : ''} </TableCell>
               <TableCell>{executive.tareco}</TableCell>
               <TableCell>{executive.birth_date}</TableCell>
               <TableCell>{executive.country}</TableCell>
@@ -189,6 +252,7 @@ export default function UsuariosPage() {
           ))}
         </TableBody>
       </Table>
+      <PaginationControls/>
     </div>
   )
 }

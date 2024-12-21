@@ -4,9 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent} from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import Link from 'next/link'
-import { ArrowLeft, Pencil} from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 
 type Assistant = {
   id: number
@@ -53,12 +53,16 @@ export default function AssistantDetailsPage() {
 
   if (!assistant) return <div>Loading...</div>
 
-  function formatPhoneNumber(cc: string, phone: string, extension?: string) {
-    let formattedPhone = `${cc} ${phone}`
-    if (extension) {
-      formattedPhone += ` (${extension})`
+  function formatPhoneNumber(cc: string | null = '', phone: string | null = '', extension?: string | null): string {
+    const cleanedCc = (cc ?? '').trim(); // Usa '' si cc es null o undefined
+    const cleanedPhone = (phone ?? '').trim(); // Usa '' si phone es null o undefined
+    const cleanedExtension = (extension ?? '').trim(); // Usa '' si extension es null o undefined
+    // Formatear el número telefónico
+    let formattedPhone = `${cleanedCc} ${cleanedPhone}`.trim(); // Elimina espacios innecesarios
+    if (cleanedExtension) {
+      formattedPhone += ` (${cleanedExtension})`;
     }
-    return formattedPhone
+    return formattedPhone;
   }
 
   return (

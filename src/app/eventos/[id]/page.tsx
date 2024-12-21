@@ -11,6 +11,7 @@ import { ImportUsers } from '@/components/ImportUsers'
 import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
+import { useSearchParams } from 'next/navigation'
 
 type Event = {
   id: number
@@ -24,6 +25,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const resolvedParams = use(params)
   const [event, setEvent] = useState<Event | null>(null)
   const [showForm, setShowForm] = useState(false)
+
+  const searchParams = useSearchParams()
+  const defaultTab = searchParams.get('tab') || 'invitados' // Leer el tab de la URL o usar "invitados" por defecto.
 
   useEffect(() => {
     fetchEvent()
@@ -65,18 +69,38 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           <p><strong>Fecha y hora:</strong> {formatDateHour(event.date_hour)}</p>
         </div>
         <div>
-          <p><strong>Lugar:</strong> {event.place}</p>
+          <p><strong>Lugar:</strong> {event.place}</p><p>
+          <strong>Link a reporte: </strong> 
+             https://sae-crm.vercel.app/eventos/{event.id}?tab=reporte
+        </p>
         </div>
       </div>
       
-      <Tabs defaultValue="invitados" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="invitados">Invitados</TabsTrigger>
-          <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>
-          <TabsTrigger value="importar-externos">Importar Externos</TabsTrigger>
-          <TabsTrigger value="subir-asistencia">Subir Asistencia Zoom</TabsTrigger>
-          <TabsTrigger value="reporte">Reporte</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue={defaultTab} className="w-full">
+      <TabsList className="sm:hidden flex gap-2 overflow-x-auto scrollbar-hide w-full">
+        <TabsTrigger value="invitados" className="flex-shrink-0 text-sm px-4 py-2">
+          Invitados
+        </TabsTrigger>
+        <TabsTrigger value="importar-usuarios" className="flex-shrink-0 text-sm px-4 py-2">
+          Importar Usuarios
+        </TabsTrigger>
+        <TabsTrigger value="importar-externos" className="flex-shrink-0 text-sm px-4 py-2">
+          Importar Externos
+        </TabsTrigger>
+        <TabsTrigger value="subir-asistencia" className="flex-shrink-0 text-sm px-4 py-2">
+          Subir Asistencia Zoom
+        </TabsTrigger>
+        <TabsTrigger value="reporte" className="flex-shrink-0 text-sm px-4 py-2">
+          Reporte
+        </TabsTrigger>
+      </TabsList>
+      <TabsList className="hidden sm:grid w-full grid-cols-5">
+        <TabsTrigger value="invitados">Invitados</TabsTrigger>
+        <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>
+        <TabsTrigger value="importar-externos">Importar Externos</TabsTrigger>
+        <TabsTrigger value="subir-asistencia">Subir Asistencia Zoom</TabsTrigger>
+        <TabsTrigger value="reporte">Reporte</TabsTrigger>
+      </TabsList>
         
         <TabsContent value="invitados">
           <div className="space-y-4">

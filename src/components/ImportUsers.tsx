@@ -50,14 +50,32 @@ const membershipTypes = [
   "SAE Ejecutivo",
   "SAE Reuniones",
   "SAE Virtual",
+  "SAE Virtual Nuevo",
+  "SAE Virtual Power",
   "SAE Básico",
+  "SAE Básico Nuevo",
+  "SAE Básico reuniones",
   "SAE Completo",
   "SAE Especial",
-  "Titular Adicional"
+  "AC",
 ]
 
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
-  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
+const userTypes = [
+  "Titular",
+  "Cupo de cortesía",
+  "Cortesía de reportes",
+  "Titular adicional",
+  "Titular virtual",
+  "Cliente potencial",
+  "Titular Axpen",
+  "Titular Vitalicio",
+  "Titular indefinido",
+  "Invitado por transición laboral",
+  "Cliente beca",
+  "Reemplazo",
+  "AC",
+  "Otros",
+]
 
 const saeMeetingsOptions = [
   "Encuentro mensual presencial",
@@ -183,7 +201,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         event_id: eventId,
         executive_id: executiveId,
         company_id: executive?.company_id,
-        email: executive?.email,
+        email: executive?.email.toLowerCase().trim(),
         is_client_company: true,
         is_user: true
       }
