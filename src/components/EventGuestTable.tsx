@@ -143,7 +143,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       query = query.eq('id', eventGuestId);
     }
     
-    const { data, error, count } = await query;    
+    const { data, error } = await query;    
   
     if (error) {
       console.error('Error fetching guests:', error)
