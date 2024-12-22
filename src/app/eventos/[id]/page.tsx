@@ -13,6 +13,7 @@ import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
 import { useSearchParams } from 'next/navigation'
 import { ScanQRTab } from '@/components/ScanGuests'
+import { Parser } from 'json2csv'
 
 type Event = {
   id: number
@@ -60,6 +61,43 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   if (!event) return <div>Cargando...</div>
+
+  const handleCSVClick = async () => { 
+    const { data, error } = await supabase
+      .from('event_guest')
+      .select(`
+        *,
+        company:company_id (razon_social),
+        executive:executive_id (name, last_name, email, office_phone, position)
+      `)
+      .eq('event_id', resolvedParams.id)
+  
+    if (error) {
+      console.error('Error fetching guests:', error)
+      return
+    }
+
+    if (data) {
+      try {        
+        const parser = new Parser();
+        const csv = parser.parse(data);
+          
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'event_guests.csv';
+        link.style.display = 'none';
+  
+        document.body.appendChild(link);
+        link.click();
+          
+        document.body.removeChild(link);
+      } catch (parseError) {
+        console.error('Error generating CSV:', parseError);
+      }
+    }
+   }
 
   return (
     <div className="container mx-auto py-10">
@@ -113,7 +151,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               <Button onClick={() => setShowForm(!showForm)}>
                 {showForm ? 'Cerrar formulario' : 'Añadir invitado'}
               </Button>
-              <Button variant="outline">Descargar CSV</Button>
+              <Button variant="outline" onClick={() => handleCSVClick()}>Descargar CSV</Button>
             </div>
             {showForm && <CreateGuestForm eventId={parseInt(resolvedParams.id)} onComplete={() => setShowForm(false)} />}
             <EventGuestTable eventId={parseInt(resolvedParams.id)} />
