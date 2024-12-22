@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { EditGuestForm } from './EditGuestForm'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import QRCode from 'qrcode'
+import JSZip from 'jszip'
 
 type EventGuest = {
   id: string
@@ -126,6 +128,73 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
     </div>
   )
 
+  const handleQRClick = async (eventGuestId: string | null = null) => {  
+    let query = supabase
+      .from('event_guest')
+      .select(`
+        *,
+        executive:executive_id (name, last_name, email, office_phone, position)
+      `)
+      .eq('event_id', eventId)
+      .ilike('name', `%${searchQuery}%`);
+    
+    if (eventGuestId) {
+      console.log("hola" + eventGuestId)
+      query = query.eq('id', eventGuestId);
+    }
+    
+    const { data, error, count } = await query;    
+  
+    if (error) {
+      console.error('Error fetching guests:', error)
+      return
+    }
+    
+    const guestsQR = data ;
+    const zip = new JSZip()
+    const qrPromises = guestsQR.map(async (guest) => {
+      const guestName = guest.is_user
+        ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
+        : guest.name
+      const qrData = `${guest.id}-${guestName}`
+  
+      try {
+        
+        const qrCodeUrl = await QRCode.toDataURL(qrData)
+  
+        
+        const byteString = atob(qrCodeUrl.split(',')[1])
+        const arrayBuffer = new ArrayBuffer(byteString.length)
+        const uint8Array = new Uint8Array(arrayBuffer)
+  
+        
+        for (let i = 0; i < byteString.length; i++) {
+          uint8Array[i] = byteString.charCodeAt(i)
+        }
+  
+        const blob = new Blob([uint8Array], { type: 'image/png' })
+  
+        
+        zip.file(`${guestName}-QR-${guest.id}.png`, blob)
+  
+        
+      } catch (error) {
+        console.error(`Error generando QR para ${guestName}:`, error)
+      }
+    })
+      
+    await Promise.all(qrPromises)    
+    
+    zip.generateAsync({ type: 'blob' }).then((content) => {
+      
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(content)
+      link.download = 'codigos_qr.zip' 
+      link.click() 
+      console.log('Archivo ZIP descargado')
+    })
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -198,6 +267,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
                     >
                       Editar
                     </Button>
+                    <Button onClick={() => handleQRClick(guest.id)}>
+                      QR
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive" size="sm">
@@ -250,6 +322,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         </TableBody>
       </Table>
       <PaginationControls />
+      <Button onClick={() => handleQRClick()}>
+        Generar Códigos QR
+      </Button>
     </div>
   )
 }
