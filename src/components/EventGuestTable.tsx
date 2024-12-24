@@ -133,13 +133,13 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       .from('event_guest')
       .select(`
         *,
-        executive:executive_id (name, last_name, email, office_phone, position)
+        company:company_id (razon_social),
+        executive:executive_id (id, name, last_name, email, office_phone, position)
       `)
       .eq('event_id', eventId)
       .ilike('name', `%${searchQuery}%`);
     
     if (eventGuestId) {
-      console.log("hola" + eventGuestId)
       query = query.eq('id', eventGuestId);
     }
     
@@ -162,18 +162,47 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         
         const qrCodeUrl = await QRCode.toDataURL(qrData)
   
-        
-        const byteString = atob(qrCodeUrl.split(',')[1])
-        const arrayBuffer = new ArrayBuffer(byteString.length)
-        const uint8Array = new Uint8Array(arrayBuffer)
-  
-        
-        for (let i = 0; i < byteString.length; i++) {
-          uint8Array[i] = byteString.charCodeAt(i)
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('No se pudo obtener el contexto 2D del canvas');
         }
+
+        const qrImage = new Image();
+
+        qrImage.src = qrCodeUrl;
+
+        await new Promise<void>((resolve) => {
+          qrImage.onload = () => {
+            const qrSize = 500; 
+            const textHeight = 60; 
+            const canvasWidth = qrSize;
+            const canvasHeight = qrSize + textHeight;
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            ctx.drawImage(qrImage, 0, 0, qrSize, qrSize);
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, qrSize, canvasWidth, textHeight);
+            
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'black';
+
+            ctx.fillText(guestName, canvasWidth / 2, qrSize + 20);
+            ctx.fillText(guest.company.razon_social, canvasWidth / 2, qrSize + 40);
+
+            resolve();
+          };
+        });
+
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
   
-        const blob = new Blob([uint8Array], { type: 'image/png' })
-  
+        if (!blob) {
+          throw new Error(`No se pudo generar el blob para ${guestName}`);
+        }
         
         zip.file(`${guestName}-QR-${guest.id}.png`, blob)
   
