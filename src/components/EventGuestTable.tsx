@@ -156,8 +156,15 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
       const guestName = guest.is_user
         ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
         : guest.name
-      const qrData = `${guest.id}-${guestName}`
-  
+
+      const qrData = guest.is_user 
+        ? `I-${guest.executive.id}`
+        : `E-${guest.id}`  
+
+      const guestCompany = guest.is_user 
+        ? guest.company.razon_social
+        : guest.company_razon_social  
+
       try {
         
         const qrCodeUrl = await QRCode.toDataURL(qrData)
@@ -192,7 +199,7 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
             ctx.fillStyle = 'black';
 
             ctx.fillText(guestName, canvasWidth / 2, qrSize + 20);
-            ctx.fillText(guest.company.razon_social, canvasWidth / 2, qrSize + 40);
+            ctx.fillText(guestCompany, canvasWidth / 2, qrSize + 40);
 
             resolve();
           };
