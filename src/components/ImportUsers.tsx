@@ -203,7 +203,8 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         company_id: executive?.company_id,
         email: executive?.email.toLowerCase().trim(),
         is_client_company: true,
-        is_user: true
+        is_user: true,
+        name: ""
       }
     })
 
