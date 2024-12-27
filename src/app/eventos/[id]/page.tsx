@@ -12,7 +12,6 @@ import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
 import { useSearchParams } from 'next/navigation'
-import { ScanQRTab } from '@/components/ScanGuests'
 import { Parser } from 'json2csv'
 
 type Event = {
@@ -129,19 +128,15 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         <TabsTrigger value="subir-asistencia" className="flex-shrink-0 text-sm px-4 py-2">
           Subir Asistencia Zoom
         </TabsTrigger>
-        <TabsTrigger value="escanear-qr" className="flex-shrink-0 text-sm px-4 py-2">
-          Escanear QR
-        </TabsTrigger>
         <TabsTrigger value="reporte" className="flex-shrink-0 text-sm px-4 py-2">
           Reporte
         </TabsTrigger>
       </TabsList>
-      <TabsList className="hidden sm:grid w-full grid-cols-6">
+      <TabsList className="hidden sm:grid w-full grid-cols-5">
         <TabsTrigger value="invitados">Invitados</TabsTrigger>
         <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>
         <TabsTrigger value="importar-externos">Importar Externos</TabsTrigger>
         <TabsTrigger value="subir-asistencia">Subir Asistencia Zoom</TabsTrigger>
-        <TabsTrigger value="escanear-qr">Escanear QR</TabsTrigger>
         <TabsTrigger value="reporte">Reporte</TabsTrigger>
       </TabsList>
         
@@ -168,10 +163,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         
         <TabsContent value="subir-asistencia">
           <UploadZoomAttendance eventId={parseInt(resolvedParams.id)} />
-        </TabsContent>
-
-        <TabsContent value="escanear-qr">
-          <ScanQRTab eventId={parseInt(resolvedParams.id)} />
         </TabsContent>
 
         <TabsContent value="reporte">
