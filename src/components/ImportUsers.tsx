@@ -29,6 +29,7 @@ type Executive = {
   company_id: number
   membership_id: number
   active: boolean
+  end_date: string
   sae_meetings: string[]
   membership: Membership
 }
@@ -63,6 +64,8 @@ const membershipTypes = [
 const userTypes = [
   "Titular",
   "Cupo de cortesía",
+  "Cupo adicional",
+  "Cortesía de reuniones",
   "Cortesía de reportes",
   "Titular adicional",
   "Titular virtual",
@@ -365,6 +368,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
             <TableHead>Nombre</TableHead>
             <TableHead>Tipo de Usuario</TableHead>
             <TableHead>Estado de usuario</TableHead>
+            <TableHead>Fecha de Fin</TableHead>
             <TableHead>Empresa</TableHead>
             <TableHead>Estado de Empresa</TableHead>
             <TableHead>Reuniones SAE</TableHead>
@@ -384,6 +388,9 @@ export function ImportUsers({ eventId }: { eventId: number }) {
               <TableCell>{executive.name} {executive.last_name}</TableCell>
               <TableCell>{executive.user_type}</TableCell>
               <TableCell>{executive.active ? 'Activo' : 'No Activo'}</TableCell>
+              <TableCell>
+                {executive.end_date && executive.end_date.length >= 5 ? executive.end_date : "Por Definir"}
+              </TableCell>
               <TableCell>
                 {companies.find(company => company.id === executive.company_id)?.razon_social || 'N/A'}
               </TableCell>

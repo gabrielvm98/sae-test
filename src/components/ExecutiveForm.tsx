@@ -62,6 +62,8 @@ const countries: CountryOption[] = [
 const userTypes = [
   "Titular",
   "Cupo de cortesía",
+  "Cupo adicional",
+  "Cortesía de reuniones",
   "Cortesía de reportes",
   "Titular adicional",
   "Titular virtual",
