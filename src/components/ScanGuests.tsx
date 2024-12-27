@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner'
+import { supabase } from '@/lib/supabase'
 
 interface ScanQRTabProps {
   eventId: number
@@ -37,13 +38,45 @@ export function ScanQRTab({ eventId }: ScanQRTabProps) {
     setIsScanning(false)
   }
 
-  const handleScan = (result: IDetectedBarcode[]) => {
+  const handleScan = async (result: IDetectedBarcode[]) => {
     if (result && result.length > 0) {
-      // Assuming you want to use the first detected barcode's text
-      const barcodeText = result[0].rawValue;  // Replace `.text` with the actual property if necessary
+      const barcodeText = result[0].rawValue;  
       console.log('QR Code scanned:', barcodeText, eventId)
-      setScannedData(barcodeText)  // Store the text of the first barcode
+      setScannedData(barcodeText)  
       stopScanning()
+
+      const [prefix, id] = barcodeText.split('-');
+      if(prefix ==='I'){
+        
+        const { error } = await supabase
+        .from('event_guest')
+        .update({ assisted: true })
+        .eq('event_id', eventId)
+        .eq('executive_id',id)
+      
+        if (error) {
+          console.error('Error fetching guests:', error)
+          return
+        }
+
+      }
+      else if (prefix ==='E'){
+
+        const { error } = await supabase
+        .from('event_guest')
+        .update({ assisted: true })
+        .eq('event_id', eventId)
+        .eq('id',id)
+      
+        if (error) {
+          console.error('Error fetching guests:', error)
+          return
+        }
+
+      }
+      else {
+        console.log('Guest not found for scanned QR code.');
+      }
     }
   }
 
