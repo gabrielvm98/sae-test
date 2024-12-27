@@ -19,6 +19,7 @@
     "@radix-ui/react-toast": "^1.2.2",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.46.1",
+    "@yudiel/react-qr-scanner": "^2.1.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "json2csv": "^6.0.0-alpha.2",
