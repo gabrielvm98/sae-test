@@ -109,7 +109,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         name: `Copia de ${event.name}`,
         event_type: event.event_type,
         date_hour: event.date_hour,
-        place: event.place,    
+        place: event.place,
+        register_open: event.register_open 
       };      
       console.log("Copia del evento:", copiedEvent);
       const { data: newEvent, error: eventError } = await supabase
