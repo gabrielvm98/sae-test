@@ -13,6 +13,7 @@ type Event = {
   event_type: string
   date_hour: string
   place: string
+  register_open: boolean
 }
 
 export default function EventosPage() {
@@ -83,6 +84,7 @@ export default function EventosPage() {
             <TableHead>Fecha</TableHead>
             <TableHead>Hora</TableHead>
             <TableHead>Lugar</TableHead>
+            <TableHead>Registro Abierto</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -96,6 +98,7 @@ export default function EventosPage() {
                 <TableCell>{date}</TableCell>
                 <TableCell>{time}</TableCell>
                 <TableCell>{event.place}</TableCell>
+                <TableCell>{event.register_open ? "Sí" : "No"}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" size="sm" asChild>

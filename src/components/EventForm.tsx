@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type EventFormProps = {
@@ -19,6 +20,7 @@ export function EventForm({ eventId }: EventFormProps) {
   const [eventType, setEventType] = useState('')
   const [dateHour, setDateHour] = useState('')
   const [place, setPlace] = useState('')
+  const [registerOpen, setRegisterOpen] = useState(false)
 
   const router = useRouter()
 
@@ -37,6 +39,7 @@ export function EventForm({ eventId }: EventFormProps) {
       setEventType(data.event_type)
       setDateHour(data.date_hour)
       setPlace(data.place)
+      setRegisterOpen(data.register_open)
     }
   }, [eventId])
 
@@ -52,7 +55,8 @@ export function EventForm({ eventId }: EventFormProps) {
       name,
       event_type: eventType,
       date_hour: dateHour,
-      place
+      place,
+      register_open: registerOpen
     }
 
     if (eventId) {
@@ -119,6 +123,16 @@ export function EventForm({ eventId }: EventFormProps) {
           onChange={(e) => setPlace(e.target.value)}
           required
         />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="registerOpen"
+          checked={registerOpen}
+          onCheckedChange={(checked) => setRegisterOpen(checked as boolean)}
+        />
+        <Label htmlFor="registerOpen" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Registro Abierto
+        </Label>
       </div>
       <Button type="submit">{eventId ? 'Actualizar' : 'Agregar Nuevo Evento'}</Button>
     </form>

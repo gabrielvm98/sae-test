@@ -21,6 +21,7 @@ type Event = {
   event_type: string
   date_hour: string
   place: string
+  register_open: boolean
 }
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -164,6 +165,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         <div>
           <p><strong>Modalidad:</strong> {event.event_type}</p>
           <p><strong>Fecha y hora:</strong> {formatDateHour(event.date_hour)}</p>
+          <p><strong>Registro Abierto:</strong> {event.register_open ? "Sí" : "No"}</p>
         </div>
         <div>
           <p><strong>Lugar:</strong> {event.place}</p><p>
