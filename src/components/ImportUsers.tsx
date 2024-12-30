@@ -359,6 +359,9 @@ export function ImportUsers({ eventId }: { eventId: number }) {
       </div>
   
       {/* Tabla */}
+      <Button onClick={handleImportSelected} className="mt-4">
+        Importar {selectedExecutives.length} Seleccionados
+      </Button>
       <Table>
         <TableHeader>
           <TableRow>
@@ -413,7 +416,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   
       {/* Botón de acción */}
       <Button onClick={handleImportSelected} className="mt-4">
-        Importar Seleccionados
+      Importar {selectedExecutives.length} Seleccionados
       </Button>
     </div>
   )
