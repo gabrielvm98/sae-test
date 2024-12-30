@@ -104,6 +104,22 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   const [selectAll, setSelectAll] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
+  const convertDateFormat = (dateString: string) => {
+    if (!dateString) return '';
+  
+    // Determine the separator used in the date string
+    const separator = dateString.includes('-') ? '-' : dateString.includes('/') ? '/' : null;
+  
+    if (!separator) return ''; // Return empty string if no valid separator is found
+  
+    // Split the date string using the identified separator
+    const [month, day, year] = dateString.split(separator);
+  
+    // Rearrange into DD-MM-YYYY or DD/MM/YYYY format
+    return `${day}${separator}${month}${separator}${year}`;
+  };
+  
+
 
   useEffect(() => {
     fetchExecutives()
@@ -392,7 +408,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
               <TableCell>{executive.user_type}</TableCell>
               <TableCell>{executive.active ? 'Activo' : 'No Activo'}</TableCell>
               <TableCell>
-                {executive.end_date && executive.end_date.length >= 5 ? executive.end_date : "Por Definir"}
+                {executive.end_date && executive.end_date.length >= 5 ? convertDateFormat(executive.end_date) : "Por Definir"}
               </TableCell>
               <TableCell>
                 {companies.find(company => company.id === executive.company_id)?.razon_social || 'N/A'}
