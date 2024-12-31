@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/hooks/use-toast"
 import { SearchableSelectFilter } from './SearchableSelectFilter'
+import Select, { MultiValue } from 'react-select';
+
+type Option = { value: string, label: string };
 
 type Membership = {
   id: number
@@ -59,6 +61,7 @@ const membershipTypes = [
   "SAE Completo",
   "SAE Especial",
   "AC",
+  "Free trial",
 ]
 
 const userTypes = [
@@ -93,14 +96,14 @@ const statusOptions = ['Cliente SAE', 'Ex-cliente SAE', 'No cliente SAE']
 export function ImportUsers({ eventId }: { eventId: number }) {
   const [executives, setExecutives] = useState<Executive[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
-  const [selectedUserType, setSelectedUserType] = useState<string>('all')
+  const [selectedUserTypes, setSelectedUserTypes] = useState<Option[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all')
   const [selectedActive, setSelectedActive] = useState<string>('all')
-  const [selectedSaeMeeting, setSelectedSaeMeeting] = useState<string>('all')
-  const [selectedCompanyStatus, setSelectedCompanyStatus] = useState<string>('all')
+  const [selectedSaeMeeting, setSelectedSaeMeeting] = useState<Option[]>([])
+  const [selectedCompanyStatus, setSelectedCompanyStatus] = useState<Option[]>([])
   const [selectedExecutives, setSelectedExecutives] = useState<number[]>([])
-  const [selectedMembershipType, setSelectedMembershipType] = useState<string>('all')
-  const [selectedForumType, setSelectedForumType] = useState<string>('all')
+  const [selectedMembershipType, setSelectedMembershipType] = useState<Option[]>([])
+  const [selectedForumType, setSelectedForumType] = useState<Option[]>([])
   const [selectAll, setSelectAll] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -163,33 +166,44 @@ export function ImportUsers({ eventId }: { eventId: number }) {
 
   const filteredExecutives = executives.filter(executive => {
     const userTypeMatch =
-      selectedUserType === 'all' || (executive.user_type && executive.user_type === selectedUserType);
+      selectedUserTypes.length === 0 || selectedUserTypes.some((option: Option) => option.value === executive.user_type);    
   
     const companyMatch =
       selectedCompanyId === 'all' || (executive.company_id && executive.company_id.toString() === selectedCompanyId);
   
     const activeMatch =
-      selectedActive === 'all' || (executive.active !== null && executive.active.toString() === selectedActive);
+      selectedActive === 'all' || (executive.active !== null && executive.active === (selectedActive === 'true'));
   
     const saeMeetingMatch =
-      selectedSaeMeeting === 'all' || 
-      (executive.sae_meetings && Array.isArray(executive.sae_meetings) && executive.sae_meetings.includes(selectedSaeMeeting));
+      selectedSaeMeeting.length === 0 || selectedSaeMeeting.some((selected: Option) => executive.sae_meetings && executive.sae_meetings.includes(selected.value));
   
     const companyStatusMatch =
-      selectedCompanyStatus === 'all' ||
-      (companies.find(company => company.id === executive.company_id)?.status === selectedCompanyStatus);
+      selectedCompanyStatus.length === 0 || selectedCompanyStatus.some((state: Option) => 
+        companies.find(company => company.id === executive.company_id)?.status === state.value
+      );
   
     const searchMatch =
       executive.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       executive.last_name.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const membershipTypeMatch = selectedMembershipType === 'all' || executive.membership?.membership_type === selectedMembershipType;
+    const membershipTypeMatch = 
+      selectedMembershipType.length === 0 || selectedMembershipType.some((option: Option) => executive.membership?.membership_type === option.value);
 
-    const forumTypeMatch = selectedForumType === 'all' || 
-      (selectedForumType === "Primero Comercial" && executive.membership?.forum_consumer_first_semester) ||
-      (selectedForumType === "Segundo Comercial" && executive.membership?.forum_consumer_second_semester) ||
-      (selectedForumType === "Primero Sectorial" && executive.membership?.forum_sectorial_first_semester) ||
-      (selectedForumType === "Segundo Sectorial" && executive.membership?.forum_sectorial_second_semester);
+    const forumTypeMatch = 
+    selectedForumType.length === 0 || selectedForumType.some((forum: Option) => {
+      switch (forum.value) {
+        case "Primero Comercial":
+          return executive.membership?.forum_consumer_first_semester;
+        case "Segundo Comercial":
+          return executive.membership?.forum_consumer_second_semester;
+        case "Primero Sectorial":
+          return executive.membership?.forum_sectorial_first_semester;
+        case "Segundo Sectorial":
+          return executive.membership?.forum_sectorial_second_semester;
+        default:
+          return false;
+      }
+    });
     
   
     return userTypeMatch && companyMatch && activeMatch && saeMeetingMatch && companyStatusMatch && searchMatch && membershipTypeMatch && forumTypeMatch;
@@ -291,86 +305,78 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         </div>
         <div>
           <h4 className="text-md font-medium">Tipo de Usuario</h4>
-          <Select value={selectedUserType} onValueChange={setSelectedUserType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {userTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select
+            isMulti
+            options={userTypes.map(type => ({ value: type, label: type, }))}
+            value={selectedUserTypes}
+            onChange={(newValue: MultiValue<Option>) => setSelectedUserTypes([...newValue])}
+            getOptionLabel={(e: Option) => e.label}
+            getOptionValue={(e: Option) => e.value}
+            placeholder="Selecciona tipos de usuario"
+          />          
         </div>
         <div>
           <h4 className="text-md font-medium">Estado Activo</h4>
-          <Select value={selectedActive} onValueChange={setSelectedActive}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="true">Activo</SelectItem>
-              <SelectItem value="false">No Activo</SelectItem>
-            </SelectContent>
-          </Select>
+          <Select
+            value={selectedActive}
+            onChange={(newValue: any) => setSelectedActive(newValue.value)}
+            options={[
+              { value: 'all', label: 'Todos' },
+              { value: 'true', label: 'Activo' },
+              { value: 'false', label: 'No Activo' }
+            ]}
+            getOptionLabel={(e: any) => e.label}
+            getOptionValue={(e: any) => e.value}
+            placeholder="Selecciona un estado"
+          />
         </div>
         <div>
           <h4 className="text-md font-medium">Reuniones SAE</h4>
-          <Select value={selectedSaeMeeting} onValueChange={setSelectedSaeMeeting}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona una reunión" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {saeMeetingsOptions.map(option => (
-                <SelectItem key={option} value={option}>{option}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select
+            isMulti
+            options={saeMeetingsOptions.map(option => ({ value: option, label: option }))}
+            value={selectedSaeMeeting}
+            onChange={(newValue: MultiValue<Option>) => setSelectedSaeMeeting([...newValue])}
+            getOptionLabel={(e: Option) => e.label}
+            getOptionValue={(e: Option) => e.value}
+            placeholder="Selecciona reuniones SAE"
+          />
         </div>
         <div>
           <h4 className="text-md font-medium">Estado de Empresa</h4>
-          <Select value={selectedCompanyStatus} onValueChange={setSelectedCompanyStatus}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un estado" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {statusOptions.map(status => (
-                <SelectItem key={status} value={status}>{status}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select
+            isMulti
+            options={statusOptions.map(state => ({ value: state, label: state }))}
+            value={selectedCompanyStatus}
+            onChange={(newValue: MultiValue<Option>) => setSelectedCompanyStatus([...newValue])}
+            getOptionLabel={(e: Option) => e.label}
+            getOptionValue={(e: Option) => e.value}
+            placeholder="Selecciona estados de empresa"
+          />
         </div>
         <div>
           <h4 className="text-md font-medium">Tipo de Membresía</h4>
-          <Select value={selectedMembershipType} onValueChange={setSelectedMembershipType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {membershipTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select
+            isMulti
+            options={membershipTypes.map(type => ({ value: type, label: type }))}
+            value={selectedMembershipType}
+            onChange={(newValue: MultiValue<Option>) => setSelectedMembershipType([...newValue])}
+            getOptionLabel={(e: Option) => e.label}
+            getOptionValue={(e: Option) => e.value}
+            placeholder="Selecciona tipos de membresía"
+          />
         </div>
         <div>
           <h4 className="text-md font-medium">Foros Semestrales</h4>
-          <Select value={selectedForumType} onValueChange={setSelectedForumType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Selecciona un foro" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {forumTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Select 
+            isMulti
+            options={forumTypes.map(type => ({ value: type, label: type }))}
+            value={selectedForumType}
+            onChange={(newValue: MultiValue<Option>) => setSelectedForumType([...newValue])}
+            getOptionLabel={(e: Option) => e.label}
+            getOptionValue={(e: Option) => e.value}
+            placeholder="Selecciona un foro"
+          />
         </div>
       </div>
   
