@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 type EventFormProps = {
   eventId?: number
+  copyEventId?: number
 }
 
 const eventTypeOptions = ['Presencial', 'Virtual', 'Híbrido']
 
-export function EventForm({ eventId }: EventFormProps) {
+export function EventForm({ eventId, copyEventId }: EventFormProps) {
   const [name, setName] = useState('')
   const [eventType, setEventType] = useState('')
   const [dateHour, setDateHour] = useState('')
@@ -68,12 +69,46 @@ export function EventForm({ eventId }: EventFormProps) {
       if (error) console.error('Error updating event:', error)
       else router.push('/eventos')
     } else {
-      const { error } = await supabase
+      const { data: newEvent, error } = await supabase
         .from('event')
         .insert([event])
+        .select()
+        .single()
 
       if (error) console.error('Error creating event:', error)
-      else router.push('/eventos')
+
+      if(copyEventId){
+        
+        const { data: guests, error: guestsError } = await supabase
+        .from('event_guest')
+        .select('*')
+        .eq('event_id', copyEventId);
+
+        if (guestsError) {
+          console.error('Error obteniendo invitados:', guestsError);
+          return;
+        }
+
+        if (guests && guests.length > 0) {
+          const copiedGuests = guests.map(({ id, ...guest }) => ({
+            ...guest,
+            event_id: true ? newEvent.id : id,               
+          }));
+    
+          const { error: copyGuestsError } = await supabase
+            .from('event_guest')
+            .insert(copiedGuests);
+    
+          if (copyGuestsError) {
+            console.error('Error copiando invitados:', copyGuestsError);
+            return;
+          }
+    
+          console.log("Invitados copiados exitosamente.");
+        }
+      }
+
+      router.push('/eventos')
     }
   }
 

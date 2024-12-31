@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
-import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-react'
+import { PlusCircle, Eye, Pencil, Trash2, Copy } from 'lucide-react'
 
 type Event = {
   id: number
@@ -111,6 +111,12 @@ export default function EventosPage() {
                       <Link href={`/eventos/${event.id}/edit`}>
                         <Pencil className="h-4 w-4" />
                         <span className="sr-only">Editar</span>
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/eventos/new?copyEventId=${event.id}`}>
+                        <Copy className="h-4 w-4" />
+                        <span className="sr-only">Copiar</span>
                       </Link>
                     </Button>
                     <Button variant="outline" size="sm" disabled>
