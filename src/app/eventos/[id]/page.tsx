@@ -63,26 +63,33 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   if (!event) return <div>Cargando...</div>
 
-  const handleCSVClick = async () => { 
+  const handleCSVClick = async () => {
     const { data, error } = await supabase
       .from('event_guest')
       .select(`
-        *,
-        company:company_id (razon_social),
-        executive:executive_id (name, last_name, email, office_phone, position)
+        name,
+        email,
+        registered
       `)
-      .eq('event_id', resolvedParams.id)
+      .eq('event_id', resolvedParams.id);
   
     if (error) {
-      console.error('Error fetching guests:', error)
-      return
+      console.error('Error fetching guests:', error);
+      return;
     }
-
+  
     if (data) {
-      try {        
-        const parser = new Parser();
-        const csv = parser.parse(data);
-          
+      try {
+        // Agregar la columna de enlace de registro
+        const enrichedData = data.map((guest) => ({
+          ...guest,
+          registration_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
+        }));
+  
+        const fields = ['name', 'email', 'registered', 'registration_link'];
+        const parser = new Parser({ fields });
+        const csv = parser.parse(enrichedData);
+  
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   
         const link = document.createElement('a');
@@ -92,13 +99,13 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   
         document.body.appendChild(link);
         link.click();
-          
+  
         document.body.removeChild(link);
       } catch (parseError) {
         console.error('Error generating CSV:', parseError);
       }
     }
-   }
+  };
 
 
   return (

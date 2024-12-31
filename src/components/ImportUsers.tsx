@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { toast } from "@/hooks/use-toast"
 import { SearchableSelectFilter } from './SearchableSelectFilter'
 import Select, { MultiValue } from 'react-select';
+import { Select as UISelect, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type Option = { value: string, label: string };
 
@@ -317,18 +318,16 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         </div>
         <div>
           <h4 className="text-md font-medium">Estado Activo</h4>
-          <Select
-            value={selectedActive}
-            onChange={(newValue: any) => setSelectedActive(newValue.value)}
-            options={[
-              { value: 'all', label: 'Todos' },
-              { value: 'true', label: 'Activo' },
-              { value: 'false', label: 'No Activo' }
-            ]}
-            getOptionLabel={(e: any) => e.label}
-            getOptionValue={(e: any) => e.value}
-            placeholder="Selecciona un estado"
-          />
+          <UISelect value={selectedActive} onValueChange={setSelectedActive}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecciona un estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="true">Activo</SelectItem>
+              <SelectItem value="false">No Activo</SelectItem>
+            </SelectContent>
+          </UISelect>
         </div>
         <div>
           <h4 className="text-md font-medium">Reuniones SAE</h4>
