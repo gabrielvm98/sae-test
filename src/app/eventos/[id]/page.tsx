@@ -12,7 +12,7 @@ import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
 import { ScanQRTab } from '@/components/ScanGuests'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Parser } from 'json2csv'
 
 type Event = {
@@ -31,7 +31,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   const searchParams = useSearchParams()
   const defaultTab = searchParams.get('tab') || 'invitados' // Leer el tab de la URL o usar "invitados" por defecto.
-  const router = useRouter()
 
   useEffect(() => {
     fetchEvent()
@@ -101,63 +100,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     }
    }
 
-   const handleCopyEvent = async () => { 
-    const confirmCopy = window.confirm(`¿Estás seguro de que deseas copiar "${event.name}"?`);
-
-    if (confirmCopy) {
-      const copiedEvent = { 
-        name: `Copia de ${event.name}`,
-        event_type: event.event_type,
-        date_hour: event.date_hour,
-        place: event.place,
-        register_open: event.register_open 
-      };      
-      console.log("Copia del evento:", copiedEvent);
-      const { data: newEvent, error: eventError } = await supabase
-        .from('event')
-        .insert([copiedEvent])
-        .select()
-        .single()
-
-      if (eventError) {
-        console.error('Error creando el evento:', eventError);
-        return;
-      }
-      console.log("Evento copiado con ID:", newEvent.id);
-
-       // Obtener invitados del evento original
-      const { data: guests, error: guestsError } = await supabase
-      .from('event_guest')
-      .select('*')
-      .eq('event_id', event.id);
-
-      if (guestsError) {
-        console.error('Error obteniendo invitados:', guestsError);
-        return;
-      }
-
-      if (guests && guests.length > 0) {
-        const copiedGuests = guests.map(({ id, ...guest }) => ({
-          ...guest,
-          event_id: true ? newEvent.id : id,               
-        }));
-  
-        const { error: copyGuestsError } = await supabase
-          .from('event_guest')
-          .insert(copiedGuests);
-  
-        if (copyGuestsError) {
-          console.error('Error copiando invitados:', copyGuestsError);
-          return;
-        }
-  
-        console.log("Invitados copiados exitosamente.");
-      }
-
-      
-      router.push('/eventos')      
-    }
-   }
 
   return (
     <div className="container mx-auto py-10">
@@ -213,7 +155,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 {showForm ? 'Cerrar formulario' : 'Añadir invitado'}
               </Button>
               <div className="flex ml-auto space-x-2">
-                <Button variant="default" onClick={() => handleCopyEvent()}>Copiar Evento</Button>
                 <Button variant="outline" onClick={() => handleCSVClick()}>Descargar CSV</Button>
               </div>
             </div>
