@@ -67,9 +67,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     const { data, error } = await supabase
       .from('event_guest')
       .select(`
-        name,
-        email,
-        registered
+        *,
+        executive:executive_id (name, last_name)
       `)
       .eq('event_id', resolvedParams.id);
   
@@ -82,7 +81,11 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       try {
         // Agregar la columna de enlace de registro
         const enrichedData = data.map((guest) => ({
-          ...guest,
+          email: guest.email,
+          name: guest.is_user
+          ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
+          : guest.name,
+          registered: guest.registered === null ? false : guest.registered,
           registration_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
         }));
   
