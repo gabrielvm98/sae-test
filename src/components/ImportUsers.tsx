@@ -244,7 +244,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
 
     const { error } = await supabase
       .from('event_guest')
-      .upsert(eventGuests)
+      .upsert(eventGuests, { onConflict: "executive_id, event_id" });  
 
     if (error) {
       console.error('Error creating/updating event_guests:', error)
