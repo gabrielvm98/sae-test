@@ -220,13 +220,18 @@ export function ImportUsers({ eventId }: { eventId: number }) {
   }
 
   const handleSelectAll = () => {
+    const visibleIds = filteredExecutives.map(executive => executive.id);
+  
     if (selectAll) {
-      setSelectedExecutives([])
+      // Deselect only the visible executives
+      setSelectedExecutives(prev => prev.filter(id => !visibleIds.includes(id)));
     } else {
-      setSelectedExecutives(filteredExecutives.map(executive => executive.id))
+      // Select all visible executives
+      setSelectedExecutives(prev => [...new Set([...prev, ...visibleIds])]);
     }
-    setSelectAll(!selectAll)
-  }
+    
+    setSelectAll(!selectAll);
+  };
 
   async function createEventGuestsBatch(eventId: number, executiveIds: number[]) {
     const eventGuests = executiveIds.map((executiveId) => {
@@ -387,7 +392,7 @@ export function ImportUsers({ eventId }: { eventId: number }) {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[50px]">
-              <Checkbox checked={selectAll} onCheckedChange={handleSelectAll} />
+              <Checkbox checked={filteredExecutives.every(executive => selectedExecutives.includes(executive.id))} onCheckedChange={handleSelectAll} />
             </TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Tipo de Usuario</TableHead>
