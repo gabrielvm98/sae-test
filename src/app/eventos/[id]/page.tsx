@@ -13,7 +13,7 @@ import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
 import { ScanQRTab } from '@/components/ScanGuests'
 import { useSearchParams } from 'next/navigation'
-import { Parser } from 'json2csv'
+import * as XLSX from 'xlsx'
 
 type Event = {
   id: number
@@ -63,7 +63,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   if (!event) return <div>Cargando...</div>
 
-  const handleCSVClick = async () => {
+  const handleExcelClick = async () => {
     const { data, error } = await supabase
       .from('event_guest')
       .select(`
@@ -89,15 +89,16 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           registration_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
         }));
   
-        const fields = ['name', 'email', 'registered', 'registration_link'];
-        const parser = new Parser({ fields });
-        const csv = parser.parse(enrichedData);
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(enrichedData);
+        XLSX.utils.book_append_sheet(wb, ws, "Guests");
   
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'event_guests.csv';
+        link.download = 'event_guests.xlsx';
         link.style.display = 'none';
   
         document.body.appendChild(link);
@@ -105,7 +106,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   
         document.body.removeChild(link);
       } catch (parseError) {
-        console.error('Error generating CSV:', parseError);
+        console.error('Error generating Excel:', parseError);
       }
     }
   };
@@ -165,7 +166,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 {showForm ? 'Cerrar formulario' : 'Añadir invitado'}
               </Button>
               <div className="flex ml-auto space-x-2">
-                <Button variant="outline" onClick={() => handleCSVClick()}>Descargar CSV</Button>
+                <Button variant="outline" onClick={() => handleExcelClick()}>Descargar Excel</Button>
               </div>
             </div>
             {showForm && <CreateGuestForm eventId={parseInt(resolvedParams.id)} onComplete={() => setShowForm(false)} />}
