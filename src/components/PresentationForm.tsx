@@ -218,7 +218,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
               id="otherFullname"
               value={otherFullname}
               onChange={(e) => setOtherFullname(e.target.value)}
-              required
+              //required
             />
           </div>
           <div>
@@ -228,7 +228,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
               type="email"
               value={otherEmail}
               onChange={(e) => setOtherEmail(e.target.value)}
-              required
+              //required
             />
           </div>
         </>

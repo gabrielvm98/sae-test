@@ -206,7 +206,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -360,7 +360,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={cantidadReuniones}
           onChange={(e) => setCantidadReuniones(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -434,7 +434,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={titularVirtual}
           onChange={(e) => setTitularVirtual(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -445,7 +445,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={cantidadPresentaciones}
           onChange={(e) => setCantidadPresentaciones(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -505,7 +505,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
             step="0.01"
             value={paymentAmount}
             onChange={(e) => setPaymentAmount(e.target.value)}
-            required
+            //required
           />
         </div>
       </div>
@@ -543,7 +543,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="signerName"
           value={signerName}
           onChange={(e) => setSignerName(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -554,7 +554,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="email"
           value={signerEmail}
           onChange={(e) => setSignerEmail(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -564,7 +564,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="signerPhone"
           value={signerPhone}
           onChange={(e) => setSignerPhone(e.target.value)}
-          required
+          //required
         />
       </div>
 

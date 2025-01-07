@@ -282,7 +282,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           pattern="[0-9]*"
           value={dni}
           onChange={(e) => setDni(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -292,7 +292,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -302,7 +302,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -400,7 +400,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>

@@ -193,7 +193,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
               id="otherFullname"
               value={otherFullname}
               onChange={(e) => setOtherFullname(e.target.value)}
-              required
+              //required
             />
           </div>
           <div>
@@ -203,7 +203,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
               type="email"
               value={otherEmail}
               onChange={(e) => setOtherEmail(e.target.value)}
-              required
+              //required
             />
           </div>
         </>
@@ -229,7 +229,7 @@ export function QueryForm({ queryId }: QueryFormProps) {
           id="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
