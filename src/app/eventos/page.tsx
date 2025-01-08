@@ -72,8 +72,16 @@ export default function EventosPage() {
             <Link href="/eventos/reportes">
               <Eye className="mr-2 h-4 w-4" /> Ver reportes
             </Link>
-          </Button>
+        </Button>
           </div>
+          <div className="mt-4">
+          <Button asChild>
+            <Link href="/eventos/reportes/macro">
+              <Eye className="mr-2 h-4 w-4" /> Ver reportes macro
+            </Link>
+        </Button>
+        </div>
+
       </div>
       <Table>
         <TableHeader>
