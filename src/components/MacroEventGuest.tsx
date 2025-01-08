@@ -59,7 +59,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     setAttendees(attendeesMap);
   };
 
-  const filteredAttendees = Object.entries(attendees).filter(([email, events]) => {
+  const filteredAttendees = Object.entries(attendees).filter(([, events]) => {
     const registeredCount = Object.values(events).filter((registered) => registered).length;
     return filter === 'multiple' ? registeredCount > 1 : true;
   });
