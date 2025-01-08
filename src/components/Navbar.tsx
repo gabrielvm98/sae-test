@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 
 export function Navbar() {
@@ -7,8 +8,14 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <Link href="/" className="text-xl font-bold">
-              SAE CRM
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/LOGOblanco.jpg"
+                alt="SAE Logo"
+                width={100}
+                height={40}
+                priority
+              />
             </Link>
           </div>
           <div className="flex">
@@ -58,3 +65,4 @@ export function Navbar() {
     </nav>
   )
 }
+

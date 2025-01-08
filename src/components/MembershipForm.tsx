@@ -15,14 +15,23 @@ type MembershipFormProps = {
   membershipId?: number
 }
 
+type Company = {
+  id: number
+  razon_social: string
+}
+
 const membershipTypes = [
   "SAE Ejecutivo",
   "SAE Reuniones",
   "SAE Virtual",
+  "SAE Virtual Nuevo",
+  "SAE Virtual Power",
   "SAE Básico",
+  "SAE Básico Nuevo",
+  "SAE Básico reuniones",
   "SAE Completo",
   "SAE Especial",
-  "Titular Adicional"
+  "AC",
 ]
 
 const paymentMethods = [
@@ -67,6 +76,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
   const [signerEmail, setSignerEmail] = useState('')
   const [signerPhone, setSignerPhone] = useState('')
   const [comments, setComments] = useState('')
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
 
   const router = useRouter()
 
@@ -80,13 +90,14 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
     if (!membershipId) return
     const { data, error } = await supabase
       .from('membership')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', membershipId)
       .single()
 
     if (error) {
       console.error('Error fetching membership:', error)
     } else if (data) {
+      setInitialCompany(data.company)
       setName(data.name)
       setCompanyId(data.company_id.toString())
       setMembershipType(data.membership_type)
@@ -183,6 +194,10 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
     }
   }
 
+  const handleCompanyChange = (value: string) => {
+    setCompanyId(value)
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
@@ -191,16 +206,17 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
 
       <div>
         <Label htmlFor="companyId">Empresa</Label>
         <SearchableSelect
-          onSelect={(value) => setCompanyId(value)}
+          onSelect={handleCompanyChange}
           placeholder="Selecciona una empresa"
           label="empresa"
+          initialValue={initialCompany}
         />
       </div>
 
@@ -344,7 +360,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={cantidadReuniones}
           onChange={(e) => setCantidadReuniones(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -418,7 +434,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={titularVirtual}
           onChange={(e) => setTitularVirtual(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -429,7 +445,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="number"
           value={cantidadPresentaciones}
           onChange={(e) => setCantidadPresentaciones(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -489,7 +505,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
             step="0.01"
             value={paymentAmount}
             onChange={(e) => setPaymentAmount(e.target.value)}
-            required
+            //required
           />
         </div>
       </div>
@@ -527,7 +543,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="signerName"
           value={signerName}
           onChange={(e) => setSignerName(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -538,7 +554,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           type="email"
           value={signerEmail}
           onChange={(e) => setSignerEmail(e.target.value)}
-          required
+          //required
         />
       </div>
 
@@ -548,7 +564,7 @@ export function MembershipForm({ membershipId }: MembershipFormProps) {
           id="signerPhone"
           value={signerPhone}
           onChange={(e) => setSignerPhone(e.target.value)}
-          required
+          //required
         />
       </div>
 

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { EditGuestForm } from './EditGuestForm'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import QRCode from 'qrcode'
+import JSZip from 'jszip'
 
 type EventGuest = {
   id: string
@@ -126,6 +128,109 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
     </div>
   )
 
+  const handleQRClick = async (eventGuestId: string | null = null) => {  
+    let query = supabase
+      .from('event_guest')
+      .select(`
+        *,
+        company:company_id (razon_social),
+        executive:executive_id (id, name, last_name, email, office_phone, position)
+      `)
+      .eq('event_id', eventId)
+      .ilike('name', `%${searchQuery}%`);
+    
+    if (eventGuestId) {
+      query = query.eq('id', eventGuestId);
+    }
+    
+    const { data, error } = await query;    
+  
+    if (error) {
+      console.error('Error fetching guests:', error)
+      return
+    }
+    
+    const guestsQR = data ;
+    const zip = new JSZip()
+    const qrPromises = guestsQR.map(async (guest) => {
+      const guestName = guest.is_user
+        ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
+        : guest.name
+
+      const qrData = guest.is_user 
+        ? `I-${guest.executive.id}`
+        : `E-${guest.id}`  
+
+      const guestCompany = guest.is_user 
+        ? guest.company.razon_social
+        : guest.company_razon_social  
+
+      try {
+        
+        const qrCodeUrl = await QRCode.toDataURL(qrData)
+  
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error('No se pudo obtener el contexto 2D del canvas');
+        }
+
+        const qrImage = new Image();
+
+        qrImage.src = qrCodeUrl;
+
+        await new Promise<void>((resolve) => {
+          qrImage.onload = () => {
+            const qrSize = 500; 
+            const textHeight = 60; 
+            const canvasWidth = qrSize;
+            const canvasHeight = qrSize + textHeight;
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
+            ctx.drawImage(qrImage, 0, 0, qrSize, qrSize);
+
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, qrSize, canvasWidth, textHeight);
+            
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'black';
+
+            ctx.fillText(guestName, canvasWidth / 2, qrSize + 20);
+            ctx.fillText(guestCompany, canvasWidth / 2, qrSize + 40);
+
+            resolve();
+          };
+        });
+
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+  
+        if (!blob) {
+          throw new Error(`No se pudo generar el blob para ${guestName}`);
+        }
+        
+        zip.file(`${guestName}-QR-${guest.id}.png`, blob)
+  
+        
+      } catch (error) {
+        console.error(`Error generando QR para ${guestName}:`, error)
+      }
+    })
+      
+    await Promise.all(qrPromises)    
+    
+    zip.generateAsync({ type: 'blob' }).then((content) => {
+      
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(content)
+      link.download = 'codigos_qr.zip' 
+      link.click() 
+      console.log('Archivo ZIP descargado')
+    })
+  }
+
   return (
     <div>
       <div className="mb-8">
@@ -198,6 +303,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
                     >
                       Editar
                     </Button>
+                    <Button onClick={() => handleQRClick(guest.id)}>
+                      QR
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="destructive" size="sm">
@@ -250,6 +358,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
         </TableBody>
       </Table>
       <PaginationControls />
+      <Button onClick={() => handleQRClick()}>
+        Generar Códigos QR
+      </Button>
     </div>
   )
 }

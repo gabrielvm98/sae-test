@@ -59,9 +59,12 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
       .eq('id', assistantId)
       .single()
 
+    console.log(data);
+
     if (error) {
       console.error('Error fetching assistant:', error)
     } else if (data) {
+      setInitialCompany(data.company)
       setDni(data.dni)
       setName(data.name)
       setLastName(data.last_name)
@@ -130,7 +133,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
           pattern="[0-9]*"
           value={dni}
           onChange={(e) => setDni(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -140,7 +143,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -150,7 +153,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -160,7 +163,7 @@ export function AssistantForm({ assistantId }: AssistantFormProps) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>

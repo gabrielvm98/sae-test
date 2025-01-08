@@ -136,7 +136,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           pattern="[0-9]*"
           value={ruc}
           onChange={(e) => setRuc(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -146,7 +146,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           type="text"
           value={razonSocial}
           onChange={(e) => setRazonSocial(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -156,7 +156,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           type="text"
           value={nombreComercial}
           onChange={(e) => setNombreComercial(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -167,7 +167,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           min="0"
           value={seats}
           onChange={(e) => setSeats(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -192,7 +192,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           type="text"
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -202,7 +202,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -225,7 +225,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
             type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            required
+            //required
           />
         </div>
       </div>
@@ -277,7 +277,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           min="0"
           value={headcount}
           onChange={(e) => setHeadcount(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -289,7 +289,7 @@ export function CompanyForm({ companyId }: CompanyFormProps) {
           min="0"
           value={sales}
           onChange={(e) => setSales(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>

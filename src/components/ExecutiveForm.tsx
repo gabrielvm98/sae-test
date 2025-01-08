@@ -59,8 +59,24 @@ const countries: CountryOption[] = [
   // Add more countries as needed
 ]
 
-const userTypes = ["Titular Principal", "Titular", "Cupo de cortesía", "Titular adicional", "Titular Axpen", 
-  "Titular vitalicio", "Titular indefinido", "Titular cortesía", "Familiar invitado", "Invitado por transición laboral", "Cliente beca", "Cliente potencial", "Otros"]
+const userTypes = [
+  "Titular",
+  "Cupo de cortesía",
+  "Cupo adicional",
+  "Cortesía de reuniones",
+  "Cortesía de reportes",
+  "Titular adicional",
+  "Titular virtual",
+  "Cliente potencial",
+  "Titular Axpen",
+  "Titular Vitalicio",
+  "Titular indefinido",
+  "Invitado por transición laboral",
+  "Cliente beca",
+  "Reemplazo",
+  "AC",
+  "Otros",
+]
 
 export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
   const [dni, setDni] = useState('')
@@ -266,7 +282,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           pattern="[0-9]*"
           value={dni}
           onChange={(e) => setDni(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -276,7 +292,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -286,7 +302,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="text"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -384,7 +400,7 @@ export function ExecutiveForm({ executiveId }: ExecutiveFormProps) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>

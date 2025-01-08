@@ -6,19 +6,22 @@ import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type EventFormProps = {
   eventId?: number
+  copyEventId?: number
 }
 
 const eventTypeOptions = ['Presencial', 'Virtual', 'Híbrido']
 
-export function EventForm({ eventId }: EventFormProps) {
+export function EventForm({ eventId, copyEventId }: EventFormProps) {
   const [name, setName] = useState('')
   const [eventType, setEventType] = useState('')
   const [dateHour, setDateHour] = useState('')
   const [place, setPlace] = useState('')
+  const [registerOpen, setRegisterOpen] = useState(false)
 
   const router = useRouter()
 
@@ -37,6 +40,7 @@ export function EventForm({ eventId }: EventFormProps) {
       setEventType(data.event_type)
       setDateHour(data.date_hour)
       setPlace(data.place)
+      setRegisterOpen(data.register_open)
     }
   }, [eventId])
 
@@ -52,7 +56,8 @@ export function EventForm({ eventId }: EventFormProps) {
       name,
       event_type: eventType,
       date_hour: dateHour,
-      place
+      place,
+      register_open: registerOpen
     }
 
     if (eventId) {
@@ -64,12 +69,46 @@ export function EventForm({ eventId }: EventFormProps) {
       if (error) console.error('Error updating event:', error)
       else router.push('/eventos')
     } else {
-      const { error } = await supabase
+      const { data: newEvent, error } = await supabase
         .from('event')
         .insert([event])
+        .select()
+        .single()
 
       if (error) console.error('Error creating event:', error)
-      else router.push('/eventos')
+
+      if(copyEventId){
+        
+        const { data: guests, error: guestsError } = await supabase
+        .from('event_guest')
+        .select('*')
+        .eq('event_id', copyEventId);
+
+        if (guestsError) {
+          console.error('Error obteniendo invitados:', guestsError);
+          return;
+        }
+
+        if (guests && guests.length > 0) {
+          const copiedGuests = guests.map(({ id, ...guest }) => ({
+            ...guest,
+            event_id: true ? newEvent.id : id,               
+          }));
+    
+          const { error: copyGuestsError } = await supabase
+            .from('event_guest')
+            .insert(copiedGuests);
+    
+          if (copyGuestsError) {
+            console.error('Error copiando invitados:', copyGuestsError);
+            return;
+          }
+    
+          console.log("Invitados copiados exitosamente.");
+        }
+      }
+
+      router.push('/eventos')
     }
   }
 
@@ -82,7 +121,7 @@ export function EventForm({ eventId }: EventFormProps) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
+          //required
         />
       </div>
       <div>
@@ -117,8 +156,18 @@ export function EventForm({ eventId }: EventFormProps) {
           type="text"
           value={place}
           onChange={(e) => setPlace(e.target.value)}
-          required
+          //required
         />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="registerOpen"
+          checked={registerOpen}
+          onCheckedChange={(checked) => setRegisterOpen(checked as boolean)}
+        />
+        <Label htmlFor="registerOpen" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          Registro Abierto
+        </Label>
       </div>
       <Button type="submit">{eventId ? 'Actualizar' : 'Agregar Nuevo Evento'}</Button>
     </form>

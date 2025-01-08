@@ -11,7 +11,9 @@ import { ImportUsers } from '@/components/ImportUsers'
 import { ImportExternals } from '@/components/ImportExternals'
 import { UploadZoomAttendance } from '@/components/UploadZoomAttendance'
 import { EventReportTab } from '@/components/EventReportTab'
+import { ScanQRTab } from '@/components/ScanGuests'
 import { useSearchParams } from 'next/navigation'
+import * as XLSX from 'xlsx'
 
 type Event = {
   id: number
@@ -19,6 +21,7 @@ type Event = {
   event_type: string
   date_hour: string
   place: string
+  register_open: boolean
 }
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -60,6 +63,55 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
   if (!event) return <div>Cargando...</div>
 
+  const handleExcelClick = async () => {
+    const { data, error } = await supabase
+      .from('event_guest')
+      .select(`
+        *,
+        executive:executive_id (name, last_name)
+      `)
+      .eq('event_id', resolvedParams.id);
+  
+    if (error) {
+      console.error('Error fetching guests:', error);
+      return;
+    }
+  
+    if (data) {
+      try {
+        // Agregar la columna de enlace de registro
+        const enrichedData = data.map((guest) => ({
+          email: guest.email,
+          name: guest.is_user
+          ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
+          : guest.name,
+          registered: guest.registered === null ? false : guest.registered,
+          registration_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
+        }));
+  
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(enrichedData);
+        XLSX.utils.book_append_sheet(wb, ws, "Guests");
+  
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'event_guests.xlsx';
+        link.style.display = 'none';
+  
+        document.body.appendChild(link);
+        link.click();
+  
+        document.body.removeChild(link);
+      } catch (parseError) {
+        console.error('Error generating Excel:', parseError);
+      }
+    }
+  };
+
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-xl font-bold mb-6">{event.name}</h1>
@@ -67,6 +119,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         <div>
           <p><strong>Modalidad:</strong> {event.event_type}</p>
           <p><strong>Fecha y hora:</strong> {formatDateHour(event.date_hour)}</p>
+          <p><strong>Registro Abierto:</strong> {event.register_open ? "Sí" : "No"}</p>
         </div>
         <div>
           <p><strong>Lugar:</strong> {event.place}</p><p>
@@ -90,15 +143,19 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         <TabsTrigger value="subir-asistencia" className="flex-shrink-0 text-sm px-4 py-2">
           Subir Asistencia Zoom
         </TabsTrigger>
+        <TabsTrigger value="escanear-qr" className="flex-shrink-0 text-sm px-4 py-2">
+          Escanear QR
+        </TabsTrigger>
         <TabsTrigger value="reporte" className="flex-shrink-0 text-sm px-4 py-2">
           Reporte
         </TabsTrigger>
       </TabsList>
-      <TabsList className="hidden sm:grid w-full grid-cols-5">
+      <TabsList className="hidden sm:grid w-full grid-cols-6">
         <TabsTrigger value="invitados">Invitados</TabsTrigger>
         <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>
         <TabsTrigger value="importar-externos">Importar Externos</TabsTrigger>
         <TabsTrigger value="subir-asistencia">Subir Asistencia Zoom</TabsTrigger>
+        <TabsTrigger value="escanear-qr">Escanear QR</TabsTrigger>
         <TabsTrigger value="reporte">Reporte</TabsTrigger>
       </TabsList>
         
@@ -108,7 +165,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               <Button onClick={() => setShowForm(!showForm)}>
                 {showForm ? 'Cerrar formulario' : 'Añadir invitado'}
               </Button>
-              <Button variant="outline">Descargar CSV</Button>
+              <div className="flex ml-auto space-x-2">
+                <Button variant="outline" onClick={() => handleExcelClick()}>Descargar Excel</Button>
+              </div>
             </div>
             {showForm && <CreateGuestForm eventId={parseInt(resolvedParams.id)} onComplete={() => setShowForm(false)} />}
             <EventGuestTable eventId={parseInt(resolvedParams.id)} />
@@ -125,6 +184,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         
         <TabsContent value="subir-asistencia">
           <UploadZoomAttendance eventId={parseInt(resolvedParams.id)} />
+        </TabsContent>
+        
+        <TabsContent value="escanear-qr">
+          <ScanQRTab eventId={parseInt(resolvedParams.id)} />
         </TabsContent>
 
         <TabsContent value="reporte">

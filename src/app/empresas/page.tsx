@@ -29,26 +29,42 @@ type Company = {
 export default function EmpresasPage() {
   const [companies, setCompanies] = useState<Company[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     fetchCompanies()
-  }, [searchQuery])
+  }, [searchQuery, currentPage])
 
   async function fetchCompanies() {
-    let query = supabase.from('company').select('*')
+    let query = supabase
+    .from('company')
+    .select('*', { count: 'exact' }) // Incluye `count` para calcular las páginas
+    .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1)
 
     if (searchQuery && searchQuery.trim() !== '') {
       query = query.or(`razon_social.ilike.%${searchQuery}%,nombre_comercial.ilike.%${searchQuery}%,ruc.ilike.%${searchQuery}%`)
     }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       console.error('Error fetching companies:', error)
     } else {
       setCompanies(data || [])
+      if (count !== null) {
+        setTotalPages(Math.ceil(count / itemsPerPage))
+      }
     }
   }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+    }
+  }
+
   const convertDateFormat = (dateString: string) => {
     if (!dateString) return ''
     // Split the date string
@@ -56,6 +72,31 @@ export default function EmpresasPage() {
     // Rearrange into DD-MM-YYYY format
     return `${day}-${month}-${year}`
   }
+
+  const PaginationControls = () => (
+    <div className="flex items-center justify-between px-2 py-4">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Anterior
+      </Button>
+      <span>
+        Página {currentPage} de {totalPages}
+      </span>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Siguiente
+      </Button>
+    </div>
+  )
+  
 
   return (
     <div className="container mx-auto py-10">
@@ -74,10 +115,11 @@ export default function EmpresasPage() {
             placeholder="Buscar por nombre de empresa..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 border rounded"
+            className="w-full p-2 border-2 border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
+    <PaginationControls />
       <Table>
         <TableHeader>
           <TableRow>
@@ -139,6 +181,7 @@ export default function EmpresasPage() {
           ))}
         </TableBody>
       </Table>
+  <PaginationControls />
     </div>
   )
 }

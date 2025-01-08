@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { assignees } from '@/components/common/Assignees'
+import { SearchableSelect } from './SearchableSelect'
+
 
 type ProjectFormProps = {
   projectId?: number
@@ -39,21 +41,9 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
   const [otherExecutive, setOtherExecutive] = useState(false) // Updated: New state variable for other executive
   const [otherFullname, setOtherFullname] = useState('') // Updated: New state variable for other executive fullname
   const [otherEmail, setOtherEmail] = useState('') // Updated: New state variable for other executive email
-  const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
   const router = useRouter()
-
-  const fetchCompanies = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('company')
-      .select('id, razon_social')
-
-    if (error) {
-      console.error('Error fetching companies:', error)
-    } else {
-      setCompanies(data || [])
-    }
-  }, [])
 
   const fetchExecutives = useCallback(async (companyId: number) => {
     const { data, error } = await supabase
@@ -72,14 +62,14 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
     if (!projectId) return
     const { data, error } = await supabase
       .from('project')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', projectId)
       .single()
 
     if (error) {
       console.error('Error fetching project:', error)
     } else if (data) {
-      setCompanyId(data.company_id.toString())
+      setInitialCompany(data.company)
       await fetchExecutives(data.company_id)
       setExecutiveId(data.executive_id ? data.executive_id.toString() : '0') // Updated: Handle new executive fields
       setOtherExecutive(data.other_executive)
@@ -95,17 +85,14 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
   }, [projectId, fetchExecutives])
 
   useEffect(() => {
-    fetchCompanies()
-    if (projectId) {
-      fetchProject()
-    }
-  }, [projectId, fetchCompanies, fetchProject])
-
-  useEffect(() => {
     if (companyId && !projectId) {
       fetchExecutives(parseInt(companyId))
     }
   }, [companyId, fetchExecutives, projectId])
+
+  useEffect(() => {
+    fetchProject();
+  }, [])
 
   const handleCompanyChange = (value: string) => {
     setCompanyId(value)
@@ -142,7 +129,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
       other_email: otherExecutive ? otherEmail : null,
       assignee: selectedAssignees,
       start_date: startDate,
-      end_date: endDate,
+      end_date: endDate ? endDate : null,
       status,
       comments,
       project_code: projectCode // Updated: Add project_code to the project object
@@ -170,18 +157,12 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="companyId">Empresa</Label>
-        <Select value={companyId} onValueChange={handleCompanyChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          onSelect={handleCompanyChange}
+          placeholder="Selecciona una empresa"
+          label="empresa"
+          initialValue={initialCompany}
+        />
       </div>
       <div>
         <Label htmlFor="projectCode">Código</Label> {/* Updated: New input field for project_code */}
@@ -216,7 +197,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
               id="otherFullname"
               value={otherFullname}
               onChange={(e) => setOtherFullname(e.target.value)}
-              required
+              //required
             />
           </div>
           <div>
@@ -226,7 +207,7 @@ export function ProjectForm({ projectId }: ProjectFormProps) {
               type="email"
               value={otherEmail}
               onChange={(e) => setOtherEmail(e.target.value)}
-              required
+              //required
             />
           </div>
         </>

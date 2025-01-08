@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { assignees } from '@/components/common/Assignees'
+import { SearchableSelect } from './SearchableSelect'
 
 type PresentationFormProps = {
   presentationId?: number
@@ -43,24 +44,12 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
   const [billable, setBillable] = useState(false)
   const [billableCurrency, setBillableCurrency] = useState('')
   const [billableAmount, setBillableAmount] = useState('')
-  const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
   const [otherExecutive, setOtherExecutive] = useState(false)
   const [otherFullname, setOtherFullname] = useState('')
   const [otherEmail, setOtherEmail] = useState('')
+  const [initialCompany, setInitialCompany] = useState<Company | undefined>(undefined)
   const router = useRouter()
-
-  const fetchCompanies = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('company')
-      .select('id, razon_social')
-
-    if (error) {
-      console.error('Error fetching companies:', error)
-    } else {
-      setCompanies(data || [])
-    }
-  }, [])
 
   const fetchExecutives = useCallback(async (companyId: number) => {
     const { data, error } = await supabase
@@ -79,13 +68,14 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
     if (!presentationId) return
     const { data, error } = await supabase
       .from('presentation')
-      .select('*')
+      .select('*, company:company_id(id, razon_social)')
       .eq('id', presentationId)
       .single()
 
     if (error) {
       console.error('Error fetching presentation:', error)
     } else if (data) {
+      setInitialCompany(data.company)
       setCompanyId(data.company_id.toString())
       await fetchExecutives(data.company_id)
       setExecutiveId(data.executive_id ? data.executive_id.toString() : '0')
@@ -107,11 +97,10 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
   }, [presentationId, fetchExecutives])
 
   useEffect(() => {
-    fetchCompanies()
     if (presentationId) {
       fetchPresentation()
     }
-  }, [presentationId, fetchCompanies, fetchPresentation])
+  }, [presentationId, fetchPresentation])
 
   useEffect(() => {
     if (companyId && !presentationId) {
@@ -198,18 +187,12 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <Label htmlFor="companyId">Empresa</Label>
-        <Select value={companyId} onValueChange={handleCompanyChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Selecciona una empresa" />
-          </SelectTrigger>
-          <SelectContent>
-            {companies.map((company) => (
-              <SelectItem key={company.id} value={company.id.toString()}>
-                {company.razon_social}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <SearchableSelect
+          onSelect={handleCompanyChange}
+          placeholder="Selecciona una empresa"
+          label="empresa"
+          initialValue={initialCompany}
+        />
       </div>
       <div>
         <Label htmlFor="executiveId">Solicitante</Label>
@@ -235,7 +218,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
               id="otherFullname"
               value={otherFullname}
               onChange={(e) => setOtherFullname(e.target.value)}
-              required
+              //required
             />
           </div>
           <div>
@@ -245,7 +228,7 @@ export function PresentationForm({ presentationId }: PresentationFormProps) {
               type="email"
               value={otherEmail}
               onChange={(e) => setOtherEmail(e.target.value)}
-              required
+              //required
             />
           </div>
         </>
