@@ -13,6 +13,7 @@ interface Event {
 export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
   const [attendees, setAttendees] = useState<{ [email: string]: { [eventName: string]: boolean } }>({});
   const [events, setEvents] = useState<Event[]>([]);
+  const [filter, setFilter] = useState<'all' | 'multiple'>('all');
 
   useEffect(() => {
     fetchAttendees();
@@ -58,9 +59,27 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     setAttendees(attendeesMap);
   };
 
+  const filteredAttendees = Object.entries(attendees).filter(([email, events]) => {
+    const registeredCount = Object.values(events).filter((registered) => registered).length;
+    return filter === 'multiple' ? registeredCount > 1 : true;
+  });
+
   return (
     <div>
       <h2 className="text-lg font-bold">Lista de Asistentes</h2>
+
+      <div className="mb-4">
+        <label className="mr-2">Mostrar más de un registro:</label>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value as 'all' | 'multiple')}
+          className="border border-gray-300 p-1"
+        >
+          <option value="all">No</option>
+          <option value="multiple">Sí</option>
+        </select>
+      </div>
+
       <table className="table-auto border-collapse border border-gray-200 w-full">
         <thead>
           <tr>
@@ -73,7 +92,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(attendees).map(([email, events]) => (
+          {filteredAttendees.map(([email, events]) => (
             <tr key={email}>
               <td className="border border-gray-300 px-4 py-2">{email}</td>
               {Object.values(events).map((registered, idx) => (
