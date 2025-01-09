@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import Papa from 'papaparse';
@@ -9,6 +9,22 @@ export default function RegisterGuestsPage() {
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [processing, setProcessing] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    const logGuestsByEmail = async () => {
+      const { data, error } = await supabase
+        .from('event_guest')
+        .select('*')
+        .eq('email', 'sebastian.hurtado@utec.edu.pe');
+      if (error) {
+        console.error('Error fetching guests:', error);
+      } else {
+        console.log('Guests with email sebastian.hurtado@utec.edu.pe:', data);
+      }
+    };
+
+    logGuestsByEmail();
+  }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null;
@@ -27,30 +43,24 @@ export default function RegisterGuestsPage() {
     Papa.parse(csvFile, {
       header: true,
       complete: async (result) => {
-        const rows = result.data as { dia: string; link: string }[];
+        const rows = result.data as { email: string; name: string, registered: string, registration_link: string }[];
         const updates = [];
 
         for (const row of rows) {
           try {
-            console.log('Email:', row);
-            const email = row.link.replace('https://sae-register.vercel.app/', '').replace('%40', '@');
-            console.log('Email:', email);
-            if (!email) continue;
 
-            const eventId = parseInt(row.dia, 10);
 
             const { error: updateError } = await supabase
               .from('event_guest')
-              .update({ registered: true })
-              .eq('email', email)
-              .eq('event_id', eventId);
+              .update({ email: row.email })
+              .eq('name', row.name)
 
             if (updateError) {
-              console.error(`Error actualizando: ${email}, evento ${eventId}`, updateError);
+              console.error(`Error actualizando: ${row.email}`, updateError);
               continue;
             }
 
-            updates.push({ email, eventId });
+            updates.push(row);
           } catch (error) {
             console.error('Error procesando fila:', row, error);
           }

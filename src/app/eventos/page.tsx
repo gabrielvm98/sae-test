@@ -116,6 +116,13 @@ export default function EventosPage() {
             </Link>
         </Button>
         </div>
+        <div className="mt-4">
+          <Button asChild>
+            <Link href="/eventos/listas">
+              <Eye className="mr-2 h-4 w-4" /> Ver listas consolidadas
+            </Link>
+        </Button>
+        </div>
 
       </div>
       <Table>
