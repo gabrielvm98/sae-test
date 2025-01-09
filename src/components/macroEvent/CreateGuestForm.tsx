@@ -37,11 +37,10 @@ export function CreateGuestForm({ eventIds, onComplete }: CreateGuestFormProps) 
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [position, setPosition] = useState('')
-  const [assistantName, setAssistantName] = useState('')
-  const [assistantEmail, setAssistantEmail] = useState('')
-  const [substitute, setSubstitute] = useState(false)
-  const [substituteName, setSubstituteName] = useState('')
-  const [substituteEmail, setSubstituteEmail] = useState('')
+  const [tipoUsuario, setTipoUsuario] = useState('')
+  const [tipoMembresia, setTipoMembresia] = useState('')
+  const [reemplazaANombre, setReemplazaANombre] = useState('')
+  const [reemplazaACorreo, setReemplazaACorreo] = useState('')
   const [companies, setCompanies] = useState<Company[]>([])
   const [executives, setExecutives] = useState<Executive[]>([])
 
@@ -89,11 +88,10 @@ export function CreateGuestForm({ eventIds, onComplete }: CreateGuestFormProps) 
       email,
       phone,
       position,
-      assistant_name: !isUser ? assistantName : null,
-      assistant_email: !isUser ? assistantEmail : null,
-      substitute,
-      substitute_name: substitute ? substituteName : null,
-      substitute_email: substitute ? substituteEmail : null,
+      tipo_usuario: tipoUsuario,
+      tipo_membresia: tipoMembresia,
+      reemplaza_a_nombre: reemplazaANombre,
+      reemplaza_a_correo: reemplazaACorreo,
     }));
 
     const { error } = await supabase.from('event_guest').insert(guests);
@@ -212,7 +210,7 @@ export function CreateGuestForm({ eventIds, onComplete }: CreateGuestFormProps) 
               id="dni"
               value={dni}
               onChange={(e) => setDni(e.target.value)}
-              required
+              
             />
           </div>
           <div>
@@ -239,56 +237,41 @@ export function CreateGuestForm({ eventIds, onComplete }: CreateGuestFormProps) 
               id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              
+            />
+          </div>
+          <div>
+            <Label htmlFor="tipoUsuario">Tipo de usuario</Label>
+            <Input
+              id="tipoUsuario"
+              value={tipoUsuario}
+              onChange={(e) => setTipoUsuario(e.target.value)}
               required
             />
           </div>
           <div>
-            <Label htmlFor="assistantName">Nombre del Asistente</Label>
+            <Label htmlFor="tipoMembresia">Tipo de membresia</Label>
             <Input
-              id="assistantName"
-              value={assistantName}
-              onChange={(e) => setAssistantName(e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="assistantEmail">Email del Asistente</Label>
-            <Input
-              id="assistantEmail"
-              type="email"
-              value={assistantEmail}
-              onChange={(e) => setAssistantEmail(e.target.value)}
-            />
-          </div>
-        </>
-      )}
-      <div>
-        <Label>
-          <Checkbox 
-            checked={substitute} 
-            onCheckedChange={(checked) => setSubstitute(checked as boolean)} 
-          />
-          {' '}Sustituto
-        </Label>
-      </div>
-      {substitute && (
-        <>
-          <div>
-            <Label htmlFor="substituteName">Nombre del Sustituto</Label>
-            <Input
-              id="substituteName"
-              value={substituteName}
-              onChange={(e) => setSubstituteName(e.target.value)}
+              id="tipoMembresia"
+              value={tipoMembresia}
+              onChange={(e) => setTipoMembresia(e.target.value)}
               required
             />
           </div>
           <div>
-            <Label htmlFor="substituteEmail">Email del Sustituto</Label>
+            <Label htmlFor="reemplazaANombre">Reemplaza a (nombre y apellido)</Label>
             <Input
-              id="substituteEmail"
-              type="email"
-              value={substituteEmail}
-              onChange={(e) => setSubstituteEmail(e.target.value)}
-              required
+              id="reemplazaANombre"
+              value={reemplazaANombre}
+              onChange={(e) => setReemplazaANombre(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="reemplazaACorreo">Reemplaza a (correo)</Label>
+            <Input
+              id="reemplazaACorreo"
+              value={reemplazaACorreo}
+              onChange={(e) => setReemplazaACorreo(e.target.value)}
             />
           </div>
         </>

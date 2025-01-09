@@ -40,6 +40,10 @@ type EventGuest = {
     office_phone: string
     position: string
   }
+  tipo_usuario?: string
+  tipo_membresia?: string
+  reemplaza_a_nombre?: string
+  reemplaza_a_correo?: string
 }
 
 export function EventGuestTable({ eventIds }: { eventIds: number[] }) {
@@ -167,10 +171,10 @@ export function EventGuestTable({ eventIds }: { eventIds: number[] }) {
             <TableHead>Nombre</TableHead>
             <TableHead>Empresa</TableHead>
             <TableHead>Cargo</TableHead>
-            <TableHead>Email</TableHead>
             <TableHead>Email del evento</TableHead>
-            <TableHead>Teléfono</TableHead>
-            <TableHead>Interno/Externo</TableHead>
+            <TableHead>Tipo de usuario</TableHead>
+            <TableHead>Membresía</TableHead>
+            <TableHead>Reemplaza a</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -194,10 +198,10 @@ export function EventGuestTable({ eventIds }: { eventIds: number[] }) {
                     ? guest.executive?.position ?? '' 
                     : guest.position ?? ''}
                 </TableCell>
-                <TableCell>{guest.is_user ? guest.executive?.email : guest.email}</TableCell>
                 <TableCell>{guest.email}</TableCell>
-                <TableCell>{guest.is_user ? guest.executive?.office_phone : guest.phone}</TableCell>
-                <TableCell>{guest.is_user ? 'Interno' : 'Externo'}</TableCell>
+                <TableCell>{guest.tipo_usuario}</TableCell>
+                <TableCell>{guest.tipo_membresia}</TableCell>
+                <TableCell>{guest.reemplaza_a_nombre}</TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button 

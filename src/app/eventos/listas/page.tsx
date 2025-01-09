@@ -73,7 +73,7 @@ export default function EventosPage() {
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button variant="outline" size="sm" asChild>
-                    <Link href={`/eventos/listas/details/55`}>
+                    <Link href={`/eventos/listas/55`}>
                     <Eye className="h-4 w-4" />
                         <span className="sr-only">Ver</span>
                       </Link>

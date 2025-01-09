@@ -30,7 +30,8 @@ export function ImportExternals({ eventIds }: { eventIds: number[] }) {
   // Función para descargar la plantilla
   const downloadTemplate = () => {
     const headers = [
-      ['Empresa', 'Nombre', 'Apellido', 'Correo', 'Cargo', 'Se registró (si/no)'],
+      ['Empresa', 'Nombre', 'Apellido', 'Correo', 'Cargo', 
+        'Tipo de usuario', 'Tipo de membresia', 'Reemplaza a (nombre y apellido)', 'Reemplaza a (correo)','Se registró (si/no)'],
     ]
 
     const workbook = XLSX.utils.book_new()
@@ -63,6 +64,10 @@ export function ImportExternals({ eventIds }: { eventIds: number[] }) {
         Apellido: string
         Correo: string
         Cargo: string
+        'Tipo de usuario': string
+        'Tipo de membresia': string
+        'Reemplaza a (nombre y apellido)': string
+        'Reemplaza a (correo)': string
         'Se registró (si/no)': string
       }>
 
@@ -73,6 +78,10 @@ export function ImportExternals({ eventIds }: { eventIds: number[] }) {
           name: row.Nombre.trim() + ' ' + row.Apellido.trim(),
           email: row.Correo.toLowerCase().trim(),
           position: row.Cargo,
+          tipo_usuario: row['Tipo de usuario'],
+          tipo_membresia: row['Tipo de membresia'],
+          reemplaza_a_nombre: row['Reemplaza a (nombre y apellido)'],
+          reemplaza_a_correo: row['Reemplaza a (correo)'].toLowerCase().trim(),
           registered:
             row['Se registró (si/no)'].toLowerCase() === 'si' ||
             row['Se registró (si/no)'].toLowerCase() === 'sí',
