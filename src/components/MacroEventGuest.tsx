@@ -12,9 +12,13 @@ interface Event {
 }
 
 export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
-  const [attendees, setAttendees] = useState<{ [email: string]: { [eventName: string]: boolean } }>({});
+  const [attendees, setAttendees] = useState<{ [email: string]: { [key: string]: any } }>({});
   const [events, setEvents] = useState<Event[]>([]);
   const [filter, setFilter] = useState<'all' | 'multiple' | 'none'>('all');
+  const [userTypeFilter, setUserTypeFilter] = useState<string>('');
+  const [membershipTypeFilter, setMembershipTypeFilter] = useState<string>('');
+  const [userTypes, setUserTypes] = useState<string[]>([]);
+  const [membershipTypes, setMembershipTypes] = useState<string[]>([]);
 
   useEffect(() => {
     fetchAttendees();
@@ -31,12 +35,12 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
       return;
     }
 
-    // @ts-expect-error prisa
+    //@ts-expect-error prisa
     setEvents(eventsData || []);
 
     const { data: guestsData, error: guestsError } = await supabase
       .from('event_guest')
-      .select('email, event_id, registered')
+      .select('email, event_id, registered, tipo_usuario, tipo_membresia')
       .in('event_id', eventIds);
 
     if (guestsError) {
@@ -44,38 +48,54 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
       return;
     }
 
-    const attendeesMap: { [email: string]: { [eventName: string]: boolean } } = {};
+    const attendeesMap: { [email: string]: { [key: string]: any } } = {};
+    const userTypesSet = new Set<string>();
+    const membershipTypesSet = new Set<string>();
 
     guestsData.forEach((guest) => {
       const event = eventsData.find((e) => e.id === guest.event_id);
       if (!event) return;
 
       if (!attendeesMap[guest.email]) {
-        attendeesMap[guest.email] = {};
+        attendeesMap[guest.email] = {
+          tipo_usuario: guest.tipo_usuario,
+          tipo_membresia: guest.tipo_membresia,
+        };
       }
 
       attendeesMap[guest.email][event.name] = guest.registered;
+      userTypesSet.add(guest.tipo_usuario);
+      membershipTypesSet.add(guest.tipo_membresia);
     });
 
     setAttendees(attendeesMap);
+    setUserTypes(Array.from(userTypesSet).sort());
+    setMembershipTypes(Array.from(membershipTypesSet).sort());
   };
 
-  const filteredAttendees = Object.entries(attendees).filter(([, events]) => {
-    const registeredCount = Object.values(events).filter((registered) => registered).length;
-    if (filter === 'multiple') return registeredCount > 1;
-    if (filter === 'none') return registeredCount === 0;
+  const filteredAttendees = Object.entries(attendees).filter(([, details]) => {
+    const registeredCount = Object.values(details).filter((value) => value === true).length;
+    if (filter === 'multiple' && registeredCount <= 1) return false;
+    if (filter === 'none' && registeredCount > 0) return false;
+    if (userTypeFilter && details.tipo_usuario !== userTypeFilter) return false;
+    if (membershipTypeFilter && details.tipo_membresia !== membershipTypeFilter) return false;
     return true; // 'all'
   });
 
   const downloadExcel = () => {
-    const dataToExport = filteredAttendees.map(([email, events]) => {
-      const row: { [key: string]: any } = { Email: email };
-      Object.entries(events).forEach(([eventName, registered]) => {
-        row[eventName] = registered ? 'Sí' : 'No';
+    const dataToExport = filteredAttendees.map(([email, details]) => {
+      const row: { [key: string]: any } = {
+        Email: email,
+        Tipo_Usuario: details.tipo_usuario,
+        Tipo_Membresia: details.tipo_membresia,
+      };
+      Object.entries(details).forEach(([key, value]) => {
+        if (key !== 'tipo_usuario' && key !== 'tipo_membresia') {
+          row[key] = value ? 'Sí' : 'No';
+        }
       });
       return row;
     });
-
     const ws = XLSX.utils.json_to_sheet(dataToExport);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Asistentes');
@@ -97,6 +117,35 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
           <option value="multiple">Más de un registro</option>
           <option value="none">Ningún registro</option>
         </select>
+
+        <label className="ml-4 mr-2">Tipo de Usuario:</label>
+        <select
+          value={userTypeFilter}
+          onChange={(e) => setUserTypeFilter(e.target.value)}
+          className="border border-gray-300 p-1"
+        >
+          <option value="">Todos</option>
+          {userTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+
+        <label className="ml-4 mr-2">Tipo de Membresía:</label>
+        <select
+          value={membershipTypeFilter}
+          onChange={(e) => setMembershipTypeFilter(e.target.value)}
+          className="border border-gray-300 p-1"
+        >
+          <option value="">Todos</option>
+          {membershipTypes.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+
         <button
           onClick={downloadExcel}
           className="ml-4 bg-blue-500 text-white px-4 py-2 rounded"
@@ -109,6 +158,8 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
         <thead>
           <tr>
             <th className="border border-gray-300 px-4 py-2">Email</th>
+            <th className="border border-gray-300 px-4 py-2">Tipo de Usuario</th>
+            <th className="border border-gray-300 px-4 py-2">Tipo de Membresía</th>
             {events.map((event) => (
               <th key={event.id} className="border border-gray-300 px-4 py-2">
                 {event.name}
@@ -117,12 +168,17 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
           </tr>
         </thead>
         <tbody>
-          {filteredAttendees.map(([email, events]) => (
+          {filteredAttendees.map(([email, details]) => (
             <tr key={email}>
               <td className="border border-gray-300 px-4 py-2">{email}</td>
-              {Object.values(events).map((registered, idx) => (
-                <td key={idx} className="border border-gray-300 px-4 py-2">
-                  {registered ? 'Sí' : 'No'}
+              <td className="border border-gray-300 px-4 py-2">{details.tipo_usuario}</td>
+              <td className="border border-gray-300 px-4 py-2">{details.tipo_membresia}</td>
+              {events.map((event) => (
+                <td
+                  key={event.id}
+                  className="border border-gray-300 px-4 py-2"
+                >
+                  {details[event.name] ? 'Sí' : 'No'}
                 </td>
               ))}
             </tr>
