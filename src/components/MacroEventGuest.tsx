@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import * as XLSX from 'xlsx';
+import { Link } from 'lucide-react';
 
 interface Event {
   id: number;
@@ -71,6 +72,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
           reemplazo_correo: replacementDict[guest.email],
           name: guest.name,
           company_razon_social: guest.company_razon_social,
+          registro_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
         };
       }
 
@@ -102,12 +104,13 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
         Nombre: details.name,
         Razon_Social: details.company_razon_social,
         Loop: `${details.name} | ${details.company_razon_social?.toUpperCase() || ''}`,
+        Link_Registro: details.registro_link,
         Tipo_Usuario: details.tipo_usuario,
         Tipo_Membresia: details.tipo_membresia,
       };
       Object.entries(details).forEach(([key, value]) => {
         if (
-          !['tipo_usuario', 'tipo_membresia', 'reemplazo_correo', 'reemplaza_a_correo', 'name', 'company_razon_social'].includes(key)
+          !['tipo_usuario', 'tipo_membresia', 'reemplazo_correo', 'reemplaza_a_correo', 'name', 'company_razon_social', 'registro_link'].includes(key)
         ) {
           row[key] = value ? 'Sí' : 'No';
         }
