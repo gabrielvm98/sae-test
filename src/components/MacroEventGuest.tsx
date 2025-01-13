@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import * as XLSX from 'xlsx';
-import { Link } from 'lucide-react';
 
 interface Event {
   id: number;
@@ -182,7 +181,8 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
             <th className="border border-gray-300 px-4 py-2">Tipo de Usuario</th>
             <th className="border border-gray-300 px-4 py-2">Tipo de Membresía</th>
             <th className="border border-gray-300 px-4 py-2">Reemplazo</th>
-            <th className="border border-gray-300 px-4 py-2">Reemplaza a</th> 
+            <th className="border border-gray-300 px-4 py-2">Reemplaza a</th>
+            <th className="border border-gray-300 px-4 py-2">Link de registro</th>
             {events.map((event) => (
               <th key={event.id} className="border border-gray-300 px-4 py-2">
                 {event.name}
@@ -198,6 +198,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
               <td className="border border-gray-300 px-4 py-2">{details.tipo_membresia}</td>
               <td className="border border-gray-300 px-4 py-2">{details.reemplaza_a_correo}</td>
               <td className="border border-gray-300 px-4 py-2">{details.reemplazo_correo}</td>
+              <td className="border border-gray-300 px-4 py-2"><a href={details.registro_link} target='_blank'>Link</a></td>
               {events.map((event) => (
                 <td
                   key={event.id}
