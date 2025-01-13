@@ -175,6 +175,7 @@ export function EventGuestTable({ eventIds }: { eventIds: number[] }) {
             <TableHead>Tipo de usuario</TableHead>
             <TableHead>Membresía</TableHead>
             <TableHead>Reemplaza a</TableHead>
+            <TableHead>Link registro</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
@@ -202,6 +203,11 @@ export function EventGuestTable({ eventIds }: { eventIds: number[] }) {
                 <TableCell>{guest.tipo_usuario}</TableCell>
                 <TableCell>{guest.tipo_membresia}</TableCell>
                 <TableCell>{guest.reemplaza_a_nombre}</TableCell>
+                <TableCell>
+                  <a href={`https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`} target='_blank'>
+                    <Button variant="outline" size="sm">Abrir</Button>
+                  </a>
+                </TableCell>
                 <TableCell>
                   <div className="flex space-x-2">
                     <Button 

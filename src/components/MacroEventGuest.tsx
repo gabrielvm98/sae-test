@@ -40,7 +40,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
 
     const { data: guestsData, error: guestsError } = await supabase
       .from('event_guest')
-      .select('email, event_id, registered, tipo_usuario, tipo_membresia')
+      .select('email, event_id, name, company_razon_social, registered, tipo_usuario, tipo_membresia, reemplaza_a_correo')
       .in('event_id', eventIds);
 
     if (guestsError) {
@@ -52,6 +52,13 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     const userTypesSet = new Set<string>();
     const membershipTypesSet = new Set<string>();
 
+    const replacementDict: { [reemplaza_a_correo: string]: string } = {};
+    guestsData.forEach((guest) => {
+      if (guest.tipo_usuario === 'Reemplazo' && guest.reemplaza_a_correo) {
+        replacementDict[guest.reemplaza_a_correo] = guest.email;
+      }
+    });
+
     guestsData.forEach((guest) => {
       const event = eventsData.find((e) => e.id === guest.event_id);
       if (!event) return;
@@ -60,6 +67,10 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
         attendeesMap[guest.email] = {
           tipo_usuario: guest.tipo_usuario,
           tipo_membresia: guest.tipo_membresia,
+          reemplaza_a_correo: guest.reemplaza_a_correo,
+          reemplazo_correo: replacementDict[guest.email],
+          name: guest.name,
+          company_razon_social: guest.company_razon_social,
         };
       }
 
@@ -86,11 +97,18 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     const dataToExport = filteredAttendees.map(([email, details]) => {
       const row: { [key: string]: any } = {
         Email: email,
+        Reemplazo: details.reemplazo_correo,
+        Reemplaza_a: details.reemplaza_a_correo,
+        Nombre: details.name,
+        Razon_Social: details.company_razon_social,
+        Loop: `${details.name} | ${details.company_razon_social?.toUpperCase() || ''}`,
         Tipo_Usuario: details.tipo_usuario,
         Tipo_Membresia: details.tipo_membresia,
       };
       Object.entries(details).forEach(([key, value]) => {
-        if (key !== 'tipo_usuario' && key !== 'tipo_membresia') {
+        if (
+          !['tipo_usuario', 'tipo_membresia', 'reemplazo_correo', 'reemplaza_a_correo', 'name', 'company_razon_social'].includes(key)
+        ) {
           row[key] = value ? 'Sí' : 'No';
         }
       });
@@ -160,6 +178,8 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
             <th className="border border-gray-300 px-4 py-2">Email</th>
             <th className="border border-gray-300 px-4 py-2">Tipo de Usuario</th>
             <th className="border border-gray-300 px-4 py-2">Tipo de Membresía</th>
+            <th className="border border-gray-300 px-4 py-2">Reemplazo</th>
+            <th className="border border-gray-300 px-4 py-2">Reemplaza a</th> 
             {events.map((event) => (
               <th key={event.id} className="border border-gray-300 px-4 py-2">
                 {event.name}
@@ -173,6 +193,8 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
               <td className="border border-gray-300 px-4 py-2">{email}</td>
               <td className="border border-gray-300 px-4 py-2">{details.tipo_usuario}</td>
               <td className="border border-gray-300 px-4 py-2">{details.tipo_membresia}</td>
+              <td className="border border-gray-300 px-4 py-2">{details.reemplaza_a_correo}</td>
+              <td className="border border-gray-300 px-4 py-2">{details.reemplazo_correo}</td>
               {events.map((event) => (
                 <td
                   key={event.id}
