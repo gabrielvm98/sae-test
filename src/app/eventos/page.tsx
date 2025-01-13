@@ -112,7 +112,7 @@ export default function EventosPage() {
           <div className="mt-4">
           <Button asChild>
             <Link href="/eventos/reportes/macro">
-              <Eye className="mr-2 h-4 w-4" /> Ver reportes macro
+              <Eye className="mr-2 h-4 w-4" /> Ver registros
             </Link>
         </Button>
         </div>

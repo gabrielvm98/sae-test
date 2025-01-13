@@ -57,6 +57,7 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
   const [searchQuery, setSearchQuery] = useState('')
   const [registeredFilter, setRegisteredFilter] = useState("Todos")
   const [attendedFilter, setAttendedFilter] = useState("Todos")
+  const [showConnectionTimeChart, setShowConnectionTimeChart] = useState(false)
   const itemsPerPage = 10
 
   useEffect(() => {
@@ -68,6 +69,20 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
   }, [defaultCompany]);
 
   async function fetchEventData() {
+    const { data: event, } = await supabase
+     .from('event')
+     .select(`
+       id,
+       name,
+       event_type
+     `)
+      .eq('id', eventId)
+      if (event) {
+        setShowConnectionTimeChart(event[0].event_type === 'Virtual')
+        console.log(event)
+      }
+
+
     const { data: guests, error } = await supabase
       .from('event_guest')
       .select(`
@@ -195,7 +210,7 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
       }
 
       {/* Métricas principales */}
-      <div className="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={`grid gap-4 grid-cols-2 sm:grid-cols-2 lg:${showConnectionTimeChart ? 'grid-cols-4' : 'grid-cols-3'}`}>
         <Card className="col-span-1">
           <CardHeader className="p-4">
             <CardTitle className="text-sm sm:text-base">Total Invitados</CardTitle>
@@ -222,7 +237,8 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
             <div className="text-xs sm:text-sm text-gray-500">({porcentajeAsistencia}%)</div>
           </CardContent>
         </Card>
-        <Card className="col-span-1">
+        { showConnectionTimeChart &&
+          <Card className="col-span-1">
           <CardHeader className="p-4">
             <CardTitle className="text-sm sm:text-base">Tiempo Promedio</CardTitle>
           </CardHeader>
@@ -230,11 +246,15 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
             <div className="text-xl sm:text-2xl font-bold">{datosFiltradosA.tiempoConexionPromedio}</div>
           </CardContent>
         </Card>
+        }
+
       </div>
-      
+    { showConnectionTimeChart &&
       <div>
-        <ConnectionTimeDistributionChart asistentes={datosFiltradosA.invitados.filter(i => i.assisted)} />
-      </div>
+      <ConnectionTimeDistributionChart asistentes={datosFiltradosA.invitados.filter(i => i.assisted)} />
+    </div>
+    }
+
 
       {/* Lista de invitados */}
       { showGuestsTable && 
