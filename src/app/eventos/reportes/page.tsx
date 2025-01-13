@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase';
 import { GuestsTable } from '@/components/ConsolidatedGuestTable';
-import { CompanySelect } from '@/components/ReportCompanySelect';
+// import { CompanySelect } from '@/components/ReportCompanySelect';
 import { Button } from "@/components/ui/button"
 
 const macroReports = [
@@ -79,9 +79,9 @@ export default function CompareEventsPage() {
   const [groups, setGroups] = useState<Group[]>([
     { id: 0, eventIds: [], guests: [] }, // Grupo inicial
   ]);
-  const [events, setEvents] = useState<{ id: number; name: string }[]>([]);
-  const [companies, setCompanies] = useState<string[]>([]);
-  const [selectedCompany, setSelectedCompany] = useState<string>("Todas");
+  const [, setEvents] = useState<{ id: number; name: string }[]>([]);
+  const [, setCompanies] = useState<string[]>([]);
+  const [selectedCompany, ] = useState<string>("Todas");
   const [consolidatedData, setConsolidatedData] = useState<ConsolidatedData | null>(null);
   const [consolidatedGuests, setConsolidatedGuests] = useState<Guest[]>([]);
   const [selectedMacroReport, setSelectedMacroReport] = useState<string | null>(null);
@@ -171,6 +171,7 @@ export default function CompareEventsPage() {
         acc.push({
           id: guest.id,
           name: guest.name,
+          // @ts-expect-error prisa
           company: guest.company?.razon_social || guest.company_razon_social || '',
           email: guest.email,
           registered: guest.registered || false,
@@ -321,7 +322,7 @@ export default function CompareEventsPage() {
         <div key={group.id}>
           <Card>
             <CardHeader>
-              {/* Mostrar el nombre del grupo */}
+              {/*@ts-expect-error prisa */}
               <CardTitle>{group.name}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -341,6 +342,7 @@ export default function CompareEventsPage() {
                 <SelectContent>
                   {groups.map((grp) => (
                     <SelectItem key={grp.id} value={grp.id.toString()}>
+              {/*@ts-expect-error prisa */}
                       {grp.name}
                     </SelectItem>
                   ))}

@@ -15,23 +15,6 @@ type ReportGuest = {
   virtual_session_time: number;
 };
 
-interface ReportGuest {
-  name: string;
-  company: string;
-  email: string;
-  registered: boolean;
-  assisted: boolean;
-  virtual_session_time: number;
-}
-
-type EventData = {
-  totalInvitados: number;
-  totalRegistrados: number;
-  totalAsistentes: number;
-  tiempoConexionPromedio: string;
-  invitados: ReportGuest[];
-};
-
 export function EventReportTab({
   guests,
   defaultCompany = "Todas",
