@@ -101,6 +101,9 @@ export default function MacroReportsPage() {
       if (guest.registered) {
         // @ts-expect-error prisa
         stats[guest.event_id].registered++;
+        if (guest.email === "mfedalto@hotmail.com") {
+            console.log(guest);
+        }
 
     // @ts-expect-error prisa
         const isPresential = presential.some((event) => event.id === guest.event_id);

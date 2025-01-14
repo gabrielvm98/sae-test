@@ -63,6 +63,10 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
       const event = eventsData.find((e) => e.id === guest.event_id);
       if (!event) return;
 
+      if (guest.email === 'mfedalto@hotmail.com') {
+        console.log('guest', guest);
+      }
+
       if (!attendeesMap[guest.email]) {
         attendeesMap[guest.email] = {
           tipo_usuario: guest.tipo_usuario,

@@ -22,7 +22,10 @@ export function GuestsTable({ guests }: { guests: any[] }) {
   
     const filteredGuests = useMemo(() => {
       return guests.filter(guest => {
-        const matchesSearch = searchQuery === '' || guest.name.toLowerCase().includes(searchQuery.toLowerCase()) || (guest.company?.razon_social || guest.company_razon_social)?.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = 
+        searchQuery === '' ||
+        guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (guest.company && guest.company.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesRegistered = registeredFilter === "Todos" || (registeredFilter === "Sí" && guest.registered) || (registeredFilter === "No" && !guest.registered);
         const matchesAttended = attendedFilter === "Todos" || (attendedFilter === "Sí" && guest.assisted) || (attendedFilter === "No" && !guest.assisted);
         return matchesSearch && matchesRegistered && matchesAttended;
@@ -93,7 +96,7 @@ export function GuestsTable({ guests }: { guests: any[] }) {
                 {paginatedGuests.map((guest, index) => (
                   <TableRow key={index}>
                     <TableCell>{guest.name}</TableCell>
-                    <TableCell>{guest.company?.razon_social || guest.company_razon_social}</TableCell>
+                    <TableCell>{guest.company}</TableCell>
                     <TableCell>{guest.registered ? "Sí" : "No"}</TableCell>
                     <TableCell>{guest.assisted ? "Sí" : "No"}</TableCell>
                     <TableCell>{formatTime(guest.virtual_session_time || 0)}</TableCell>

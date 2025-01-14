@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from '@/lib/supabase';
 import { GuestsTable } from '@/components/ConsolidatedGuestTable';
-// import { CompanySelect } from '@/components/ReportCompanySelect';
+import { CompanySelect } from '@/components/ReportCompanySelect';
 import { Button } from "@/components/ui/button"
+import MacroEventSummary from '@/components/macroEvent/Summary';
 
 const macroReports = [
   {
@@ -17,6 +18,51 @@ const macroReports = [
       { id: 2, name: "Virtual PM", eventIds: [23] },
     ],
   },
+  {
+    name: "Encuentro Enero",
+    groups: [
+      { id: 1, name: "Martes 14 almuerzo", eventIds: [53] },
+      { id: 2, name: "Miércoles 15 desayuno", eventIds: [60] },
+      { id: 3, name: "Miércoles 15 almuerzo", eventIds: [61] },
+      { id: 4, name: "Jueves 16 mañana (Virtual)", eventIds: [55] },
+      { id: 5, name: "Jueves 16 almuerzo", eventIds: [62] },
+    ],
+  },
+  {
+    name: "Encuentro Enero por evento",
+    groups: [
+      { id: 1, name: "Martes 14 almuerzo", eventIds: [53] },
+      { id: 2, name: "Miércoles 15 desayuno", eventIds: [60] },
+      { id: 3, name: "Miércoles 15 almuerzo", eventIds: [61] },
+      { id: 4, name: "Jueves 16 mañana (Virtual)", eventIds: [55] },
+      { id: 5, name: "Jueves 16 almuerzo", eventIds: [62] },
+    ],
+  },
+  {
+    name: "Encuentro Enero por día",
+    groups: [
+      { id: 1, name: "Martes", eventIds: [53] },
+      { id: 2, name: "Miércoles", eventIds: [60, 61] },
+      { id: 3, name: "Jueves", eventIds: [55, 62] },
+    ],
+  },
+  {
+    name: "Encuentro Enero por modalidad",
+    groups: [
+      { id: 1, name: "Presencial", eventIds: [53, 60, 61, 62] },
+      { id: 2, name: "Virtual", eventIds: [55] },
+    ],
+  },
+  {
+    name: "Encuentro Enero por turno",
+    groups: [
+      { id: 1, name: "Mañana", eventIds: [53, 61, 62] },
+      { id: 2, name: "Tarde", eventIds: [60, 55] },
+    ],
+  },
+];
+
+const macroReportsEnero = [
   {
     name: "Encuentro Enero por evento",
     groups: [
@@ -80,8 +126,8 @@ export default function CompareEventsPage() {
     { id: 0, eventIds: [], guests: [] }, // Grupo inicial
   ]);
   const [, setEvents] = useState<{ id: number; name: string }[]>([]);
-  const [, setCompanies] = useState<string[]>([]);
-  const [selectedCompany, ] = useState<string>("Todas");
+  const [companies, setCompanies] = useState<string[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<string>("Todas");
   const [consolidatedData, setConsolidatedData] = useState<ConsolidatedData | null>(null);
   const [consolidatedGuests, setConsolidatedGuests] = useState<Guest[]>([]);
   const [selectedMacroReport, setSelectedMacroReport] = useState<string | null>(null);
@@ -226,6 +272,7 @@ export default function CompareEventsPage() {
 
     setConsolidatedData(consolidated);
     setConsolidatedGuests(filteredGuests);
+    console.log(filteredGuests);
   }
 
   function addGroup() {
@@ -302,7 +349,6 @@ export default function CompareEventsPage() {
         </div>
       )}
       
-      {/*
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>Filtrar por Empresa</CardTitle>
@@ -315,66 +361,73 @@ export default function CompareEventsPage() {
           />
         </CardContent>
       </Card>
-      */}
-      <br />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {groups.map((group) => (
-        <div key={group.id}>
-          <Card>
-            <CardHeader>
-              {/*@ts-expect-error prisa */}
-              <CardTitle>{group.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Selector de grupos */}
-              <Select
-                value={group.id.toString()} // Valor preseleccionado del grupo
-                onValueChange={(value) => {
-                  const selectedGroup = groups.find((g) => g.id === Number(value));
-                  if (selectedGroup) {
-                    fetchGuestsForEventGroup(selectedGroup.eventIds, group.id);
-                  }
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un grupo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {groups.map((grp) => (
-                    <SelectItem key={grp.id} value={grp.id.toString()}>
-              {/*@ts-expect-error prisa */}
-                      {grp.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <br />
-              {/* Reporte del grupo con filtro de empresa */}
-              <EventReportTab
-                guests={group.guests.filter(
-                  (guest) =>
-                    selectedCompany === "Todas" || guest.company === selectedCompany
-                )}
-                defaultCompany={selectedCompany}
-                showCompanyFilter={false}
-              />
-              <br />
-              {/* Botón para eliminar grupo */}
-              <Button onClick={() => removeGroup(group.id)}>
-                Eliminar Grupo
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      ))}
 
-      </div>
       <br />
-      <div className="grid gap-4 mb-6">
-      <Button onClick={addGroup}>
-        Agregar Grupo
-      </Button>
-      </div>
+      {
+        selectedMacroReport == "Encuentro Enero" ? (
+          <MacroEventSummary macroReports={macroReportsEnero} defaultCompany={selectedCompany} />
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {groups.map((group) => (
+              <div key={group.id}>
+                <Card>
+                  <CardHeader>
+                    {/*@ts-expect-error prisa */}
+                    <CardTitle>{group.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {/* Selector de grupos */}
+                    <Select
+                      value={group.id.toString()} // Valor preseleccionado del grupo
+                      onValueChange={(value) => {
+                        const selectedGroup = groups.find((g) => g.id === Number(value));
+                        if (selectedGroup) {
+                          fetchGuestsForEventGroup(selectedGroup.eventIds, group.id);
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona un grupo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groups.map((grp) => (
+                          <SelectItem key={grp.id} value={grp.id.toString()}>
+                    {/*@ts-expect-error prisa */}
+                            {grp.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <br />
+                    {/* Reporte del grupo con filtro de empresa */}
+                    <EventReportTab
+                      guests={group.guests.filter(
+                        (guest) =>
+                          selectedCompany === "Todas" || guest.company === selectedCompany
+                      )}
+                      defaultCompany={selectedCompany}
+                      showCompanyFilter={false}
+                    />
+                    <br />
+                    {/* Botón para eliminar grupo */}
+                    <Button onClick={() => removeGroup(group.id)}>
+                      Eliminar Grupo
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            ))}
+            </div>
+            <br />
+            <div className="grid gap-4 mb-6">
+            <Button onClick={addGroup}>
+              Agregar Grupo
+            </Button>
+            </div>
+          </>
+          )
+            }
         <br />
       <GuestsTable guests={consolidatedGuests} />
     </div>
