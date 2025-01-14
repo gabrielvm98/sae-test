@@ -310,7 +310,10 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
                     <TableHead className="w-[150px] min-w-[150px]">Empresa</TableHead>
                     <TableHead className="w-[100px] min-w-[100px]">Registrado</TableHead>
                     <TableHead className="w-[100px] min-w-[100px]">Asistió</TableHead>
+                    { showConnectionTimeChart &&
                     <TableHead className="w-[150px] min-w-[150px]">Tiempo de Conexión</TableHead>
+                    }
+                    
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -320,7 +323,9 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
                       <TableCell>{invitado.company}</TableCell>
                       <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
                       <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
+                      { showConnectionTimeChart &&
                       <TableCell>{formatTime(invitado.virtual_session_time)}</TableCell>
+                      }
                     </TableRow>
                   ))}
                 </TableBody>

@@ -9,6 +9,7 @@ import { GuestsTable } from '@/components/ConsolidatedGuestTable';
 import { CompanySelect } from '@/components/ReportCompanySelect';
 import { Button } from "@/components/ui/button"
 import MacroEventSummary from '@/components/macroEvent/Summary';
+import * as XLSX from 'xlsx';
 
 const macroReports = [
   {
@@ -109,6 +110,13 @@ interface Guest {
   position: string;
 }
 
+type GroupSummary = {
+  name: string;
+  totalInvitados: number;
+  totalRegistrados: number;
+  totalAsistentes: number;
+};
+
 interface Group {
   id: number; // Identificador único del grupo
   eventIds: number[]; // IDs de eventos en este grupo
@@ -132,6 +140,13 @@ export default function CompareEventsPage() {
   const [consolidatedGuests, setConsolidatedGuests] = useState<Guest[]>([]);
   const [selectedMacroReport, setSelectedMacroReport] = useState<string | null>(null);
   const [groupCounter, setGroupCounter] = useState(1); // Contador para IDs únicos de grupos
+  const [macroReportData, setMacroReportData] = useState<{ [key: string]: GroupSummary[] }>({});
+
+
+  const handleSummariesChange = (summaries: { [key: string]: GroupSummary[] }) => {
+    setMacroReportData(summaries);
+  };
+
 
   useEffect(() => {
     fetchEvents();
@@ -197,6 +212,82 @@ export default function CompareEventsPage() {
 
     setCompanies(["Todas", ...Array.from(companySet).sort()]);
   }
+
+  const handleDownloadReport = () => {
+    if (!consolidatedData) {
+      console.error('No hay datos consolidados para generar el reporte.');
+      return;
+    }
+  
+    if (!macroReportData || Object.keys(macroReportData).length === 0) {
+      console.error('No hay datos del macro reporte para generar el Excel.');
+      return;
+    }
+  
+    const combinedData = [];
+  
+    // Agregar sección consolidada
+    combinedData.push(['Consolidado']); // Título
+    combinedData.push(['Metric', 'Value']); // Encabezado
+    combinedData.push(['Total Invitados', consolidatedData.totalInvitados || 0]);
+    combinedData.push(['Total Registrados', consolidatedData.totalRegistrados || 0]);
+    combinedData.push([
+      'Total Registrados %',
+      consolidatedData.totalInvitados
+        ? ((consolidatedData.totalRegistrados / consolidatedData.totalInvitados) * 100).toFixed(2) + '%'
+        : '0.00%',
+    ]);
+    combinedData.push(['Total Asistentes', consolidatedData.totalAsistentes || 0]);
+    combinedData.push([
+      'Total Asistentes %',
+      consolidatedData.totalRegistrados
+        ? ((consolidatedData.totalAsistentes / consolidatedData.totalRegistrados) * 100).toFixed(2) + '%'
+        : '0.00%',
+    ]);
+    combinedData.push([]); // Línea en blanco para separar secciones
+  
+    // Agregar datos detallados por sección
+    Object.entries(macroReportData).forEach(([reportTitle, groups]) => {
+      combinedData.push([reportTitle]); // Título de la sección
+      combinedData.push([
+        'Grupo',
+        'Total Invitados',
+        'Total Registrados',
+        '% Registrados',
+        'Total Asistentes',
+        '% Asistentes',
+      ]); // Encabezados de la tabla
+  
+      groups.forEach((group) => {
+        combinedData.push([
+          group.name,
+          group.totalInvitados || 0,
+          group.totalRegistrados || 0,
+          group.totalInvitados
+            ? ((group.totalRegistrados / group.totalInvitados) * 100).toFixed(2) + '%'
+            : '0.00%',
+          group.totalAsistentes || 0,
+          group.totalRegistrados
+            ? ((group.totalAsistentes / group.totalRegistrados) * 100).toFixed(2) + '%'
+            : '0.00%',
+        ]);
+      });
+  
+      combinedData.push([]); // Línea en blanco entre tablas
+    });
+  
+    // Crear el libro y la hoja
+    const worksheet = XLSX.utils.aoa_to_sheet(combinedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte');
+  
+    // Descargar el archivo Excel
+    XLSX.writeFile(workbook, 'reporte_encuentro_enero.xlsx');
+  };
+  
+  
+  
+  
 
   async function fetchGuestsForEventGroup(eventIds: number[], groupId: number) {
     const { data: rawGuests, error } = await supabase
@@ -316,7 +407,12 @@ export default function CompareEventsPage() {
             ))}
           </SelectContent>
         </Select>
-
+        {/* Botón para descargar reporte */}
+        {selectedMacroReport === 'Encuentro Enero' && (
+              <Button className="mt-4" onClick={handleDownloadReport}>
+                Descargar reporte
+              </Button>
+            )}
         </CardContent>
       </Card>
 
@@ -374,7 +470,7 @@ export default function CompareEventsPage() {
       <br />
       {
         selectedMacroReport == "Encuentro Enero" ? (
-          <MacroEventSummary macroReports={macroReportsEnero} defaultCompany={selectedCompany} />
+          <MacroEventSummary macroReports={macroReportsEnero} defaultCompany={selectedCompany} onSummariesChange={handleSummariesChange}/>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

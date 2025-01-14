@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { ListaDeAsistentes } from '@/components/MacroEventGuest';
+import * as XLSX from 'xlsx';
+
 interface Event {
     id: number;
     name: string;
@@ -28,6 +30,7 @@ export default function MacroReportsPage() {
     const { data: eventsData, error } = await supabase
       .from('event')
       .select('*')
+      .order('date_hour', { ascending: true })
       .eq('macro_event_id', macroEventId);
 
     if (error) {
@@ -145,6 +148,92 @@ export default function MacroReportsPage() {
     });
   };
 
+  const handleDownloadReport = () => {
+    if (!presentialEvents.length && !virtualEvents.length) {
+      console.error('No hay datos para descargar.');
+      return;
+    }
+  
+    const combinedData = [];
+  
+    // Agregar título y tabla para eventos presenciales
+    if (presentialEvents.length > 0) {
+      combinedData.push(['Eventos Presenciales']); // Título
+      combinedData.push([
+        'Evento',
+        'Invitados',
+        'Registrados',
+        '% Registrados',
+        'Asistencia',
+        '% Asistencia',
+      ]); // Encabezado
+  
+      presentialEvents.forEach((event) => {
+        const stats = eventGuestStats[event.id] || {};
+        const registeredPercentage = stats.guests
+          ? ((stats.registered / stats.guests) * 100).toFixed(2) + '%'
+          : '0.00%';
+        const assistedPercentage = stats.registered
+          ? ((stats.assisted / stats.registered) * 100).toFixed(2) + '%'
+          : '0.00%';
+  
+        combinedData.push([
+          event.name,
+          stats.guests || 0,
+          stats.registered || 0,
+          registeredPercentage,
+          stats.assisted || 0,
+          assistedPercentage,
+        ]);
+      });
+  
+      combinedData.push([]); // Línea en blanco para separar secciones
+    }
+  
+    // Agregar título y tabla para eventos virtuales
+    if (virtualEvents.length > 0) {
+      combinedData.push(['Eventos Virtuales']); // Título
+      combinedData.push([
+        'Evento',
+        'Invitados',
+        'Registrados',
+        '% Registrados',
+        'Asistencia',
+        '% Asistencia',
+      ]); // Encabezado
+  
+      virtualEvents.forEach((event) => {
+        const stats = eventGuestStats[event.id] || {};
+        const registeredPercentage = stats.guests
+          ? ((stats.registered / stats.guests) * 100).toFixed(2) + '%'
+          : '0.00%';
+        const assistedPercentage = stats.registered
+          ? ((stats.assisted / stats.registered) * 100).toFixed(2) + '%'
+          : '0.00%';
+  
+        combinedData.push([
+          event.name,
+          stats.guests || 0,
+          stats.registered || 0,
+          registeredPercentage,
+          stats.assisted || 0,
+          assistedPercentage,
+        ]);
+      });
+  
+      combinedData.push([]); // Línea en blanco para separar secciones
+    }
+  
+    // Crear la hoja de Excel
+    const worksheet = XLSX.utils.aoa_to_sheet(combinedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reporte Eventos');
+  
+    // Descargar el archivo
+    XLSX.writeFile(workbook, 'reporte_eventos.xlsx');
+  };
+
+
     // @ts-expect-error prisa
   const renderEventTable = (events, title) => (
     <div>
@@ -192,7 +281,12 @@ export default function MacroReportsPage() {
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-bold">Reportes Macro</h1>
-
+      <button
+        onClick={handleDownloadReport}
+        className="px-4 py-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        Descargar Reporte
+      </button>
       {status && <p className="mt-2 text-sm text-gray-700">{status}</p>}
 
       {renderEventTable(presentialEvents, "Eventos Presenciales")}

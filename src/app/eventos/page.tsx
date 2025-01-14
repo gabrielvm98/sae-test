@@ -31,6 +31,8 @@ export default function EventosPage() {
       query = query.ilike('name', `%${searchQuery}%`)
     }
 
+    query = query.order('date_hour', { ascending: true });
+
     const { data, error } = await query
 
     if (error) {

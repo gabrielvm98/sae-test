@@ -28,6 +28,7 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     const { data: eventsData, error: eventsError } = await supabase
       .from('event')
       .select('id, name')
+      .order('date_hour', { ascending: true })
       .in('id', eventIds);
 
     if (eventsError) {
@@ -62,10 +63,6 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     guestsData.forEach((guest) => {
       const event = eventsData.find((e) => e.id === guest.event_id);
       if (!event) return;
-
-      if (guest.email === 'mfedalto@hotmail.com') {
-        console.log('guest', guest);
-      }
 
       if (!attendeesMap[guest.email]) {
         attendeesMap[guest.email] = {

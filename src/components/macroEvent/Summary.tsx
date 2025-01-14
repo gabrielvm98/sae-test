@@ -29,7 +29,15 @@ type GroupSummary = {
   totalAsistentes: number;
 };
 
-export default function MacroEventSummary({ macroReports, defaultCompany }: { macroReports: MacroReport[], defaultCompany: string }) {
+export default function MacroEventSummary({
+  macroReports,
+  defaultCompany,
+  onSummariesChange,
+}: {
+  macroReports: MacroReport[];
+  defaultCompany: string;
+  onSummariesChange: (summaries: { [key: string]: GroupSummary[] }) => void;
+}) {
   const [summaries, setSummaries] = useState<{ [key: string]: GroupSummary[] }>({});
 
   useEffect(() => {
@@ -80,6 +88,7 @@ export default function MacroEventSummary({ macroReports, defaultCompany }: { ma
         }
 
         newSummaries[report.name] = groupSummaries;
+        onSummariesChange(newSummaries);
       }
 
       setSummaries(newSummaries);
