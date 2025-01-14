@@ -45,7 +45,7 @@ export function GuestsTable({ guests }: { guests: any[] }) {
           <div className="flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0 sm:space-x-4 mb-4">
             <Input
               type="text"
-              placeholder="Buscar invitados..."
+              placeholder="Buscar por invitado o empresa..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full sm:max-w-xs"

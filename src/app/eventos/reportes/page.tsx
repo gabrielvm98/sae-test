@@ -135,6 +135,9 @@ export default function CompareEventsPage() {
 
   useEffect(() => {
     fetchEvents();
+    const params = new URLSearchParams(window.location.search);
+    const macroReportParam = params.get('macroReport');
+    setSelectedMacroReport(macroReportParam || null);
   }, []);
 
   useEffect(() => {
@@ -152,6 +155,11 @@ export default function CompareEventsPage() {
           fetchGuestsForEventGroup(group.eventIds, group.id)
         );
       }
+      
+      const params = new URLSearchParams(window.location.search);
+      params.set('macroReport', selectedMacroReport);
+      window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+      
     }
   }, [selectedMacroReport]);
   
@@ -296,18 +304,19 @@ export default function CompareEventsPage() {
           <CardTitle>Seleccionar Macro Reporte</CardTitle>
         </CardHeader>
         <CardContent>
-          <Select onValueChange={setSelectedMacroReport}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona un macro reporte" />
-            </SelectTrigger>
-            <SelectContent>
-              {macroReports.map((report) => (
-                <SelectItem key={report.name} value={report.name}>
-                  {report.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <Select value={selectedMacroReport || ''} onValueChange={setSelectedMacroReport}>
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona un macro reporte" />
+          </SelectTrigger>
+          <SelectContent>
+            {macroReports.map((report) => (
+              <SelectItem key={report.name} value={report.name}>
+                {report.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         </CardContent>
       </Card>
 
