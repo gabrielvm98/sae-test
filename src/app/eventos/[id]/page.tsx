@@ -85,7 +85,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           name: guest.is_user
           ? `${guest.executive?.name} ${guest.executive?.last_name || ''}`.trim()
           : guest.name,
+          company: guest.company_razon_social,
           registered: guest.registered === null ? false : guest.registered,
+          assisted: guest.assisted === null ? false : guest.assisted,
           registration_link: `https://sae-register.vercel.app/${encodeURIComponent(guest.email)}`
         }));
   
