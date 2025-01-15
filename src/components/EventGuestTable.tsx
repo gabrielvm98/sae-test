@@ -29,6 +29,8 @@ type EventGuest = {
   substitute_name: string | null
   substitute_email: string | null
   virtual_session_time: number | null
+  tipo_usuario: string | null
+  tipo_membresia: string | null
   registered: boolean
   assisted: boolean
   position: string | null
@@ -257,10 +259,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
             <TableHead>Nombre</TableHead>
             <TableHead>Empresa</TableHead>
             <TableHead>Cargo</TableHead>
-            <TableHead>Email</TableHead>
             <TableHead>Email del evento</TableHead>
-            <TableHead>Teléfono</TableHead>
-            <TableHead>Interno/Externo</TableHead>
+            <TableHead>Tipo de usuario</TableHead>
+            <TableHead>Tipo de membresía</TableHead>
             <TableHead>Registrado</TableHead>
             <TableHead>Asistió</TableHead>
             <TableHead>Tiempo en sesión virtual</TableHead>
@@ -287,10 +288,9 @@ export function EventGuestTable({ eventId }: { eventId: number }) {
                     ? guest.executive?.position ?? '' 
                     : guest.position ?? ''}
                 </TableCell>
-                <TableCell>{guest.is_user ? guest.executive?.email : guest.email}</TableCell>
                 <TableCell>{guest.email}</TableCell>
-                <TableCell>{guest.is_user ? guest.executive?.office_phone : guest.phone}</TableCell>
-                <TableCell>{guest.is_user ? 'Interno' : 'Externo'}</TableCell>
+                <TableCell>{guest.tipo_usuario || ''}</TableCell>
+                <TableCell>{guest.tipo_membresia || ''}</TableCell>
                 <TableCell>{guest.registered ? 'Sí' : 'No'}</TableCell>
                 <TableCell>{guest.assisted ? 'Sí' : 'No'}</TableCell>
                 <TableCell>{guest.virtual_session_time || 'N/A'}</TableCell>

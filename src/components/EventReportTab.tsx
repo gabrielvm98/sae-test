@@ -21,6 +21,8 @@ type SupabaseGuest = {
   assisted: boolean
   is_client_company: boolean
   position: string | null
+  tipo_usuario: string | null
+  tipo_membresia: string | null
   executive?: {
     name: string
     last_name: string
@@ -39,6 +41,8 @@ type ReportGuest = {
   registered: boolean
   assisted: boolean
   virtual_session_time: number
+  tipo_usuario: string
+  tipo_membresia: string
 }
 
 type EventData = {
@@ -95,6 +99,8 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
         assisted,
         position,
         is_client_company,
+        tipo_usuario,
+        tipo_membresia,
         executive:executive_id (name, last_name, position),
         company:company_id (razon_social)
       `)
@@ -122,7 +128,9 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
       company: guest.is_client_company && guest.company ? guest.company.razon_social : guest.company_razon_social || '',
       registered: guest.registered,
       assisted: guest.assisted,
-      virtual_session_time: guest.virtual_session_time || 0
+      virtual_session_time: guest.virtual_session_time || 0,
+      tipo_usuario: guest.tipo_usuario || '',
+      tipo_membresia: guest.tipo_membresia || '',
     }))
 
     setEventData({
@@ -308,6 +316,8 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
                   <TableRow>
                     <TableHead className="w-[150px] min-w-[150px]">Nombre</TableHead>
                     <TableHead className="w-[150px] min-w-[150px]">Empresa</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Tipo de usuario</TableHead>
+                    <TableHead className="w-[100px] min-w-[100px]">Tipo de membresía</TableHead>
                     <TableHead className="w-[100px] min-w-[100px]">Registrado</TableHead>
                     <TableHead className="w-[100px] min-w-[100px]">Asistió</TableHead>
                     { showConnectionTimeChart &&
@@ -321,6 +331,8 @@ export function EventReportTab({ eventId, defaultCompany = "Todas", showCompanyF
                     <TableRow key={index}>
                       <TableCell>{invitado.name}</TableCell>
                       <TableCell>{invitado.company}</TableCell>
+                      <TableCell>{invitado.tipo_usuario}</TableCell>
+                      <TableCell>{invitado.tipo_membresia}</TableCell>
                       <TableCell>{invitado.registered ? 'Sí' : 'No'}</TableCell>
                       <TableCell>{invitado.assisted ? 'Sí' : 'No'}</TableCell>
                       { showConnectionTimeChart &&
