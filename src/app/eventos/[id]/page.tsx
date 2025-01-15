@@ -14,6 +14,7 @@ import { EventReportTab } from '@/components/EventReportTab'
 import { ScanQRTab } from '@/components/ScanGuests'
 import { useSearchParams } from 'next/navigation'
 import * as XLSX from 'xlsx'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 type Event = {
   id: number
@@ -132,26 +133,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       </div>
       
       <Tabs defaultValue={defaultTab} className="w-full">
-      <TabsList className="sm:hidden flex gap-2 overflow-x-auto scrollbar-hide w-full">
-        <TabsTrigger value="invitados" className="flex-shrink-0 text-sm px-4 py-2">
-          Invitados
-        </TabsTrigger>
-        <TabsTrigger value="importar-usuarios" className="flex-shrink-0 text-sm px-4 py-2">
-          Importar Usuarios
-        </TabsTrigger>
-        <TabsTrigger value="importar-externos" className="flex-shrink-0 text-sm px-4 py-2">
-          Importar Externos
-        </TabsTrigger>
-        <TabsTrigger value="subir-asistencia" className="flex-shrink-0 text-sm px-4 py-2">
-          Subir Asistencia Zoom
-        </TabsTrigger>
-        <TabsTrigger value="escanear-qr" className="flex-shrink-0 text-sm px-4 py-2">
-          Escanear QR
-        </TabsTrigger>
-        <TabsTrigger value="reporte" className="flex-shrink-0 text-sm px-4 py-2">
-          Reporte
-        </TabsTrigger>
-      </TabsList>
+        
+
+
+      <div className="sm:hidden mb-6">
+        <Select value={defaultTab} onValueChange={(value) => window.location.search = `?tab=${value}`}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Selecciona una sección" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="invitados">Invitados</SelectItem>
+            <SelectItem value="importar-usuarios">Importar Usuarios</SelectItem>
+            <SelectItem value="importar-externos">Importar Externos</SelectItem>
+            <SelectItem value="subir-asistencia">Subir Asistencia Zoom</SelectItem>
+            <SelectItem value="escanear-qr">Escanear QR</SelectItem>
+            <SelectItem value="reporte">Reporte</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <TabsList className="hidden sm:grid w-full grid-cols-6">
         <TabsTrigger value="invitados">Invitados</TabsTrigger>
         <TabsTrigger value="importar-usuarios">Importar Usuarios</TabsTrigger>

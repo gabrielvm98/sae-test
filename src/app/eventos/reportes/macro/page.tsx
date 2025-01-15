@@ -238,8 +238,9 @@ export default function MacroReportsPage() {
   const renderEventTable = (events, title) => (
     <div>
       <h2 className="text-lg font-bold">{title}</h2>
-      <table className="table-auto border-collapse border border-gray-200 w-full">
-        <thead>
+      <div className="overflow-x-auto">
+      <table className="table-auto border-collapse border border-gray-200 w-full text-sm md:text-base">
+      <thead>
           <tr>
             <th className="border border-gray-300 px-4 py-2">Evento</th>
             <th className="border border-gray-300 px-4 py-2">Invitados</th>
@@ -275,17 +276,18 @@ export default function MacroReportsPage() {
           </tr>
         </tfoot>
       </table>
+      </div>
     </div>
   );
 
   return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-bold">Reportes Macro</h1>
+    <div className="p-4 space-y-4 max-w-7xl mx-auto">
+      <h1 className="text-xl font-bold">Seguimiento de registro</h1>
       <button
         onClick={handleDownloadReport}
         className="px-4 py-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
-        Descargar Reporte
+        Descargar Seguimiento
       </button>
       {status && <p className="mt-2 text-sm text-gray-700">{status}</p>}
 

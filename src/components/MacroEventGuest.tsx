@@ -127,8 +127,8 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
     <div>
       <h2 className="text-lg font-bold">Lista de Asistentes</h2>
 
-      <div className="mb-4">
-        <label className="mr-2">Filtrar:</label>
+      <div className="mb-4 flex flex-wrap gap-4">
+      <label className="mr-2">Filtrar:</label>
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value as 'all' | 'multiple' | 'none')}
@@ -174,44 +174,58 @@ export function ListaDeAsistentes({ eventIds }: { eventIds: number[] }) {
           Descargar Excel
         </button>
       </div>
+      <div className="overflow-x-auto">
+      <table className="table-auto border-collapse border border-gray-200 w-full text-sm md:text-base">
+      <thead>
+        <tr>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Email</th>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Tipo de Usuario</th>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Tipo de Membresía</th>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Reemplazo</th>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Reemplaza a</th>
+          <th className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">Link de registro</th>
+          {events.map((event) => (
+            <th
+              key={event.id}
+              className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2"
+            >
+              {event.name}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {filteredAttendees.map(([email, details]) => (
+          <tr key={email}>
+            <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">{email}</td>
+            <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">{details.tipo_usuario}</td>
+            <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">{details.tipo_membresia}</td>
+                        <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2 w-[80px] max-w-[80px] overflow-hidden text-ellipsis break-words">
+              {details.reemplaza_a_correo}
+            </td>
+            <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2 w-[80px] max-w-[80px] overflow-hidden text-ellipsis break-words">
+              {details.reemplazo_correo}
+            </td>
 
-      <table className="table-auto border-collapse border border-gray-200 w-full">
-        <thead>
-          <tr>
-            <th className="border border-gray-300 px-4 py-2">Email</th>
-            <th className="border border-gray-300 px-4 py-2">Tipo de Usuario</th>
-            <th className="border border-gray-300 px-4 py-2">Tipo de Membresía</th>
-            <th className="border border-gray-300 px-4 py-2">Reemplazo</th>
-            <th className="border border-gray-300 px-4 py-2">Reemplaza a</th>
-            <th className="border border-gray-300 px-4 py-2">Link de registro</th>
+            <td className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2">
+              <a href={details.registro_link} target="_blank" className="text-blue-500 underline">
+                Link
+              </a>
+            </td>
             {events.map((event) => (
-              <th key={event.id} className="border border-gray-300 px-4 py-2">
-                {event.name}
-              </th>
+              <td
+                key={event.id}
+                className="border border-gray-300 px-2 py-1 text-xs sm:px-4 sm:py-2 text-center"
+              >
+                {details[event.name] ? 'Sí' : 'No'}
+              </td>
             ))}
           </tr>
-        </thead>
-        <tbody>
-          {filteredAttendees.map(([email, details]) => (
-            <tr key={email}>
-              <td className="border border-gray-300 px-4 py-2">{email}</td>
-              <td className="border border-gray-300 px-4 py-2">{details.tipo_usuario}</td>
-              <td className="border border-gray-300 px-4 py-2">{details.tipo_membresia}</td>
-              <td className="border border-gray-300 px-4 py-2">{details.reemplaza_a_correo}</td>
-              <td className="border border-gray-300 px-4 py-2">{details.reemplazo_correo}</td>
-              <td className="border border-gray-300 px-4 py-2"><a href={details.registro_link} target='_blank'>Link</a></td>
-              {events.map((event) => (
-                <td
-                  key={event.id}
-                  className="border border-gray-300 px-4 py-2"
-                >
-                  {details[event.name] ? 'Sí' : 'No'}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
+        ))}
+      </tbody>
+
       </table>
+      </div>
     </div>
   );
 }

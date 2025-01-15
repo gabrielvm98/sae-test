@@ -108,7 +108,7 @@ export default function MacroEventSummary({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre del Grupo</TableHead>
+                  <TableHead>Evento</TableHead>
                   <TableHead>Invitados</TableHead>
                   <TableHead>Registrados</TableHead>
                   <TableHead>Asistentes</TableHead>
