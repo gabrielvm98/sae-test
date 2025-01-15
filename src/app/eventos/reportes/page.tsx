@@ -29,6 +29,7 @@ const macroReports = [
       { id: 5, name: "Jueves 16 almuerzo", eventIds: [62] },
     ],
   },
+  /*
   {
     name: "Encuentro Enero por evento",
     groups: [
@@ -57,10 +58,11 @@ const macroReports = [
   {
     name: "Encuentro Enero por turno",
     groups: [
-      { id: 1, name: "Mañana", eventIds: [53, 61, 62] },
-      { id: 2, name: "Tarde", eventIds: [60, 55] },
+      { id: 1, name: "Mañana", eventIds: [60, 55] },
+      { id: 2, name: "Tarde", eventIds: [53, 61, 62] },
     ],
   },
+  */
 ];
 
 const macroReportsEnero = [
@@ -92,8 +94,8 @@ const macroReportsEnero = [
   {
     name: "Encuentro Enero por turno",
     groups: [
-      { id: 1, name: "Mañana", eventIds: [53, 61, 62] },
-      { id: 2, name: "Tarde", eventIds: [60, 55] },
+      { id: 1, name: "Mañana", eventIds: [60, 55] },
+      { id: 2, name: "Tarde", eventIds: [53, 61, 62] },
     ],
   },
 ];
