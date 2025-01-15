@@ -43,19 +43,20 @@ export default function RegisterGuestsPage() {
     Papa.parse(csvFile, {
       header: true,
       complete: async (result) => {
-        const rows = result.data as { correo: string}[];
+        const rows = result.data as { email: string}[];
         const updates = [];
 
         for (const row of rows) {
           try {
             const { error: updateError } = await supabase
               .from('event_guest')
-              .update({ tipo_usuario: "Free trial", tipo_membresia: "Free trial" })
-              .eq('email', row.correo);
-              console.log('Actualizando:', row.correo);
+              .update({ assisted: true })
+              .eq('email', row.email)
+              .eq('event_id', 53);
 
+            console.log(`Actualizando: ${row.email}`);
             if (updateError) {
-              console.error(`Error actualizando: ${row.correo}`, updateError);
+              console.error(`Error actualizando: ${row.email}`, updateError);
               continue;
             }
 

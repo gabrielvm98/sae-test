@@ -61,22 +61,37 @@ export function ScanQRTab({ eventId }: ScanQRTabProps) {
 
       }
       else if (prefix ==='E'){
+        const { data: guestData, error: fetchError } = await supabase
+        .from("event_guest")
+        .select("email")
+        .eq("id", id)
+        .single();
 
-        const { error } = await supabase
-        .from('event_guest')
+      if (fetchError) {
+        console.error("Error fetching external guest email:", fetchError);
+        return;
+      }
+
+      const guestEmail = guestData?.email;
+      if (!guestEmail) {
+        console.error("No email found for external guest with ID:", id);
+        return;
+      }
+
+      // Actualizar asistencia por email
+      const { error: updateError } = await supabase
+        .from("event_guest")
         .update({ assisted: true })
-        .eq('event_id', eventId)
-        .eq('id',id)
-      
-        if (error) {
-          console.error('Error fetching guests:', error)
-          return
-        }
+        .eq("event_id", eventId)
+        .eq("email", guestEmail);
 
+      if (updateError) {
+        console.error("Error updating external guest by email:", updateError);
+        return;
       }
-      else {
-        console.log('Guest not found for scanned QR code.');
-      }
+    } else {
+      console.log("Invalid QR code prefix or guest not found.");
+    }
     }
   }
 
