@@ -173,7 +173,7 @@ export function UploadZoomAttendance({ eventId }: { eventId: number }) {
         .from('event_guest')
         .select('id, email, is_user')
         .eq('event_id', eventId)
-        .or(`email.in.(${emails.join(',')})`)
+        .in('email', emails);
   
       if (error) {
         console.error('Error al obtener invitados:', error);
